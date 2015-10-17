@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/shaders">
+        <file alias="HeightMap">HeightMap.frag</file>
+    </qresource>
+    <qresource prefix="/test">
+        <file alias="depth">depth.jpg</file>
+    </qresource>
+</RCC>
