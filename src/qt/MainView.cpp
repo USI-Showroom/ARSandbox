@@ -32,9 +32,10 @@ void MainView::paintGL()
     double size=1;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
+	glLoadIdentity();
 
     glEnable(GL_TEXTURE_2D); 
-    glActiveTexture(GL_TEXTURE0);
+//    glActiveTexture(GL_TEXTURE0);
     QOpenGLTexture texture(QOpenGLTexture::Target2D);
     texture.setData(QImage(":/test/depth"));
     texture.bind(0);

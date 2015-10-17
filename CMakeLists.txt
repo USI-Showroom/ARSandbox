@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ARSandBox)
 
+
+IF(WIN32)
+	SET(CMAKE_PREFIX_PATH "C:\\Qt\\5.5\\msvc2013")
+ENDIF()
+
 ###########################
 # Sources
 file(GLOB_RECURSE ARSANDBOX_SOURCES "src/*.cpp")
