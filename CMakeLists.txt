@@ -16,7 +16,7 @@ file(GLOB_RECURSE ARSANDBOX_UIS "src/qt/*.ui")
 file(GLOB_RECURSE ARSANDBOX_RESOURCES "src/resource/*.qrc")
 
 SET(ARSANDBOX_MAIN "src/main.cpp")
-SET(ARSANDBOX_INCLUDE "src" "src/qt")
+SET(ARSANDBOX_INCLUDE "src" "src/qt" "src/kinect")
 #########################
 
 

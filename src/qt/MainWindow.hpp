@@ -4,6 +4,8 @@
 #include <vector>
 #include <QMainWindow>
 
+#include "KinectComunicator.hpp"
+
 namespace Ui {
     class MainWindow;
 }
@@ -19,6 +21,7 @@ public:
 
 private:
     Ui::MainWindow* _ui;
+    KinectComunicator _kinectCommunicator;
 };
 
 
