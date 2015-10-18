@@ -1,9 +1,10 @@
 #ifdef WIN32
 #include "KinectManager.hpp"
 
+#include <iostream>
 
 KinectManager::KinectManager(IKinectProcessor *processor)
-: IKinectManager(processor), _kinectSensor(NULL), _depthFrameReader(NULL),
+: IKinectManager(processor), _kinectSensor(NULL), _depthFrameReader(NULL)
 { }
 
 KinectManager::~KinectManager()
@@ -29,7 +30,7 @@ void KinectManager::update()
 
     if (SUCCEEDED(hr))
     {
-        int time = 0;
+		INT64 time = 0;
         IFrameDescription* frameDescription = NULL;
         int width = 0;
         int height = 0;
@@ -61,7 +62,7 @@ void KinectManager::update()
         if (SUCCEEDED(hr)) hr = depthFrame->AccessUnderlyingBuffer(&bufferSize, &buffer);            
         
         if (SUCCEEDED(hr))
-            processor->processDepth(time, buffer, width, height, depthMinReliableDistance, depthMaxDistance);
+            _processor->processDepth(time, buffer, width, height, depthMinReliableDistance, depthMaxDistance);
 
         SafeRelease(frameDescription);
     }
