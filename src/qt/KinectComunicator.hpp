@@ -17,13 +17,13 @@ public:
 
     void initialize();
 
-    virtual void processDepth(INT64 time, const UINT16* buffer, int height, int width, USHORT minDepth, USHORT maxDepth);
+	virtual void processDepth(INT64 time, const UINT16* buffer, int width, int height, USHORT minDepth, USHORT maxDepth);
 
     private slots:
     void updateKinectManager();
 
 signals:
-    void newData(const UINT16 *buffer);
+	void newData(const UINT16 *buffer, int w, int h);
 private:
     IKinectManager *_manager;
     QTimer *_kinectTimer;

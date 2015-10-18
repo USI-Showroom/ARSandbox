@@ -44,8 +44,7 @@ void KinectComunicator::updateKinectManager()
     _manager->update();
 }
 
-void KinectComunicator::processDepth(INT64 time, const UINT16* buffer, int height, int width, USHORT minDepth, USHORT maxDepth)
+void KinectComunicator::processDepth(INT64 time, const UINT16* buffer, int width, int height, USHORT minDepth, USHORT maxDepth)
 {
-    std::cout<<"asd"<<std::endl;
-    emit newData(buffer);
+    emit newData(buffer,width,height);
 }
