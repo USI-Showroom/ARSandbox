@@ -1,7 +1,7 @@
 #include <QGLWidget>
 #include <QPaintEvent>
 #include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
+//#include <QOpenGLTexture>
 
 class MainView : public QGLWidget
 {
@@ -22,5 +22,6 @@ protected:
 
 private:
 	QOpenGLShaderProgram _shader;
-	QOpenGLTexture _texture;
+	//QOpenGLTexture _texture;
+	GLuint _txt;
 };

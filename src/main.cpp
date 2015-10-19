@@ -10,9 +10,8 @@ int main(int argc, char *argv[])
     QFont f=QApplication::font();
     f.setFamily("Helvetica");
     QApplication::setFont(f);
+	a.setAttribute(Qt::AA_UseHighDpiPixmaps);
     
-    
-    a.setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     MainWindow w;
     w.show();
