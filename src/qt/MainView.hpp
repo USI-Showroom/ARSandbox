@@ -1,7 +1,8 @@
 #include <QGLWidget>
 #include <QPaintEvent>
 #include <QOpenGLShaderProgram>
-//#include <QOpenGLTexture>
+
+#include "IKinectProcessor.hpp"
 
 class MainView : public QGLWidget
 {
@@ -15,6 +16,8 @@ public:
 public slots:
 void newKinectData(const UINT16 *data, int w, int h);
 
+private:
+    void checkGLError();
 
 protected:
 	void paintGL();
