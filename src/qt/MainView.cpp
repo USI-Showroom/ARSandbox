@@ -49,20 +49,11 @@ void MainView::initializeGL() {
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
 {
-/*_texture.destroy();
-_texture.setSize(w, h);
-_texture.setFormat(QOpenGLTexture::R16U);
-_texture.allocateStorage(QOpenGLTexture::Red_Integer, QOpenGLTexture::UInt16);
-
-_texture.bind();
-_texture.setData(QOpenGLTexture::Red_Integer, QOpenGLTexture::UInt16, data);
-_texture.generateMipMaps();
-_texture.create();*/
 
 if(_txt>0)
     glDeleteTextures(1, &_txt);
 
-glActiveTexture(GL_TEXTURE0);
+//glActiveTexture(GL_TEXTURE0);
 
 glGenTextures(1, &_txt);
 glBindTexture(GL_TEXTURE_2D, _txt);
@@ -70,35 +61,11 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-// glGenerateMipmap(GL_TEXTURE_2D);
-
 checkGLError();
 glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, data);
-
-
-/*uchar *datac = new uchar[w*h];
-
-for (int i = 0; i < w*h; ++i){
-USHORT depth = data[i];
-BYTE intensity = static_cast<BYTE>((depth >= 100) && (depth <= 4500) ? (depth % 256) : 0);
-datac[i] = intensity;
-}
-
-
-QImage tmp(datac, w, h, QImage::Format_Grayscale8);
-_texture.destroy();
-_texture.setData(tmp);
-
-delete[] datac;*/
-
-
-
-
 checkGLError();
-paintGL();
+
+update();
 
 checkGLError();
 }
@@ -125,8 +92,9 @@ void MainView::paintGL()
 
     glEnable(GL_TEXTURE_2D);
 
-    glActiveTexture(GL_TEXTURE0);
-    if (_txt > 0)
+    //glActiveTexture(GL_TEXTURE0);
+    
+	if (_txt > 0)
         glBindTexture(GL_TEXTURE_2D, _txt);
 
     _shader.bind();

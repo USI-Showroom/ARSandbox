@@ -6,15 +6,16 @@
 
 #ifdef WIN32
 #include "KinectManager.hpp"
-#else
-#include "FakeKinectManager.hpp"
 #endif
+#include "FakeKinectManager.hpp"
+
 
 KinectComunicator::KinectComunicator()
 : _manager(NULL), _kinectTimer(NULL)
 {
 #ifdef WIN32
     _manager=new KinectManager(this);
+	//_manager=new FakeKinectManager(this);
 #else
     _manager=new FakeKinectManager(this);
 #endif

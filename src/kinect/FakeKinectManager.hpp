@@ -1,22 +1,22 @@
-#ifndef __KINECT_MANAGER_H__
-#define __KINECT_MANAGER_H__
+#ifndef __FAKE_KINECT_MANAGER_H__
+#define __FAKE_KINECT_MANAGER_H__
 
 #include "IKinectManager.hpp"
 
 class FakeKinectManager : public IKinectManager
 {
 public:
-    FakeKinectManager(IKinectProcessor *processor)
-    : IKinectManager(processor)
-    { 
-        _w=300;
-        _h=150;
-        _data=new UINT16[_w*_h];
-        _count=0;
+	FakeKinectManager(IKinectProcessor *processor)
+		: IKinectManager(processor)
+	{
+		_w = 300;
+		_h = 150;
+		_data = new UINT16[_w*_h];
+		_count = 0;
 
-        for (int i = 0; i < _w*_h; ++i)
-            _data[i]=i%2;
-    }
+		for (int i = 0; i < _w*_h; ++i)
+			_data[i] = i;
+	}
 
     virtual ~FakeKinectManager() { 
         delete[] _data;
@@ -36,4 +36,4 @@ private:
     int _w, _h;
     UINT16 *_data;
 };
-#endif //__KINECT_MANAGER_H__
+#endif //__FAKE_KINECT_MANAGER_H__

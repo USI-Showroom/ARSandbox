@@ -1,14 +1,14 @@
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QPaintEvent>
 #include <QOpenGLShaderProgram>
 
 #include "IKinectProcessor.hpp"
 
-class MainView : public QGLWidget
+class MainView : public QOpenGLWidget
 {
 	Q_OBJECT
 private:
-	typedef QGLWidget super;
+	typedef QOpenGLWidget  super;
 public:
 	MainView(QWidget *parent = NULL);
 	~MainView();
