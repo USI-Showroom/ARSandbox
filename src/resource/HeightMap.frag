@@ -1,8 +1,12 @@
-#version 130
-// #extension GL_EXT_gpu_shader4 : enable
-// uniform usampler2D tex1;
+#define NO_KINECT
 
+#ifndef NO_KINECT
+#version 130
+#extension GL_EXT_gpu_shader4 : enable
+uniform usampler2D height;
+#else
 uniform sampler2D height;
+#endif
 
 uniform sampler2D level0;
 uniform sampler2D level1;
@@ -56,12 +60,16 @@ float weight(float heightV, int region)
 
 void main()
 {
+#ifdef NO_KINECT
 	vec4 heightTxt = texture2D(height, gl_TexCoord[0].xy);
-    // uvec4 heightTxt = texture2D(tex1, gl_TexCoord[0].xy);
+#else
+    uvec4 heightTxt = texture2D(height, gl_TexCoord[0].xy);
+#endif
 
     float heightV=heightTxt.r;
-    // height=float(mod(height,256.0))/256.0;
-
+#ifndef NO_KINECT
+    heightV=float(mod(heightV,256.0))/256.0;
+#endif
     
     vec4 level0Txt = texture2D(level0, gl_TexCoord[1].xy);
     vec4 level1Txt = texture2D(level1, gl_TexCoord[1].xy);
