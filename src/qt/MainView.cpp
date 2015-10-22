@@ -180,16 +180,20 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    glTexCoord2f(0,0);
+    glMultiTexCoord2f(GL_TEXTURE0,0,0);
+    glMultiTexCoord2f(GL_TEXTURE1,0,0);
     glVertex2d(-size,-size);
 
-    glTexCoord2f(0,1);
+    glMultiTexCoord2f(GL_TEXTURE0,0,1);
+    glMultiTexCoord2f(GL_TEXTURE1,0,10);
     glVertex2d(-size,size);
 
-    glTexCoord2f(1,1);
+    glMultiTexCoord2f(GL_TEXTURE0,1,1);
+    glMultiTexCoord2f(GL_TEXTURE1,10,10);
     glVertex2d(size,size);
 
-    glTexCoord2f(1,0);
+    glMultiTexCoord2f(GL_TEXTURE0,1,0);
+    glMultiTexCoord2f(GL_TEXTURE1,10,0);
     glVertex2d(size,-size);
 
     glEnd();
