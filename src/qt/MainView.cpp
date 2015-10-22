@@ -3,6 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <gl\gl.h>
+#include <gl\GLU.h>
 #endif
 #include <QGLWidget>
 #include <iostream>
@@ -35,7 +36,7 @@ void MainView::setUniforms()
     GLuint level2T = _shader.uniformLocation("level2");
     GLuint level3T = _shader.uniformLocation("level3");
     GLuint level4T = _shader.uniformLocation("level4");
-
+	
     _shader.setUniformValue(heightT,0);
 
     _shader.setUniformValue(level0T,1);
@@ -43,6 +44,8 @@ void MainView::setUniforms()
     _shader.setUniformValue(level2T,3);
     _shader.setUniformValue(level3T,4);
     _shader.setUniformValue(level4T,5);
+
+	checkGLError();
 }
 
 void MainView::initializeGL() {
@@ -68,23 +71,20 @@ void MainView::initializeGL() {
 
     _shader.link();
 
-    setUniforms();
-
-
-    _shader.bind();
-
-
-    int M, m;
+	int M, m, maxTxt;
 
     glDisable(GL_BLEND);
 
     glGetIntegerv(GL_MAJOR_VERSION, &M);
     glGetIntegerv(GL_MINOR_VERSION, &m);
 
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTxt);
+
     std::cout << "OpenGL version " << M << "." << m<<std::endl;
 
-    std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GLSL version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "GLSL version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	std::cout << "Max textures " << maxTxt << std::endl;
 
     createTexture(":/terrain/level0",_level0);
     createTexture(":/terrain/level1",_level1);
@@ -92,17 +92,20 @@ void MainView::initializeGL() {
     createTexture(":/terrain/level3",_level3);
     createTexture(":/terrain/level4",_level4);
 
+	_funs.initializeOpenGLFunctions();
+	_funs2.initializeOpenGLFunctions();
+
     checkGLError();
 }
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
 {
-
     if(_txt>0)
         glDeleteTextures(1, &_txt);
 
 #ifdef WIN32
-    glGenTextures(1, &_txt);
+#ifndef NO_KINECT
+	glGenTextures(1, &_txt);
     glBindTexture(GL_TEXTURE_2D, _txt);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -111,13 +114,14 @@ void MainView::newKinectData(const UINT16 *data, int w, int h)
     checkGLError();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, data);
 #else
+	createTexture(":/test/depth", _txt);
+#endif
+#else
     createTexture(":/test/depth",_txt);
 #endif
     checkGLError();
 
     update();
-
-    checkGLError();
 }
 
 void MainView::checkGLError()
@@ -143,9 +147,29 @@ void MainView::createTexture(const QString &path, GLuint &txtId)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
 }
 
+void MainView::activeTexture(GLenum texture)
+{
+#ifdef WIN32
+	_funs.glActiveTexture(texture);
+#else
+	glActiveTexture(texture);
+#endif
+}
+
+
+void MainView::textureCoords(GLenum texture, float u, float v)
+{
+#ifdef WIN32
+	_funs2.glMultiTexCoord2f(texture,u,v);
+#else
+	glMultiTexCoord2f(texture,u,v);
+#endif
+}
+
 void MainView::paintGL()
 {
-    double size=1;
+	static double textSize = 2;
+    static double size=1;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_BLEND);
@@ -155,45 +179,45 @@ void MainView::paintGL()
 
     glEnable(GL_TEXTURE_2D);
 
+	_shader.bind();
     setUniforms();
-    _shader.bind();
     
-    glActiveTexture(GL_TEXTURE0);
+	activeTexture(GL_TEXTURE0);
     if (_txt > 0)
         glBindTexture(GL_TEXTURE_2D, _txt);
 
 
-    glActiveTexture(GL_TEXTURE1);
+	activeTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _level0);
 
-    glActiveTexture(GL_TEXTURE2);
+	activeTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, _level1);
 
-    glActiveTexture(GL_TEXTURE3);
+	activeTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, _level2);
 
-    glActiveTexture(GL_TEXTURE4);
+	activeTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, _level3);
 
-    glActiveTexture(GL_TEXTURE5);
+	activeTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, _level4);
 
     glBegin(GL_QUADS);
 
-    glMultiTexCoord2f(GL_TEXTURE0,0,0);
-    glMultiTexCoord2f(GL_TEXTURE1,0,0);
+	textureCoords(GL_TEXTURE0, 0, 0);
+	textureCoords(GL_TEXTURE1, 0, 0);
     glVertex2d(-size,-size);
 
-    glMultiTexCoord2f(GL_TEXTURE0,0,1);
-    glMultiTexCoord2f(GL_TEXTURE1,0,10);
+	textureCoords(GL_TEXTURE0, 0, 1);
+	textureCoords(GL_TEXTURE1, 0, textSize);
     glVertex2d(-size,size);
 
-    glMultiTexCoord2f(GL_TEXTURE0,1,1);
-    glMultiTexCoord2f(GL_TEXTURE1,10,10);
+	textureCoords(GL_TEXTURE0, 1, 1);
+	textureCoords(GL_TEXTURE1, textSize, textSize);
     glVertex2d(size,size);
 
-    glMultiTexCoord2f(GL_TEXTURE0,1,0);
-    glMultiTexCoord2f(GL_TEXTURE1,10,0);
+	textureCoords(GL_TEXTURE0, 1, 0);
+	textureCoords(GL_TEXTURE1, textSize, 0);
     glVertex2d(size,-size);
 
     glEnd();
@@ -201,4 +225,6 @@ void MainView::paintGL()
     glDisable(GL_TEXTURE_2D);
 
     glPopMatrix();
+
+	checkGLError();
 }

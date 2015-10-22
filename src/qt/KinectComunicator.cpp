@@ -14,8 +14,11 @@ KinectComunicator::KinectComunicator()
 : _manager(NULL), _kinectTimer(NULL)
 {
 #ifdef WIN32
+#ifndef NO_KINECT
     _manager=new KinectManager(this);
-	//_manager=new FakeKinectManager(this);
+#else
+	_manager=new FakeKinectManager(this);
+#endif
 #else
     _manager=new FakeKinectManager(this);
 #endif

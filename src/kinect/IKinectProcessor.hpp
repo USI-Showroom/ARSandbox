@@ -1,3 +1,5 @@
+#define NO_KINECT
+
 #ifndef __IKINECT_PROCESSOR_H__
 #define __IKINECT_PROCESSOR_H__
 
