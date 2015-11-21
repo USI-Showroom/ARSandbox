@@ -1,4 +1,4 @@
-#define NO_KINECT
+//#define NO_KINECT
 
 #ifndef NO_KINECT
 #version 130
@@ -78,6 +78,12 @@ void main()
     float heightV=heightTxt.r;
 
     heightV=(heightV-minH)/(maxH-minH);
+    heightV=min(1.0,heightV);
+    heightV=max(0.0,heightV);
+
+#ifndef NO_KINECT
+    heightV=1-heightV;
+#endif
 
 
     

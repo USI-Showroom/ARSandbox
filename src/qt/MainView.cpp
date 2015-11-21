@@ -183,78 +183,91 @@ void MainView::textureCoords(GLenum texture, float u, float v)
 
 void MainView::keyPressEvent(QKeyEvent *e)
 {
-    static const float offset=0.01;
+    static const float offset=0.01f;
+#ifdef NO_KINECT
+	static const float hoffset = offset;
+#else
+	static const float hoffset = 10.0f;
+#endif
+
     const int key=e->key();
 
-    switch(key)
-    {
-        case Qt::Key_W:
-        {
-            txtMinY-=offset;
-            txtMaxY-=offset;
-            break;
-        }
-        case Qt::Key_S:
-        {
-            txtMinY+=offset;
-            txtMaxY+=offset;
-            break;
-        }
-        ///////////////////////////////////////
-        case Qt::Key_A:
-        {
-            txtMinX+=offset;
-            txtMaxX+=offset;
-            break;
-        }
-        case Qt::Key_D:
-        {
-            txtMinX-=offset;
-            txtMaxX-=offset;
-            break;
-        }
-        ///////////////////////////////////////
-        case Qt::Key_E:
-        {
-            txtMinX-=offset;
-            txtMinY-=offset;
-            txtMaxX+=offset;
-            txtMaxY+=offset;
-            break;
-        }
-        case Qt::Key_Q:
-        {
-            txtMinX+=offset;
-            txtMinY+=offset;
-            txtMaxX-=offset;
-            txtMaxY-=offset;
-            break;
-        }
-        ///////////////////////////////////////
-        case Qt::Key_R:
-        {
-            minH+=offset;
-            break;
-        }
-        case Qt::Key_T:
-        {
-            minH-=offset;
-            break;
-        }
-        ///////////////////////////////////////
-         case Qt::Key_F:
-        {
-            maxH+=offset;
-            break;
-        }
-        case Qt::Key_G:
-        {
-            maxH-=offset;
-            break;
-        }
+	const bool shift = e->modifiers() & Qt::ShiftModifier;
+	const float step = offset / (shift ? 10.0 : 1.0);
+	const float hstep = hoffset / (shift ? 10.0 : 1.0);
 
 
-    }
+	switch (key)
+	{
+	case Qt::Key_W:
+	{
+		txtMinY -= step;
+		txtMaxY -= step;
+		break;
+	}
+	case Qt::Key_S:
+	{
+		txtMinY += step;
+		txtMaxY += step;
+		break;
+	}
+	///////////////////////////////////////
+	case Qt::Key_A:
+	{
+		txtMinX += step;
+		txtMaxX += step;
+		break;
+	}
+	case Qt::Key_D:
+	{
+		txtMinX -= step;
+		txtMaxX -= step;
+		break;
+	}
+	///////////////////////////////////////
+	case Qt::Key_E:
+	{
+		txtMinX -= step;
+		txtMinY -= step;
+		txtMaxX += step;
+		txtMaxY += step;
+		break;
+	}
+	case Qt::Key_Q:
+	{
+		txtMinX += step;
+		txtMinY += step;
+		txtMaxX -= step;
+		txtMaxY -= step;
+		break;
+	}
+	///////////////////////////////////////
+	case Qt::Key_T:
+	{
+		minH += hstep;
+		break;
+	}
+	case Qt::Key_R:
+	{
+		minH -= hstep;
+		break;
+	}
+	///////////////////////////////////////
+	case Qt::Key_G:
+	{
+		maxH += hstep;
+		break;
+	}
+	case Qt::Key_F:
+	{
+		maxH -= hstep;
+		break;
+	}
+
+
+	}
+
+	std::cout <<"min h: "<< minH << " max h: " << maxH << std::endl;
 
     update();
 }
@@ -297,19 +310,19 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    textureCoords(GL_TEXTURE0, txtMinX, txtMinY);
+    textureCoords(GL_TEXTURE0, txtMaxX, txtMaxY);
     textureCoords(GL_TEXTURE1, 0, 0);
     glVertex2d(-size,-size);
 
-    textureCoords(GL_TEXTURE0, txtMinX, txtMaxY);
+    textureCoords(GL_TEXTURE0, txtMaxX, txtMinY);
     textureCoords(GL_TEXTURE1, 0, textSize);
     glVertex2d(-size,size);
 
-    textureCoords(GL_TEXTURE0, txtMaxX, txtMaxY);
+    textureCoords(GL_TEXTURE0, txtMinX, txtMinY);
     textureCoords(GL_TEXTURE1, textSize, textSize);
     glVertex2d(size,size);
 
-    textureCoords(GL_TEXTURE0, txtMaxX, txtMinY);
+    textureCoords(GL_TEXTURE0, txtMinX, txtMaxY);
     textureCoords(GL_TEXTURE1, textSize, 0);
     glVertex2d(size,-size);
 
