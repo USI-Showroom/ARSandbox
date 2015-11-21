@@ -8,6 +8,9 @@ uniform usampler2D height;
 uniform sampler2D height;
 #endif
 
+uniform float minH;
+uniform float maxH;
+
 uniform sampler2D level0;
 uniform sampler2D level1;
 uniform sampler2D level2;
@@ -60,6 +63,12 @@ float weight(float heightV, int region)
 
 void main()
 {
+    if(gl_TexCoord[0].x < 0.0 || gl_TexCoord[0].x>1.0 || gl_TexCoord[0].y <0.0 || gl_TexCoord[0].y > 1.0)
+    {
+        gl_FragColor=vec4(0,0,0,1);
+        return;
+    }
+
 #ifdef NO_KINECT
 	vec4 heightTxt = texture2D(height, gl_TexCoord[0].xy);
 #else
@@ -67,9 +76,10 @@ void main()
 #endif
 
     float heightV=heightTxt.r;
-#ifndef NO_KINECT
-    heightV=float(mod(heightV,256.0))/256.0;
-#endif
+
+    heightV=(heightV-minH)/(maxH-minH);
+
+
     
     vec4 level0Txt = texture2D(level0, gl_TexCoord[1].xy);
     vec4 level1Txt = texture2D(level1, gl_TexCoord[1].xy);

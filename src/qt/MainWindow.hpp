@@ -19,6 +19,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    void keyPressEvent(QKeyEvent *e);
+
 private:
     Ui::MainWindow* _ui;
     KinectComunicator _kinectCommunicator;
