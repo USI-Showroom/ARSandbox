@@ -3,6 +3,7 @@
     <qresource prefix="/shaders">
         <file alias="HeightMap.vert">HeightMap.vert</file>
         <file alias="HeightMap.frag">HeightMap.frag</file>
+        <file alias="Checkerboard.frag">Checkerboard.frag</file>
     </qresource>
     <qresource prefix="/test">
         <file alias="depth">depth.png</file>

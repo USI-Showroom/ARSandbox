@@ -1,4 +1,4 @@
-//#define NO_KINECT
+#define NO_KINECT
 
 #ifndef NO_KINECT
 #version 130
@@ -63,16 +63,18 @@ float weight(float heightV, int region)
 
 void main()
 {
-    if(gl_TexCoord[0].x < 0.0 || gl_TexCoord[0].x>1.0 || gl_TexCoord[0].y <0.0 || gl_TexCoord[0].y > 1.0)
+    vec2 txtH=gl_TexCoord[0].xy/gl_TexCoord[0].z;
+
+    if(txtH.x < 0.0 || txtH.x>1.0 || txtH.y <0.0 || txtH.y > 1.0)
     {
         gl_FragColor=vec4(0,0,0,1);
         return;
     }
 
 #ifdef NO_KINECT
-	vec4 heightTxt = texture2D(height, gl_TexCoord[0].xy);
+	vec4 heightTxt = texture2D(height, txtH.xy);
 #else
-    uvec4 heightTxt = texture2D(height, gl_TexCoord[0].xy);
+    uvec4 heightTxt = texture2D(height, txtH.xy);
 #endif
 
     float heightV=heightTxt.r;
@@ -85,13 +87,15 @@ void main()
     heightV=1-heightV;
 #endif
 
+    
+    vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
     
-    vec4 level0Txt = texture2D(level0, gl_TexCoord[1].xy);
-    vec4 level1Txt = texture2D(level1, gl_TexCoord[1].xy);
-    vec4 level2Txt = texture2D(level2, gl_TexCoord[1].xy);
-    vec4 level3Txt = texture2D(level3, gl_TexCoord[1].xy);
-    vec4 level4Txt = texture2D(level4, gl_TexCoord[1].xy);
+    vec4 level0Txt = texture2D(level0, txt);
+    vec4 level1Txt = texture2D(level1, txt);
+    vec4 level2Txt = texture2D(level2, txt);
+    vec4 level3Txt = texture2D(level3, txt);
+    vec4 level4Txt = texture2D(level4, txt);
 
     gl_FragColor=   weight(heightV,0)*level0Txt+
                     weight(heightV,1)*level1Txt+

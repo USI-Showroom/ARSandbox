@@ -31,7 +31,7 @@ private:
 
     void createTexture(const QString &path, GLuint &txtId);
 	void activeTexture(GLenum texture);
-	void textureCoords(GLenum texture, float u, float v);
+	void textureCoords(GLenum texture, float u, float v, int i);
 
 
 protected:
@@ -43,11 +43,15 @@ protected:
 
 
 private:
-	QOpenGLShaderProgram _shader;
+	QOpenGLShaderProgram _shader, _checkerboard;
 
-	float txtMinX, txtMinY, txtMaxX, txtMaxY;
+	bool _setupMode, _showCheckerboard;
 
-	float minH, maxH;
+	float _txtMinX, _txtMinY, _txtMaxX, _txtMaxY;
+
+	double _top, _bottom;
+
+	float _minH, _maxH;
 
 	GLuint _txt;
 	GLuint _level0, _level1, _level2, _level3, _level4;

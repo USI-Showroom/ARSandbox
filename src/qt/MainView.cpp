@@ -8,19 +8,26 @@
 #include <QGLWidget>
 #include <iostream>
 #include "MainView.hpp"
+#include <cmath>
 
 
 MainView::MainView(QWidget *parent)
-: super(parent), _shader(this), _txt(0)
+: super(parent), _shader(this), _checkerboard(this), _txt(0)
 { 
-    txtMinX=0;
-    txtMinY=0;
+    _txtMinX=0;
+    _txtMinY=0;
 
-    txtMaxX=1;
-    txtMaxY=1;
+    _txtMaxX=1;
+    _txtMaxY=1;
 
-    minH=0;
-    maxH=1;
+    _minH=0;
+    _maxH=1;
+
+    _top=1;
+    _bottom=1;
+
+    _setupMode=true;
+    _showCheckerboard=false;
 }
 
 MainView::~MainView()
@@ -39,7 +46,7 @@ MainView::~MainView()
 void MainView::setUniforms()
 {
     GLuint heightT = _shader.uniformLocation("height");
-    
+
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
 
@@ -51,8 +58,8 @@ void MainView::setUniforms()
 
     _shader.setUniformValue(heightT,0);
 
-    _shader.setUniformValue(minHT,minH);
-    _shader.setUniformValue(maxHT,maxH);
+    _shader.setUniformValue(minHT,_minH);
+    _shader.setUniformValue(maxHT,_maxH);
 
     _shader.setUniformValue(level0T,1);
     _shader.setUniformValue(level1T,2);
@@ -81,10 +88,21 @@ void MainView::initializeGL() {
     QFileInfo fragFile(":/shaders/HeightMap.frag");
     fragShader.compileSourceFile(fragFile.absoluteFilePath());
 
+    QOpenGLShader fragCheckerShader(QOpenGLShader::Fragment);
+    QFileInfo fragCheckerFile(":/shaders/Checkerboard.frag");
+    fragCheckerShader.compileSourceFile(fragCheckerFile.absoluteFilePath());
+
     _shader.addShader(&vertShader);
     _shader.addShader(&fragShader);
 
     _shader.link();
+
+
+    _checkerboard.addShader(&vertShader);
+    _checkerboard.addShader(&fragCheckerShader);
+
+    _checkerboard.link();
+
 
     int M, m, maxTxt;
 
@@ -165,19 +183,41 @@ void MainView::createTexture(const QString &path, GLuint &txtId)
 void MainView::activeTexture(GLenum texture)
 {
 #ifdef WIN32
-	_funs.glActiveTexture(texture);
+    _funs.glActiveTexture(texture);
 #else
-	glActiveTexture(texture);
+    glActiveTexture(texture);
 #endif
 }
 
 
-void MainView::textureCoords(GLenum texture, float u, float v)
+void MainView::textureCoords(GLenum texture, float u, float v, int i)
 {
+
+    float scaling=1;
+    const float interY= (_bottom - _top) / (_bottom + _top);
+    const float opi=1+interY;
+    const float omi=1-interY;
+
+    switch(i)
+    {
+        case 0:
+        case 3:
+        scaling=sqrt(_bottom*_bottom+opi*opi)/sqrt(_top*_top+omi*omi)+1;
+        break;
+
+        case 1:
+        case 2:
+        scaling=sqrt(_top*_top+omi*omi)/sqrt(_bottom*_bottom+opi*opi)+1;
+        break;
+    }
+
+    const float us=u*scaling;
+    const float vs=v*scaling;
+
 #ifdef WIN32
-	_funs2.glMultiTexCoord2f(texture,u,v);
+    _funs2.glMultiTexCoord3f(texture,us,vs,scaling);
 #else
-	glMultiTexCoord2f(texture,u,v);
+    glMultiTexCoord3f(texture,us,vs,scaling);
 #endif
 }
 
@@ -185,97 +225,131 @@ void MainView::keyPressEvent(QKeyEvent *e)
 {
     static const float offset=0.01f;
 #ifdef NO_KINECT
-	static const float hoffset = offset;
+    static const float hoffset = offset;
 #else
-	static const float hoffset = 10.0f;
+    static const float hoffset = 10.0f;
 #endif
 
     const int key=e->key();
 
-	const bool shift = e->modifiers() & Qt::ShiftModifier;
-	const float step = offset / (shift ? 10.0 : 1.0);
-	const float hstep = hoffset / (shift ? 10.0 : 1.0);
+    if(key==Qt::Key_F5)
+        _setupMode=!_setupMode;
+
+    if(!_setupMode) return;
+
+    const bool shift = e->modifiers() & Qt::ShiftModifier;
+    const float step = offset / (shift ? 10.0 : 1.0);
+    const float hstep = hoffset / (shift ? 10.0 : 1.0);
 
 
-	switch (key)
-	{
-	case Qt::Key_W:
-	{
-		txtMinY -= step;
-		txtMaxY -= step;
-		break;
-	}
-	case Qt::Key_S:
-	{
-		txtMinY += step;
-		txtMaxY += step;
-		break;
-	}
-	///////////////////////////////////////
-	case Qt::Key_A:
-	{
-		txtMinX += step;
-		txtMaxX += step;
-		break;
-	}
-	case Qt::Key_D:
-	{
-		txtMinX -= step;
-		txtMaxX -= step;
-		break;
-	}
-	///////////////////////////////////////
-	case Qt::Key_E:
-	{
-		txtMinX -= step;
-		txtMinY -= step;
-		txtMaxX += step;
-		txtMaxY += step;
-		break;
-	}
-	case Qt::Key_Q:
-	{
-		txtMinX += step;
-		txtMinY += step;
-		txtMaxX -= step;
-		txtMaxY -= step;
-		break;
-	}
-	///////////////////////////////////////
-	case Qt::Key_T:
-	{
-		minH += hstep;
-		break;
-	}
-	case Qt::Key_R:
-	{
-		minH -= hstep;
-		break;
-	}
-	///////////////////////////////////////
-	case Qt::Key_G:
-	{
-		maxH += hstep;
-		break;
-	}
-	case Qt::Key_F:
-	{
-		maxH -= hstep;
-		break;
-	}
+
+    switch (key)
+    {
+        case Qt::Key_W:
+        {
+            _txtMinY -= step;
+            _txtMaxY -= step;
+            break;
+        }
+        case Qt::Key_S:
+        {
+            _txtMinY += step;
+            _txtMaxY += step;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_A:
+        {
+            _txtMinX += step;
+            _txtMaxX += step;
+            break;
+        }
+        case Qt::Key_D:
+        {
+            _txtMinX -= step;
+            _txtMaxX -= step;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_E:
+        {
+            _txtMinX -= step;
+            _txtMinY -= step;
+            _txtMaxX += step;
+            _txtMaxY += step;
+            break;
+        }
+        case Qt::Key_Q:
+        {
+            _txtMinX += step;
+            _txtMinY += step;
+            _txtMaxX -= step;
+            _txtMaxY -= step;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_T:
+        {
+            _minH += hstep;
+            break;
+        }
+        case Qt::Key_R:
+        {
+            _minH -= hstep;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_G:
+        {
+            _maxH += hstep;
+            break;
+        }
+        case Qt::Key_F:
+        {
+            _maxH -= hstep;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_C:
+        {
+            _showCheckerboard = !_showCheckerboard;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_V:
+        {
+            _top -= step;
+            break;
+        }
+        case Qt::Key_B:
+        {
+            _top += step;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_N:
+        {
+            _bottom -= step;
+            break;
+        }
+        case Qt::Key_M:
+        {
+            _bottom += step;
+            break;
+        }
 
 
-	}
+    }
 
-	std::cout <<"min h: "<< minH << " max h: " << maxH << std::endl;
+    std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
 
     update();
 }
 
 void MainView::paintGL()
 {
-	static double textSize = 2;
-    static double size=1;
+    static const double textSize = 2;
+    static const double size = 1;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_BLEND);
@@ -285,9 +359,13 @@ void MainView::paintGL()
 
     glEnable(GL_TEXTURE_2D);
 
-    _shader.bind();
-    setUniforms();
-    
+    if(_showCheckerboard)
+        _checkerboard.bind();
+    else{
+        _shader.bind();
+        setUniforms();
+    }
+
     activeTexture(GL_TEXTURE0);
     if (_txt > 0)
         glBindTexture(GL_TEXTURE_2D, _txt);
@@ -310,21 +388,21 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    textureCoords(GL_TEXTURE0, txtMaxX, txtMaxY);
-    textureCoords(GL_TEXTURE1, 0, 0);
-    glVertex2d(-size,-size);
+    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMaxY,0);
+    textureCoords(GL_TEXTURE1, 0, 0, 0);
+    glVertex2d(-_bottom,-size);
 
-    textureCoords(GL_TEXTURE0, txtMaxX, txtMinY);
-    textureCoords(GL_TEXTURE1, 0, textSize);
-    glVertex2d(-size,size);
+    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMinY,1);
+    textureCoords(GL_TEXTURE1, 0, textSize, 1);
+    glVertex2d(-_top,size);
 
-    textureCoords(GL_TEXTURE0, txtMinX, txtMinY);
-    textureCoords(GL_TEXTURE1, textSize, textSize);
-    glVertex2d(size,size);
+    textureCoords(GL_TEXTURE0, _txtMinX, _txtMinY,2);
+    textureCoords(GL_TEXTURE1, textSize, textSize, 2);
+    glVertex2d(_top,size);
 
-    textureCoords(GL_TEXTURE0, txtMinX, txtMaxY);
-    textureCoords(GL_TEXTURE1, textSize, 0);
-    glVertex2d(size,-size);
+    textureCoords(GL_TEXTURE0, _txtMinX, _txtMaxY,3);
+    textureCoords(GL_TEXTURE1, textSize, 0, 3);
+    glVertex2d(_bottom,-size);
 
     glEnd();
 
