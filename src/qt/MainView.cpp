@@ -13,7 +13,8 @@
 
 MainView::MainView(QWidget *parent)
 : super(parent), _shader(this), _txt(0),
-p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1)
+p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1),
+_gameTexture(0)
 { 
 #ifdef NO_KINECT
     _minH=0;
@@ -38,11 +39,16 @@ MainView::~MainView()
     glDeleteTextures(1, &_level2);
     glDeleteTextures(1, &_level3);
     glDeleteTextures(1, &_level4);
+
+    if(_gameTexture>0)
+        glDeleteTextures(1, &_gameTexture);
 }
 
 void MainView::setUniforms()
 {
     GLuint heightT = _shader.uniformLocation("height");
+
+    GLuint gameT = _shader.uniformLocation("gameTexture");
 
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
@@ -53,18 +59,24 @@ void MainView::setUniforms()
     GLuint level3T = _shader.uniformLocation("level3");
     GLuint level4T = _shader.uniformLocation("level4");
 
+    
+
     _shader.setUniformValue(heightT,0);
+
+    _shader.setUniformValue(gameT,1);
 
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
 
-    _shader.setUniformValue(level0T,1);
-    _shader.setUniformValue(level1T,2);
-    _shader.setUniformValue(level2T,3);
-    _shader.setUniformValue(level3T,4);
-    _shader.setUniformValue(level4T,5);
+    _shader.setUniformValue(level0T,2);
+    _shader.setUniformValue(level1T,3);
+    _shader.setUniformValue(level2T,4);
+    _shader.setUniformValue(level3T,5);
+    _shader.setUniformValue(level4T,6);
 
-    checkGLError();
+    
+
+    checkGLError("setUniforms");
 }
 
 void MainView::initializeGL() {
@@ -114,7 +126,27 @@ void MainView::initializeGL() {
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
 
-    checkGLError();
+
+
+    checkGLError("init");
+}
+
+void MainView::newGameImage(const QImage &img)
+{
+    if(_gameTexture>0)
+        glDeleteTextures(1, &_gameTexture);
+
+    QImage tmp=QGLWidget::convertToGLFormat(img);
+    glGenTextures(1, &_gameTexture);
+    glBindTexture(GL_TEXTURE_2D, _gameTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tmp.width(), tmp.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp.bits());
+
+    checkGLError("newGameImage");
+    update();
 }
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
@@ -130,7 +162,7 @@ void MainView::newKinectData(const UINT16 *data, int w, int h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    checkGLError();
+    checkGLError("kinect");
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, data);
 #else
     createTexture(":/test/depth", _txt);
@@ -138,18 +170,18 @@ void MainView::newKinectData(const UINT16 *data, int w, int h)
 #else
     createTexture(":/test/depth",_txt);
 #endif
-    checkGLError();
+    checkGLError("new data");
 
     update();
 }
 
-void MainView::checkGLError()
+void MainView::checkGLError(const std::string &msg)
 {
     GLenum error = GL_NO_ERROR;
     do {
         error = glGetError();
         if (error != GL_NO_ERROR)
-            std::cerr<<error<<std::endl;
+            std::cerr<<"["<<msg<<"] "<<error<<std::endl;
     } while (error != GL_NO_ERROR);
 }
 
@@ -327,18 +359,23 @@ void MainView::paintGL()
 
 
     activeTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _level0);
+    if (_gameTexture > 0)
+        glBindTexture(GL_TEXTURE_2D, _gameTexture);
+
 
     activeTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _level1);
+    glBindTexture(GL_TEXTURE_2D, _level0);
 
     activeTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, _level2);
+    glBindTexture(GL_TEXTURE_2D, _level1);
 
     activeTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, _level3);
+    glBindTexture(GL_TEXTURE_2D, _level2);
 
     activeTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, _level3);
+
+    activeTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D, _level4);
 
     glBegin(GL_QUADS);
@@ -365,5 +402,5 @@ void MainView::paintGL()
 
     glPopMatrix();
 
-    checkGLError();
+    checkGLError("draw");
 }

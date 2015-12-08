@@ -22,6 +22,9 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
 
     connect(_ui->mainView, SIGNAL(keyPress(const int)),
             &_gameManager, SLOT(keyPress(const int)));
+
+    connect(&_gameManager, SIGNAL(gameTextureChanged(const QImage&)),
+            _ui->mainView, SLOT(newGameImage(const QImage&)));
 }
 
 

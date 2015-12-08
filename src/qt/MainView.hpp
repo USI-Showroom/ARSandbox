@@ -27,13 +27,14 @@ signals:
 	void keyPress(const int keyCode);
 
 public slots:
-void newKinectData(const UINT16 *data, int w, int h);
+	void newKinectData(const UINT16 *data, int w, int h);
+	void newGameImage(const QImage &img);
 
 private:
-    void checkGLError();
-    void setUniforms();
+	void checkGLError(const std::string &msg);
+	void setUniforms();
 
-    void createTexture(const QString &path, GLuint &txtId);
+	void createTexture(const QString &path, GLuint &txtId);
 	void activeTexture(GLenum texture);
 	void textureCoords(GLenum texture, float u, float v, int i);
 
@@ -42,7 +43,7 @@ protected:
 	void paintGL();
 	void initializeGL();
 
-    
+
 
 
 
@@ -61,4 +62,6 @@ private:
 	QOpenGLFunctions_2_0 _funs2;
 
 	Point2d p0,p1,p2,p3;
+
+	GLuint _gameTexture;
 };

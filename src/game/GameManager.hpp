@@ -4,6 +4,7 @@
 #include "IKinectProcessor.hpp"
 
 #include <QObject>
+#include <QImage>
 
 
 class QTimer;
@@ -14,6 +15,9 @@ class GameManager : public QObject
 public:
     GameManager();
     ~GameManager();
+
+signals:
+    void gameTextureChanged(const QImage &img);
 
 private slots:
     void updateGame();
@@ -27,6 +31,7 @@ public:
 
 private:
     QTimer *_gameTimer;
+    QImage _image;
 };
 #endif
 
