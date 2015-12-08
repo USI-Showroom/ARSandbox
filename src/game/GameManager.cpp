@@ -6,7 +6,7 @@
 #include <QPainter>
 
 GameManager::GameManager()
-: _image(512,424,QImage::Format_ARGB32), _position(256,212)
+: _image(512*2,424*2,QImage::Format_ARGB32), _position(256*2,212*2)
 { 
 
     _playing=false;
