@@ -224,7 +224,11 @@ void MainView::keyPressEvent(QKeyEvent *e)
     if(key==Qt::Key_F5)
         _setupMode=!_setupMode;
 
-    if(!_setupMode) return;
+    if(!_setupMode) 
+    {
+        emit keyPress(key);
+        return;
+    }
 
     const bool shift = e->modifiers() & Qt::ShiftModifier;
     const float step = offset / (shift ? 10.0 : 1.0);
@@ -301,7 +305,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
 void MainView::paintGL()
 {
-    static const double nTiles = 2;
+    static const double nTiles = 10;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

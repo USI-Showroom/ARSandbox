@@ -13,12 +13,12 @@ ENDIF()
 file(GLOB_RECURSE ARSANDBOX_SOURCES "src/*.cpp")
 file(GLOB_RECURSE ARSANDBOX_HEADERS "src/*.hpp")
 
-file(GLOB_RECURSE ARSANDBOX_QT_SRC_HEADERS "src/qt/*.hpp")
+file(GLOB_RECURSE ARSANDBOX_QT_SRC_HEADERS "src/qt/*.hpp" "src/game/*.hpp")
 file(GLOB_RECURSE ARSANDBOX_UIS "src/qt/*.ui")
 file(GLOB_RECURSE ARSANDBOX_RESOURCES "src/resource/*.qrc")
 
 SET(ARSANDBOX_MAIN "src/main.cpp")
-SET(ARSANDBOX_INCLUDE "src" "src/qt" "src/kinect" "src/geom")
+SET(ARSANDBOX_INCLUDE "src" "src/qt" "src/kinect" "src/geom" "src/game")
 #########################
 
 #########################

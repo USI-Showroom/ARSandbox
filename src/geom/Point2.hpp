@@ -1,5 +1,5 @@
-#ifndef Point2d_H
-#define Point2d_H
+#ifndef __POINT_2_H__
+#define __POINT_2_H__
 
 #include <cassert>
 #include <cmath>

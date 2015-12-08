@@ -5,6 +5,7 @@
 #include <QMainWindow>
 
 #include "KinectComunicator.hpp"
+#include "GameManager.hpp"
 
 namespace Ui {
     class MainWindow;
@@ -25,6 +26,7 @@ protected:
 private:
     Ui::MainWindow* _ui;
     KinectComunicator _kinectCommunicator;
+    GameManager _gameManager;
 };
 
 

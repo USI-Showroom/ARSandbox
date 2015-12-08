@@ -23,6 +23,9 @@ public:
 
 	void keyPressEvent(QKeyEvent *e);
 
+signals:
+	void keyPress(const int keyCode);
+
 public slots:
 void newKinectData(const UINT16 *data, int w, int h);
 
