@@ -7,6 +7,7 @@
 
 #include <QKeyEvent>
 
+#include "Point2.hpp"
 
 #include "IKinectProcessor.hpp"
 
@@ -43,18 +44,18 @@ protected:
 
 
 private:
-	QOpenGLShaderProgram _shader, _checkerboard;
+	QOpenGLShaderProgram _shader;
 
-	bool _setupMode, _showCheckerboard;
-
-	float _txtMinX, _txtMinY, _txtMaxX, _txtMaxY;
-
-	double _top, _bottom;
+	bool _setupMode;
 
 	float _minH, _maxH;
+
+	int _currentCorner;
 
 	GLuint _txt;
 	GLuint _level0, _level1, _level2, _level3, _level4;
 	QOpenGLFunctions _funs;
 	QOpenGLFunctions_2_0 _funs2;
+
+	Point2d p0,p1,p2,p3;
 };

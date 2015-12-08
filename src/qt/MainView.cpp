@@ -12,22 +12,19 @@
 
 
 MainView::MainView(QWidget *parent)
-: super(parent), _shader(this), _checkerboard(this), _txt(0)
+: super(parent), _shader(this), _txt(0),
+p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1)
 { 
-    _txtMinX=0;
-    _txtMinY=0;
-
-    _txtMaxX=1;
-    _txtMaxY=1;
-
+#ifdef NO_KINECT
     _minH=0;
     _maxH=1;
-
-    _top=1;
-    _bottom=1;
-
+#else
+    _minH=1200;
+    _maxH=1400;
+#endif
     _setupMode=true;
-    _showCheckerboard=false;
+
+    _currentCorner=0;
 }
 
 MainView::~MainView()
@@ -88,21 +85,10 @@ void MainView::initializeGL() {
     QFileInfo fragFile(":/shaders/HeightMap.frag");
     fragShader.compileSourceFile(fragFile.absoluteFilePath());
 
-    QOpenGLShader fragCheckerShader(QOpenGLShader::Fragment);
-    QFileInfo fragCheckerFile(":/shaders/Checkerboard.frag");
-    fragCheckerShader.compileSourceFile(fragCheckerFile.absoluteFilePath());
-
     _shader.addShader(&vertShader);
     _shader.addShader(&fragShader);
 
     _shader.link();
-
-
-    _checkerboard.addShader(&vertShader);
-    _checkerboard.addShader(&fragCheckerShader);
-
-    _checkerboard.link();
-
 
     int M, m, maxTxt;
 
@@ -194,21 +180,24 @@ void MainView::textureCoords(GLenum texture, float u, float v, int i)
 {
 
     float scaling=1;
-    const float interY= (_bottom - _top) / (_bottom + _top);
-    const float opi=1+interY;
-    const float omi=1-interY;
+    const Point2d inter(
+        ( (p0.x()*p2.y()-p0.y()*p2.x())*(p1.x()-p3.x()) - (p0.x()-p2.x())*(p1.x()*p3.y()-p1.y()*p3.x()) )/
+        ( (p0.x()-p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()-p3.y()) ),
+
+        ( (p0.x()*p2.y()-p0.y()*p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()*p3.y()-p1.y()*p3.x()) )/
+        ( (p0.x()-p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()-p3.y()) )
+        );
 
     switch(i)
     {
         case 0:
-        case 3:
-        scaling=sqrt(_bottom*_bottom+opi*opi)/sqrt(_top*_top+omi*omi)+1;
-        break;
-
+        scaling=(p0-inter).norm()/(inter-p2).norm()+1; break;
         case 1:
+        scaling=(p1-inter).norm()/(inter-p3).norm()+1; break;
         case 2:
-        scaling=sqrt(_top*_top+omi*omi)/sqrt(_bottom*_bottom+opi*opi)+1;
-        break;
+        scaling=(p2-inter).norm()/(inter-p0).norm()+1; break;
+        case 3:
+        scaling=(p3-inter).norm()/(inter-p1).norm()+1; break;
     }
 
     const float us=u*scaling;
@@ -241,104 +230,68 @@ void MainView::keyPressEvent(QKeyEvent *e)
     const float step = offset / (shift ? 10.0 : 1.0);
     const float hstep = hoffset / (shift ? 10.0 : 1.0);
 
+    Point2d dir;
+
 
 
     switch (key)
     {
+        case Qt::Key_1: _currentCorner=0; break;
+        case Qt::Key_2: _currentCorner=1; break;
+        case Qt::Key_3: _currentCorner=2; break;
+        case Qt::Key_4: _currentCorner=3; break;
+////////////////////////////////////////////
         case Qt::Key_W:
         {
-            _txtMinY -= step;
-            _txtMaxY -= step;
+            dir.x() = -step;
             break;
         }
         case Qt::Key_S:
         {
-            _txtMinY += step;
-            _txtMaxY += step;
+            dir.x() = +step;
             break;
         }
 ///////////////////////////////////////
         case Qt::Key_A:
         {
-            _txtMinX += step;
-            _txtMaxX += step;
+            dir.y() = +step;
             break;
         }
         case Qt::Key_D:
         {
-            _txtMinX -= step;
-            _txtMaxX -= step;
+            dir.y() = -step;
             break;
         }
 ///////////////////////////////////////
-        case Qt::Key_E:
-        {
-            _txtMinX -= step;
-            _txtMinY -= step;
-            _txtMaxX += step;
-            _txtMaxY += step;
-            break;
-        }
-        case Qt::Key_Q:
-        {
-            _txtMinX += step;
-            _txtMinY += step;
-            _txtMaxX -= step;
-            _txtMaxY -= step;
-            break;
-        }
-///////////////////////////////////////
-        case Qt::Key_T:
+        case Qt::Key_Y:
         {
             _minH += hstep;
             break;
         }
-        case Qt::Key_R:
+        case Qt::Key_H:
         {
             _minH -= hstep;
             break;
         }
 ///////////////////////////////////////
-        case Qt::Key_G:
+        case Qt::Key_U:
         {
             _maxH += hstep;
             break;
         }
-        case Qt::Key_F:
+        case Qt::Key_J:
         {
             _maxH -= hstep;
             break;
         }
-///////////////////////////////////////
-        case Qt::Key_C:
-        {
-            _showCheckerboard = !_showCheckerboard;
-            break;
-        }
-///////////////////////////////////////
-        case Qt::Key_V:
-        {
-            _top -= step;
-            break;
-        }
-        case Qt::Key_B:
-        {
-            _top += step;
-            break;
-        }
-///////////////////////////////////////
-        case Qt::Key_N:
-        {
-            _bottom -= step;
-            break;
-        }
-        case Qt::Key_M:
-        {
-            _bottom += step;
-            break;
-        }
+    }
 
-
+    switch(_currentCorner)
+    {
+        case 0: p0+=dir; break;
+        case 1: p1+=dir; break;
+        case 2: p2+=dir; break;
+        case 3: p3+=dir; break;
     }
 
     std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
@@ -348,8 +301,8 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
 void MainView::paintGL()
 {
-    static const double textSize = 2;
-    static const double size = 1;
+    static const double nTiles = 2;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_BLEND);
@@ -359,12 +312,10 @@ void MainView::paintGL()
 
     glEnable(GL_TEXTURE_2D);
 
-    if(_showCheckerboard)
-        _checkerboard.bind();
-    else{
-        _shader.bind();
-        setUniforms();
-    }
+    
+    _shader.bind();
+    setUniforms();
+    
 
     activeTexture(GL_TEXTURE0);
     if (_txt > 0)
@@ -388,21 +339,21 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    textureCoords(GL_TEXTURE0, _txtMinX, _txtMinY,0);
+    textureCoords(GL_TEXTURE0, 0, 0, 0);
     textureCoords(GL_TEXTURE1, 0, 0, 0);
-    glVertex2d(-_bottom,-size);
+    glVertex2d(p0.x(), p0.y());
 
-    textureCoords(GL_TEXTURE0, _txtMinX, _txtMaxY,1);
-    textureCoords(GL_TEXTURE1, 0, textSize, 1);
-    glVertex2d(-_top,size);
+    textureCoords(GL_TEXTURE0, 0, 1, 1);
+    textureCoords(GL_TEXTURE1, 0, nTiles, 1);
+    glVertex2d(p1.x(), p1.y());
 
-    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMaxY,2);
-    textureCoords(GL_TEXTURE1, textSize, textSize, 2);
-    glVertex2d(_top,size);
+    textureCoords(GL_TEXTURE0, 1, 1, 2);
+    textureCoords(GL_TEXTURE1, nTiles, nTiles, 2);
+    glVertex2d(p2.x(), p2.y());
 
-    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMinY,3);
-    textureCoords(GL_TEXTURE1, textSize, 0, 3);
-    glVertex2d(_bottom,-size);
+    textureCoords(GL_TEXTURE0, 1, 0, 3);
+    textureCoords(GL_TEXTURE1, nTiles, 0, 3);
+    glVertex2d(p3.x(), p3.y());
 
     glEnd();
 
