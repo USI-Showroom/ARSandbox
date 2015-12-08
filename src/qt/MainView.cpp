@@ -10,6 +10,8 @@
 #include "MainView.hpp"
 #include <cmath>
 
+#include <QImage>
+
 
 MainView::MainView(QWidget *parent)
 : super(parent), _shader(this), _txt(0),
@@ -26,6 +28,10 @@ _gameTexture(0)
     _setupMode=true;
 
     _currentCorner=0;
+
+    _initialized=false;
+
+    _tmpGameImage=NULL;
 }
 
 MainView::~MainView()
@@ -80,6 +86,7 @@ void MainView::setUniforms()
 }
 
 void MainView::initializeGL() {
+    _initialized=true;
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_TEXTURE_2D);
@@ -126,13 +133,22 @@ void MainView::initializeGL() {
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
 
-
+    if(_tmpGameImage){
+        newGameImage(*_tmpGameImage);
+        _tmpGameImage=NULL;
+    }
 
     checkGLError("init");
 }
 
 void MainView::newGameImage(const QImage &img)
 {
+    if(!_initialized)
+    {
+        _tmpGameImage=&img;
+        return;
+    }
+
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 
@@ -253,8 +269,10 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     const int key=e->key();
 
-    if(key==Qt::Key_F5)
+    if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
+        emit toggleSetupMode(_setupMode,_minH,_maxH);
+    }
 
     if(!_setupMode) 
     {
