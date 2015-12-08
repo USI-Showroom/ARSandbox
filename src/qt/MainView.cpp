@@ -388,19 +388,19 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMaxY,0);
+    textureCoords(GL_TEXTURE0, _txtMinX, _txtMinY,0);
     textureCoords(GL_TEXTURE1, 0, 0, 0);
     glVertex2d(-_bottom,-size);
 
-    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMinY,1);
+    textureCoords(GL_TEXTURE0, _txtMinX, _txtMaxY,1);
     textureCoords(GL_TEXTURE1, 0, textSize, 1);
     glVertex2d(-_top,size);
 
-    textureCoords(GL_TEXTURE0, _txtMinX, _txtMinY,2);
+    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMaxY,2);
     textureCoords(GL_TEXTURE1, textSize, textSize, 2);
     glVertex2d(_top,size);
 
-    textureCoords(GL_TEXTURE0, _txtMinX, _txtMaxY,3);
+    textureCoords(GL_TEXTURE0, _txtMaxX, _txtMinY,3);
     textureCoords(GL_TEXTURE1, textSize, 0, 3);
     glVertex2d(_bottom,-size);
 
