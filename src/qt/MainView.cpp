@@ -27,7 +27,7 @@ _gameTexture(0)
 #endif
     _setupMode=true;
 
-    _currentCorner=0;
+    _currentCorner=4;
 
     _initialized=false;
 
@@ -228,12 +228,19 @@ void MainView::textureCoords(GLenum texture, float u, float v, int i)
 {
 
     float scaling=1;
-    const Point2d inter(
-        ( (p0.x()*p2.y()-p0.y()*p2.x())*(p1.x()-p3.x()) - (p0.x()-p2.x())*(p1.x()*p3.y()-p1.y()*p3.x()) )/
-        ( (p0.x()-p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()-p3.y()) ),
 
-        ( (p0.x()*p2.y()-p0.y()*p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()*p3.y()-p1.y()*p3.x()) )/
-        ( (p0.x()-p2.x())*(p1.y()-p3.y()) - (p0.y()-p2.y())*(p1.x()-p3.y()) )
+    const double x1=p0.x(), y1=p0.y();
+    const double x2=p2.x(), y2=p2.y();
+
+    const double x3=p1.x(), y3=p1.y();
+    const double x4=p3.x(), y4=p3.y();
+
+    const Point2d inter(
+        ( (x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4) )/
+        ( (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4) ),
+
+        ( (x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4) )/
+        ( (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4) )
         );
 
     switch(i)
@@ -286,6 +293,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     Point2d dir;
 
+    double mult=1;
 
 
     switch (key)
@@ -294,58 +302,68 @@ void MainView::keyPressEvent(QKeyEvent *e)
         case Qt::Key_2: _currentCorner=1; break;
         case Qt::Key_3: _currentCorner=2; break;
         case Qt::Key_4: _currentCorner=3; break;
+        case Qt::Key_5: _currentCorner=4; break;
+        case Qt::Key_6: _currentCorner=5; break;
 ////////////////////////////////////////////
         case Qt::Key_W:
         {
             dir.x() = -step;
+            mult=-1;
             break;
         }
         case Qt::Key_S:
         {
             dir.x() = +step;
+            mult=-1;
             break;
         }
 ///////////////////////////////////////
         case Qt::Key_A:
         {
             dir.y() = +step;
+            mult=1;
             break;
         }
         case Qt::Key_D:
         {
             dir.y() = -step;
-            break;
-        }
-///////////////////////////////////////
-        case Qt::Key_Y:
-        {
-            _minH += hstep;
-            break;
-        }
-        case Qt::Key_H:
-        {
-            _minH -= hstep;
+            mult=1;
             break;
         }
 ///////////////////////////////////////
         case Qt::Key_U:
         {
-            _maxH += hstep;
+            _minH += hstep;
             break;
         }
         case Qt::Key_J:
+        {
+            _minH -= hstep;
+            break;
+        }
+///////////////////////////////////////
+        case Qt::Key_I:
+        {
+            _maxH += hstep;
+            break;
+        }
+        case Qt::Key_K:
         {
             _maxH -= hstep;
             break;
         }
     }
 
+    std::cout<<_currentCorner<<std::endl;
     switch(_currentCorner)
     {
         case 0: p0+=dir; break;
         case 1: p1+=dir; break;
         case 2: p2+=dir; break;
         case 3: p3+=dir; break;
+        case 4: p0+=mult*dir; p2-=mult*dir; p1-=dir; p3+=dir; break;
+        case 5: p0+=dir; p2+=dir; p1+=dir; p3+=dir; break;
+        // case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
     }
 
     std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
