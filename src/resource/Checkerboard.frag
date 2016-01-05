@@ -4,7 +4,7 @@ void main()
 {
     vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
-    float nSquares=10.0;    
+    float nSquares=5.0;    
     txt*=nSquares;
 
     int tx=int(floor(txt.x));

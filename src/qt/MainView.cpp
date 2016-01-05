@@ -14,8 +14,9 @@
 
 
 MainView::MainView(QWidget *parent)
-: super(parent), _shader(this), _txt(0),
+	: super(parent), _shader(this), _checkerboard(this), _txt(0),
 p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1),
+txt0(0, 0), txt1(0, 1), txt2(1, 1), txt3(1, 0),
 _gameTexture(0)
 { 
 #ifdef NO_KINECT
@@ -23,9 +24,10 @@ _gameTexture(0)
     _maxH=1;
 #else
     _minH=1200;
-    _maxH=1400;
+    _maxH=1340;
 #endif
     _setupMode=true;
+	_moveTexture = false;
 
     _currentCorner=4;
 
@@ -92,7 +94,7 @@ void MainView::initializeGL() {
     glEnable(GL_TEXTURE_2D);
 
     glShadeModel(GL_SMOOTH);
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 1);
 
 
     QOpenGLShader vertShader(QOpenGLShader::Vertex);
@@ -104,10 +106,22 @@ void MainView::initializeGL() {
     QFileInfo fragFile(":/shaders/HeightMap.frag");
     fragShader.compileSourceFile(fragFile.absoluteFilePath());
 
+	QOpenGLShader fragCheckerShader(QOpenGLShader::Fragment);
+	QFileInfo fragCheckerFile(":/shaders/Checkerboard.frag");
+	fragCheckerShader.compileSourceFile(fragCheckerFile.absoluteFilePath());
+
+
     _shader.addShader(&vertShader);
     _shader.addShader(&fragShader);
 
     _shader.link();
+
+
+	_checkerboard.addShader(&vertShader);
+	_checkerboard.addShader(&fragCheckerShader);
+
+	_checkerboard.link();
+
 
     int M, m, maxTxt;
 
@@ -276,6 +290,8 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     const int key=e->key();
 
+	if (key == Qt::Key_Escape) exit(1);
+
     if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
         emit toggleSetupMode(_setupMode,_minH,_maxH);
@@ -304,27 +320,29 @@ void MainView::keyPressEvent(QKeyEvent *e)
         case Qt::Key_4: _currentCorner=3; break;
         case Qt::Key_5: _currentCorner=4; break;
         case Qt::Key_6: _currentCorner=5; break;
+
+		case Qt::Key_Space: _moveTexture = !_moveTexture; break;
 ////////////////////////////////////////////
-        case Qt::Key_W:
+        case Qt::Key_A:
         {
             dir.x() = -step;
             mult=-1;
             break;
         }
-        case Qt::Key_S:
+        case Qt::Key_D:
         {
             dir.x() = +step;
             mult=-1;
             break;
         }
 ///////////////////////////////////////
-        case Qt::Key_A:
+        case Qt::Key_W:
         {
             dir.y() = +step;
             mult=1;
             break;
         }
-        case Qt::Key_D:
+        case Qt::Key_S:
         {
             dir.y() = -step;
             mult=1;
@@ -352,28 +370,79 @@ void MainView::keyPressEvent(QKeyEvent *e)
             _maxH -= hstep;
             break;
         }
+
+		case Qt::Key_0:
+		{
+			p0 = Point2d(-1, -1);
+			p1 = Point2d(-1, 1);
+			p2 = Point2d(1, 1);
+			p3 = Point2d(1, -1);
+
+
+			txt0 = Point2d(0, 0);
+			txt1 = Point2d(0, 1);
+			txt2 = Point2d(1, 1);
+			txt3 = Point2d(1, 0);
+
+			break;
+		}
     }
 
-    std::cout<<_currentCorner<<std::endl;
-    switch(_currentCorner)
-    {
-        case 0: p0+=dir; break;
-        case 1: p1+=dir; break;
-        case 2: p2+=dir; break;
-        case 3: p3+=dir; break;
-        case 4: p0+=mult*dir; p2-=mult*dir; p1-=dir; p3+=dir; break;
-        case 5: p0+=dir; p2+=dir; p1+=dir; p3+=dir; break;
-        // case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
-    }
+	if (_moveTexture)
+	{
+		switch (_currentCorner)
+		{
+		case 0: txt0 += dir; break;
+		case 1: txt1 += dir; break;
+		case 2: txt2 += dir; break;
+		case 3: txt3 += dir; break;
+		case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
+		case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
+			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+		}
+	}
+	else{
+		switch (_currentCorner)
+		{
+		case 0: p0 += dir; break;
+		case 1: p1 += dir; break;
+		case 2: p2 += dir; break;
+		case 3: p3 += dir; break;
+		case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
+		case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
+			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+		}
+	}
 
     std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
 
     update();
 }
 
+
+Point2d MainView::bilinInterp(const Point2d &p)
+{
+	const double x = p.x(), y = p.y();
+
+	const double x1 = p0.x(), y1 = p0.y();
+	const double x2 = p2.x(), y2 = p2.y();
+
+	Point2d res = 1.0 / ((x2 - x1)*(y2 - y1))*(txt0*(x2-x)*(y2-y)+txt3*(x-x1)*(y2-y)+txt1*(x2-x)*(y-y1)+txt2*(x-x1)*(y-y1));
+
+	return res;
+}
+
+void MainView::mouseReleaseEvent(QMouseEvent *e)
+{ }
+
 void MainView::paintGL()
 {
     static const double nTiles = 10;
+
+	if (_setupMode)
+		glClearColor(1, 0, 0, 1);
+	else
+		glClearColor(0, 0, 0, 1);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -385,9 +454,14 @@ void MainView::paintGL()
     glEnable(GL_TEXTURE_2D);
 
     
-    _shader.bind();
-    setUniforms();
-    
+	if (_moveTexture || !_setupMode)
+	{
+		_shader.bind();
+		setUniforms();
+	}
+	else{
+		_checkerboard.bind();
+	}
 
     activeTexture(GL_TEXTURE0);
     if (_txt > 0)
@@ -416,26 +490,26 @@ void MainView::paintGL()
 
     glBegin(GL_QUADS);
 
-    textureCoords(GL_TEXTURE0, 0, 0, 0);
-    textureCoords(GL_TEXTURE1, 0, 0, 0);
+
+	textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
+	textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
     glVertex2d(p0.x(), p0.y());
 
-    textureCoords(GL_TEXTURE0, 0, 1, 1);
-    textureCoords(GL_TEXTURE1, 0, nTiles, 1);
+	textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
+	textureCoords(GL_TEXTURE1, txt1.x()*nTiles, txt1.y()*nTiles, 1);
     glVertex2d(p1.x(), p1.y());
 
-    textureCoords(GL_TEXTURE0, 1, 1, 2);
-    textureCoords(GL_TEXTURE1, nTiles, nTiles, 2);
+	textureCoords(GL_TEXTURE0, txt2.x(), txt2.y(), 2);
+	textureCoords(GL_TEXTURE1, txt2.x()*nTiles, txt2.y()*nTiles, 2);
     glVertex2d(p2.x(), p2.y());
 
-    textureCoords(GL_TEXTURE0, 1, 0, 3);
-    textureCoords(GL_TEXTURE1, nTiles, 0, 3);
+	textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
+	textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
     glVertex2d(p3.x(), p3.y());
 
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
-
     glPopMatrix();
 
     checkGLError("draw");

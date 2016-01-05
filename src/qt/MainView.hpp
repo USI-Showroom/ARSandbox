@@ -6,6 +6,7 @@
 #include <QOpenGLFunctions>
 
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 #include "Point2.hpp"
 
@@ -24,6 +25,7 @@ public:
 
 
 	void keyPressEvent(QKeyEvent *e);
+	void mouseReleaseEvent(QMouseEvent *e);
 
 signals:
 	void keyPress(const int keyCode);
@@ -42,6 +44,9 @@ private:
 	void textureCoords(GLenum texture, float u, float v, int i);
 
 
+	Point2d MainView::bilinInterp(const Point2d &p);
+
+
 protected:
 	void paintGL();
 	void initializeGL();
@@ -51,12 +56,12 @@ protected:
 
 
 private:
-	QOpenGLShaderProgram _shader;
+	QOpenGLShaderProgram _shader, _checkerboard;
 
 	bool _setupMode;
 
 	float _minH, _maxH;
-
+	std::vector<QPoint> _positions;
 	int _currentCorner;
 
 	GLuint _txt;
@@ -64,10 +69,13 @@ private:
 	QOpenGLFunctions _funs;
 	QOpenGLFunctions_2_0 _funs2;
 
-	Point2d p0,p1,p2,p3;
+	Point2d p0, p1, p2, p3;
+	Point2d txt0, txt1, txt2, txt3;
 
 	GLuint _gameTexture;
 	bool _initialized;
+
+	bool _moveTexture;
 
 	const QImage *_tmpGameImage;
 };

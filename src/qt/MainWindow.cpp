@@ -13,7 +13,7 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
      _kinectCommunicator.initialize();
     
    
-	//this->showFullScreen();
+	this->showFullScreen();
 
 	connect(&_kinectCommunicator, SIGNAL(newData(const UINT16 *, int , int )),
 		           _ui->mainView, SLOT(newKinectData(const UINT16 *, int , int )));
@@ -37,6 +37,11 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     _ui->mainView->keyPressEvent(e);
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *e)
+{
+	_ui->mainView->mouseReleaseEvent(e);
 }
 
 MainWindow::~MainWindow()

@@ -22,6 +22,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *e);
+	void mouseReleaseEvent(QMouseEvent *e);
 
 private:
     Ui::MainWindow* _ui;
