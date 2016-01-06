@@ -44,7 +44,7 @@ private:
 	void createTexture(const QString &path, GLuint &txtId);
 	void activeTexture(GLenum texture);
 	void textureCoords(GLenum texture, float u, float v, int i);
-
+	void reloadTerainTextures(const std::string &terrainIndex);
 
 	Point2d bilinInterp(const Point2d &p);
 
@@ -69,6 +69,8 @@ private:
 
 	GLuint _txt;
 	GLuint _level0, _level1, _level2, _level3, _level4;
+	GLuint _gameTexture;
+
 	QOpenGLFunctions _funs;
 	QOpenGLFunctions_2_0 _funs2;
 
@@ -76,7 +78,6 @@ private:
 	Point2d txt0, txt1, txt2, txt3;
 
 
-	GLuint _gameTexture;
 	bool _initialized;
 
 	bool _moveTexture;

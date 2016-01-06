@@ -13,10 +13,13 @@
 
 
 MainView::MainView(QWidget *parent)
-	: super(parent), _shader(this), _checkerboard(this), _txt(0),
+: super(parent), _shader(this), _checkerboard(this), _txt(0),
+
+_level0(0), _level1(0), _level2(0), _level3(0), _level4(0), _gameTexture(0),
+
 p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1),
 txt0(0, 0), txt1(0, 1), txt2(1, 1), txt3(1, 0),
-_gameTexture(0),
+
 _zoom(":/interaction/zoom"), _move(":/interaction/move"), 
 _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interaction/2"), _corner3(":/interaction/3")
 { 
@@ -28,7 +31,7 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
     _maxH=1340;
 #endif
     _setupMode=true;
-	_moveTexture = false;
+    _moveTexture = false;
 
     _currentCorner=4;
 
@@ -107,9 +110,9 @@ void MainView::initializeGL() {
     QFileInfo fragFile(":/shaders/HeightMap.frag");
     fragShader.compileSourceFile(fragFile.absoluteFilePath());
 
-	QOpenGLShader fragCheckerShader(QOpenGLShader::Fragment);
-	QFileInfo fragCheckerFile(":/shaders/Checkerboard.frag");
-	fragCheckerShader.compileSourceFile(fragCheckerFile.absoluteFilePath());
+    QOpenGLShader fragCheckerShader(QOpenGLShader::Fragment);
+    QFileInfo fragCheckerFile(":/shaders/Checkerboard.frag");
+    fragCheckerShader.compileSourceFile(fragCheckerFile.absoluteFilePath());
 
 
     _shader.addShader(&vertShader);
@@ -118,10 +121,10 @@ void MainView::initializeGL() {
     _shader.link();
 
 
-	_checkerboard.addShader(&vertShader);
-	_checkerboard.addShader(&fragCheckerShader);
+    _checkerboard.addShader(&vertShader);
+    _checkerboard.addShader(&fragCheckerShader);
 
-	_checkerboard.link();
+    _checkerboard.link();
 
 
     int M, m, maxTxt;
@@ -139,12 +142,7 @@ void MainView::initializeGL() {
     std::cout << "GLSL version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Max textures " << maxTxt << std::endl;
 
-    std::string terrainIndex="0";
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level0"),_level0);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level1"),_level1);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level2"),_level2);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level3"),_level3);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level4"),_level4);
+    reloadTerainTextures("0");
 
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
@@ -155,6 +153,26 @@ void MainView::initializeGL() {
     }
 
     checkGLError("init");
+}
+
+void MainView::reloadTerainTextures(const std::string &terrainIndex)
+{
+    if(_level0>0)
+        glDeleteTextures(1, &_level0);
+    if(_level1>0)
+        glDeleteTextures(1, &_level1);
+    if(_level2>0)
+        glDeleteTextures(1, &_level2);
+    if(_level3>0)
+        glDeleteTextures(1, &_level3);
+    if(_level4>0)
+        glDeleteTextures(1, &_level4);
+
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level0"),_level0);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level1"),_level1);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level2"),_level2);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level3"),_level3);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level4"),_level4);
 }
 
 void MainView::newGameImage(const QImage &img)
@@ -292,7 +310,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     const int key=e->key();
 
-	if (key == Qt::Key_Escape) exit(1);
+    if (key == Qt::Key_Escape) exit(1);
 
     if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
@@ -316,6 +334,9 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     switch (key)
     {
+        case Qt::Key_F1: reloadTerainTextures("0"); break;
+        case Qt::Key_F2: reloadTerainTextures("1"); break;
+
         case Qt::Key_1: _currentCorner=0; break;
         case Qt::Key_2: _currentCorner=1; break;
         case Qt::Key_3: _currentCorner=2; break;
@@ -323,7 +344,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
         case Qt::Key_5: _currentCorner=4; break;
         case Qt::Key_6: _currentCorner=5; break;
 
-		case Qt::Key_Space: _moveTexture = !_moveTexture; break;
+        case Qt::Key_Space: _moveTexture = !_moveTexture; break;
 ////////////////////////////////////////////
         case Qt::Key_A:
         {
@@ -373,52 +394,52 @@ void MainView::keyPressEvent(QKeyEvent *e)
             break;
         }
 
-		case Qt::Key_0:
-		{
-			p0 = Point2d(-1, -1);
-			p1 = Point2d(-1, 1);
-			p2 = Point2d(1, 1);
-			p3 = Point2d(1, -1);
+        case Qt::Key_0:
+        {
+           p0 = Point2d(-1, -1);
+           p1 = Point2d(-1, 1);
+           p2 = Point2d(1, 1);
+           p3 = Point2d(1, -1);
 
 
-			txt0 = Point2d(0, 0);
-			txt1 = Point2d(0, 1);
-			txt2 = Point2d(1, 1);
-			txt3 = Point2d(1, 0);
+           txt0 = Point2d(0, 0);
+           txt1 = Point2d(0, 1);
+           txt2 = Point2d(1, 1);
+           txt3 = Point2d(1, 0);
 
-			break;
-		}
-    }
+           break;
+       }
+   }
 
-	if (_moveTexture)
-	{
-		switch (_currentCorner)
-		{
-		case 0: txt0 += dir; break;
-		case 1: txt1 += dir; break;
-		case 2: txt2 += dir; break;
-		case 3: txt3 += dir; break;
-		case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
-		case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
+   if (_moveTexture)
+   {
+      switch (_currentCorner)
+      {
+          case 0: txt0 += dir; break;
+          case 1: txt1 += dir; break;
+          case 2: txt2 += dir; break;
+          case 3: txt3 += dir; break;
+          case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
+          case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
 			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
-		}
-	}
-	else{
-		switch (_currentCorner)
-		{
-		case 0: p0 += dir; break;
-		case 1: p1 += dir; break;
-		case 2: p2 += dir; break;
-		case 3: p3 += dir; break;
-		case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
-		case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
+      }
+  }
+  else{
+      switch (_currentCorner)
+      {
+          case 0: p0 += dir; break;
+          case 1: p1 += dir; break;
+          case 2: p2 += dir; break;
+          case 3: p3 += dir; break;
+          case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
+          case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
 			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
-		}
-	}
+      }
+  }
 
-    std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
+  std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
 
-    update();
+  update();
 }
 
 
@@ -444,100 +465,100 @@ void MainView::paintEvent(QPaintEvent *e)
     QPainter painter(this);
     static const double nTiles = 10;
 
-	if (_setupMode)
-		glClearColor(1, 0, 0, 1);
-	else
-		glClearColor(0, 0, 0, 1);
+    if (_setupMode)
+      glClearColor(1, 0, 0, 1);
+  else
+      glClearColor(0, 0, 0, 1);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glDisable(GL_BLEND);
+  glDisable(GL_BLEND);
 
-    glPushMatrix();
-    glLoadIdentity();
+  glPushMatrix();
+  glLoadIdentity();
 
-    glEnable(GL_TEXTURE_2D);
+  glEnable(GL_TEXTURE_2D);
 
-    
-	if (_moveTexture || !_setupMode)
-	{
-		_shader.bind();
-		setUniforms();
-	}
-	else{
-		_checkerboard.bind();
-	}
 
+  if (_moveTexture || !_setupMode)
+  {
+      _shader.bind();
+      setUniforms();
+  }
+  else{
+      _checkerboard.bind();
+  }
+
+  activeTexture(GL_TEXTURE0);
+  if (_txt > 0)
+    glBindTexture(GL_TEXTURE_2D, _txt);
+
+
+activeTexture(GL_TEXTURE1);
+if (_gameTexture > 0)
+    glBindTexture(GL_TEXTURE_2D, _gameTexture);
+
+
+activeTexture(GL_TEXTURE2);
+glBindTexture(GL_TEXTURE_2D, _level0);
+
+activeTexture(GL_TEXTURE3);
+glBindTexture(GL_TEXTURE_2D, _level1);
+
+activeTexture(GL_TEXTURE4);
+glBindTexture(GL_TEXTURE_2D, _level2);
+
+activeTexture(GL_TEXTURE5);
+glBindTexture(GL_TEXTURE_2D, _level3);
+
+activeTexture(GL_TEXTURE6);
+glBindTexture(GL_TEXTURE_2D, _level4);
+
+glBegin(GL_QUADS);
+
+
+textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
+textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
+glVertex2d(p0.x(), p0.y());
+
+textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
+textureCoords(GL_TEXTURE1, txt1.x()*nTiles, txt1.y()*nTiles, 1);
+glVertex2d(p1.x(), p1.y());
+
+textureCoords(GL_TEXTURE0, txt2.x(), txt2.y(), 2);
+textureCoords(GL_TEXTURE1, txt2.x()*nTiles, txt2.y()*nTiles, 2);
+glVertex2d(p2.x(), p2.y());
+
+textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
+textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
+glVertex2d(p3.x(), p3.y());
+
+glEnd();
+
+glDisable(GL_TEXTURE_2D);
+glPopMatrix();
+checkGLError("draw");
+
+
+if(_setupMode){
     activeTexture(GL_TEXTURE0);
-    if (_txt > 0)
-        glBindTexture(GL_TEXTURE_2D, _txt);
+    const double w=this->size().width();
+    const double h=this->size().height();
+    const QPoint corner(w/2-100,h/2-100);
 
-
-    activeTexture(GL_TEXTURE1);
-    if (_gameTexture > 0)
-        glBindTexture(GL_TEXTURE_2D, _gameTexture);
-
-
-    activeTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _level0);
-
-    activeTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, _level1);
-
-    activeTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, _level2);
-
-    activeTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, _level3);
-
-    activeTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, _level4);
-
-    glBegin(GL_QUADS);
-
-
-	textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
-	textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
-    glVertex2d(p0.x(), p0.y());
-
-	textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
-	textureCoords(GL_TEXTURE1, txt1.x()*nTiles, txt1.y()*nTiles, 1);
-    glVertex2d(p1.x(), p1.y());
-
-	textureCoords(GL_TEXTURE0, txt2.x(), txt2.y(), 2);
-	textureCoords(GL_TEXTURE1, txt2.x()*nTiles, txt2.y()*nTiles, 2);
-    glVertex2d(p2.x(), p2.y());
-
-	textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
-	textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
-    glVertex2d(p3.x(), p3.y());
-
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
-    activeTexture(GL_TEXTURE0);
-    checkGLError("draw");
-    
-
-    if(_setupMode){
-        const double w=this->size().width();
-        const double h=this->size().height();
-        const QPoint corner(w/2-100,h/2-100);
-
-        switch (_currentCorner)
-        {
+    switch (_currentCorner)
+    {
         case 0: painter.drawImage(corner, _corner0); break;
         case 1: painter.drawImage(corner, _corner1); break;
         case 2: painter.drawImage(corner, _corner2); break;
         case 3: painter.drawImage(corner, _corner3); break;
         case 4: painter.drawImage(corner, _zoom); break;
         case 5: painter.drawImage(corner, _move); break;
-        }
-
-        
     }
-    painter.end();
+
+
+}
+painter.end();
 }
 
 

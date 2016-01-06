@@ -23,6 +23,14 @@
         <file alias="level4">terrain/0/level4.png</file>
     </qresource>
 
+        <qresource prefix="/terrain/1">
+        <file alias="level0">terrain/1/level0.jpg</file>
+        <file alias="level1">terrain/1/level1.jpg</file>
+        <file alias="level2">terrain/1/level2.jpg</file>
+        <file alias="level3">terrain/1/level3.jpg</file>
+        <file alias="level4">terrain/1/level4.png</file>
+    </qresource>
+
     <qresource prefix="/test">
         <file alias="depth">depth.png</file>
     </qresource>
