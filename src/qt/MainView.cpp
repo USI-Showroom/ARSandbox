@@ -10,14 +10,15 @@
 #include "MainView.hpp"
 #include <cmath>
 
-#include <QImage>
 
 
 MainView::MainView(QWidget *parent)
 	: super(parent), _shader(this), _checkerboard(this), _txt(0),
 p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1),
 txt0(0, 0), txt1(0, 1), txt2(1, 1), txt3(1, 0),
-_gameTexture(0)
+_gameTexture(0),
+_zoom(":/interaction/zoom"), _move(":/interaction/move"), 
+_corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interaction/2"), _corner3(":/interaction/3")
 { 
 #ifdef NO_KINECT
     _minH=0;
@@ -138,11 +139,12 @@ void MainView::initializeGL() {
     std::cout << "GLSL version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Max textures " << maxTxt << std::endl;
 
-    createTexture(":/terrain/level0",_level0);
-    createTexture(":/terrain/level1",_level1);
-    createTexture(":/terrain/level2",_level2);
-    createTexture(":/terrain/level3",_level3);
-    createTexture(":/terrain/level4",_level4);
+    std::string terrainIndex="0";
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level0"),_level0);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level1"),_level1);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level2"),_level2);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level3"),_level3);
+    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level4"),_level4);
 
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
@@ -435,8 +437,11 @@ Point2d MainView::bilinInterp(const Point2d &p)
 void MainView::mouseReleaseEvent(QMouseEvent *e)
 { }
 
-void MainView::paintGL()
+// void MainView::paintGL()
+void MainView::paintEvent(QPaintEvent *e) 
 {
+
+    QPainter painter(this);
     static const double nTiles = 10;
 
 	if (_setupMode)
@@ -511,6 +516,33 @@ void MainView::paintGL()
 
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
-
+    activeTexture(GL_TEXTURE0);
     checkGLError("draw");
+    
+
+    if(_setupMode){
+        const double w=this->size().width();
+        const double h=this->size().height();
+        const QPoint corner(w/2-100,h/2-100);
+
+        switch (_currentCorner)
+        {
+        case 0: painter.drawImage(corner, _corner0); break;
+        case 1: painter.drawImage(corner, _corner1); break;
+        case 2: painter.drawImage(corner, _corner2); break;
+        case 3: painter.drawImage(corner, _corner3); break;
+        case 4: painter.drawImage(corner, _zoom); break;
+        case 5: painter.drawImage(corner, _move); break;
+        }
+
+        
+    }
+    painter.end();
 }
+
+
+
+
+
+
+
