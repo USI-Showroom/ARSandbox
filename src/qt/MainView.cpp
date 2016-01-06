@@ -25,7 +25,7 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
 { 
 #ifdef NO_KINECT
     _minH=0;
-    _maxH=1;
+    _maxH=255;
 #else
     _minH=1200;
     _maxH=1340;
@@ -36,6 +36,7 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
     _currentCorner=4;
 
     _initialized=false;
+    _mustReloadGameTexture=false;
 
     _tmpGameImage=NULL;
 }
@@ -71,22 +72,22 @@ void MainView::setUniforms()
     GLuint level3T = _shader.uniformLocation("level3");
     GLuint level4T = _shader.uniformLocation("level4");
 
-    
+
 
     _shader.setUniformValue(heightT,0);
 
-    _shader.setUniformValue(gameT,1);
+    _shader.setUniformValue(gameT,6);
 
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
 
-    _shader.setUniformValue(level0T,2);
-    _shader.setUniformValue(level1T,3);
-    _shader.setUniformValue(level2T,4);
-    _shader.setUniformValue(level3T,5);
-    _shader.setUniformValue(level4T,6);
+    _shader.setUniformValue(level0T,1);
+    _shader.setUniformValue(level1T,2);
+    _shader.setUniformValue(level2T,3);
+    _shader.setUniformValue(level3T,4);
+    _shader.setUniformValue(level4T,5);
 
-    
+
 
     checkGLError("setUniforms");
 }
@@ -147,11 +148,6 @@ void MainView::initializeGL() {
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
 
-    if(_tmpGameImage){
-        newGameImage(*_tmpGameImage);
-        _tmpGameImage=NULL;
-    }
-
     checkGLError("init");
 }
 
@@ -180,13 +176,23 @@ void MainView::newGameImage(const QImage &img)
     if(!_initialized)
     {
         _tmpGameImage=&img;
+        _mustReloadGameTexture=true;
         return;
     }
+
+    _mustReloadGameTexture=true;
+    update();
+}
+
+void MainView::reloadGameImage()
+{
+    if(!_mustReloadGameTexture) return;
+    _mustReloadGameTexture=false;
 
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 
-    QImage tmp=QGLWidget::convertToGLFormat(img);
+    QImage tmp=QGLWidget::convertToGLFormat(*_tmpGameImage);
     glGenTextures(1, &_gameTexture);
     glBindTexture(GL_TEXTURE_2D, _gameTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -196,7 +202,6 @@ void MainView::newGameImage(const QImage &img)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tmp.width(), tmp.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp.bits());
 
     checkGLError("newGameImage");
-    update();
 }
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
@@ -396,63 +401,63 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
         case Qt::Key_0:
         {
-           p0 = Point2d(-1, -1);
-           p1 = Point2d(-1, 1);
-           p2 = Point2d(1, 1);
-           p3 = Point2d(1, -1);
+         p0 = Point2d(-1, -1);
+         p1 = Point2d(-1, 1);
+         p2 = Point2d(1, 1);
+         p3 = Point2d(1, -1);
 
 
-           txt0 = Point2d(0, 0);
-           txt1 = Point2d(0, 1);
-           txt2 = Point2d(1, 1);
-           txt3 = Point2d(1, 0);
+         txt0 = Point2d(0, 0);
+         txt1 = Point2d(0, 1);
+         txt2 = Point2d(1, 1);
+         txt3 = Point2d(1, 0);
 
-           break;
-       }
-   }
+         break;
+     }
+ }
 
-   if (_moveTexture)
-   {
-      switch (_currentCorner)
-      {
-          case 0: txt0 += dir; break;
-          case 1: txt1 += dir; break;
-          case 2: txt2 += dir; break;
-          case 3: txt3 += dir; break;
-          case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
-          case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
-			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
-      }
-  }
-  else{
-      switch (_currentCorner)
-      {
-          case 0: p0 += dir; break;
-          case 1: p1 += dir; break;
-          case 2: p2 += dir; break;
-          case 3: p3 += dir; break;
-          case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
-          case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
-			// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
-      }
-  }
+ if (_moveTexture)
+ {
+    switch (_currentCorner)
+    {
+        case 0: txt0 += dir; break;
+        case 1: txt1 += dir; break;
+        case 2: txt2 += dir; break;
+        case 3: txt3 += dir; break;
+        case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
+        case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
+	// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+    }
+}
+else{
+    switch (_currentCorner)
+    {
+        case 0: p0 += dir; break;
+        case 1: p1 += dir; break;
+        case 2: p2 += dir; break;
+        case 3: p3 += dir; break;
+        case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
+        case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
+	// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+    }
+}
 
-  std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
+std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
 
-  update();
+update();
 }
 
 
 Point2d MainView::bilinInterp(const Point2d &p)
 {
-	const double x = p.x(), y = p.y();
+    const double x = p.x(), y = p.y();
 
-	const double x1 = p0.x(), y1 = p0.y();
-	const double x2 = p2.x(), y2 = p2.y();
+    const double x1 = p0.x(), y1 = p0.y();
+    const double x2 = p2.x(), y2 = p2.y();
 
-	Point2d res = 1.0 / ((x2 - x1)*(y2 - y1))*(txt0*(x2-x)*(y2-y)+txt3*(x-x1)*(y2-y)+txt1*(x2-x)*(y-y1)+txt2*(x-x1)*(y-y1));
+    Point2d res = 1.0 / ((x2 - x1)*(y2 - y1))*(txt0*(x2-x)*(y2-y)+txt3*(x-x1)*(y2-y)+txt1*(x2-x)*(y-y1)+txt2*(x-x1)*(y-y1));
 
-	return res;
+    return res;
 }
 
 void MainView::mouseReleaseEvent(QMouseEvent *e)
@@ -461,104 +466,106 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
 // void MainView::paintGL()
 void MainView::paintEvent(QPaintEvent *e) 
 {
-
+    reloadGameImage();
     QPainter painter(this);
     static const double nTiles = 10;
 
-    if (_setupMode)
-      glClearColor(1, 0, 0, 1);
-  else
-      glClearColor(0, 0, 0, 1);
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glDisable(GL_BLEND);
-
-  glPushMatrix();
-  glLoadIdentity();
-
-  glEnable(GL_TEXTURE_2D);
-
-
-  if (_moveTexture || !_setupMode)
-  {
-      _shader.bind();
-      setUniforms();
-  }
-  else{
-      _checkerboard.bind();
-  }
-
-  activeTexture(GL_TEXTURE0);
-  if (_txt > 0)
-    glBindTexture(GL_TEXTURE_2D, _txt);
-
-
-activeTexture(GL_TEXTURE1);
-if (_gameTexture > 0)
-    glBindTexture(GL_TEXTURE_2D, _gameTexture);
-
-
-activeTexture(GL_TEXTURE2);
-glBindTexture(GL_TEXTURE_2D, _level0);
-
-activeTexture(GL_TEXTURE3);
-glBindTexture(GL_TEXTURE_2D, _level1);
-
-activeTexture(GL_TEXTURE4);
-glBindTexture(GL_TEXTURE_2D, _level2);
-
-activeTexture(GL_TEXTURE5);
-glBindTexture(GL_TEXTURE_2D, _level3);
-
-activeTexture(GL_TEXTURE6);
-glBindTexture(GL_TEXTURE_2D, _level4);
-
-glBegin(GL_QUADS);
-
-
-textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
-textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
-glVertex2d(p0.x(), p0.y());
-
-textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
-textureCoords(GL_TEXTURE1, txt1.x()*nTiles, txt1.y()*nTiles, 1);
-glVertex2d(p1.x(), p1.y());
-
-textureCoords(GL_TEXTURE0, txt2.x(), txt2.y(), 2);
-textureCoords(GL_TEXTURE1, txt2.x()*nTiles, txt2.y()*nTiles, 2);
-glVertex2d(p2.x(), p2.y());
-
-textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
-textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
-glVertex2d(p3.x(), p3.y());
-
-glEnd();
-
-glDisable(GL_TEXTURE_2D);
-glPopMatrix();
-checkGLError("draw");
-
-
-if(_setupMode){
-    activeTexture(GL_TEXTURE0);
-    const double w=this->size().width();
-    const double h=this->size().height();
-    const QPoint corner(w/2-100,h/2-100);
-
-    switch (_currentCorner)
-    {
-        case 0: painter.drawImage(corner, _corner0); break;
-        case 1: painter.drawImage(corner, _corner1); break;
-        case 2: painter.drawImage(corner, _corner2); break;
-        case 3: painter.drawImage(corner, _corner3); break;
-        case 4: painter.drawImage(corner, _zoom); break;
-        case 5: painter.drawImage(corner, _move); break;
+    if (_setupMode){
+        glClearColor(1, 0, 0, 1);
+    }
+    else{
+        glClearColor(0, 0, 0, 1);
     }
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-}
-painter.end();
+    glDisable(GL_BLEND);
+
+    glPushMatrix();
+    glLoadIdentity();
+
+    glEnable(GL_TEXTURE_2D);
+
+
+    if (_moveTexture || !_setupMode)
+    {
+        _shader.bind();
+        setUniforms();
+    }
+    else{
+        _checkerboard.bind();
+    }
+
+    activeTexture(GL_TEXTURE0);
+    if (_txt > 0)
+        glBindTexture(GL_TEXTURE_2D, _txt);
+
+
+    activeTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, _level0);
+
+    activeTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, _level1);
+
+    activeTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, _level2);
+
+    activeTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, _level3);
+
+    activeTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, _level4);
+
+
+    activeTexture(GL_TEXTURE6);
+    if (_gameTexture > 0)
+        glBindTexture(GL_TEXTURE_2D, _gameTexture);
+
+    glBegin(GL_QUADS);
+
+
+    textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
+    textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
+    glVertex2d(p0.x(), p0.y());
+
+    textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
+    textureCoords(GL_TEXTURE1, txt1.x()*nTiles, txt1.y()*nTiles, 1);
+    glVertex2d(p1.x(), p1.y());
+
+    textureCoords(GL_TEXTURE0, txt2.x(), txt2.y(), 2);
+    textureCoords(GL_TEXTURE1, txt2.x()*nTiles, txt2.y()*nTiles, 2);
+    glVertex2d(p2.x(), p2.y());
+
+    textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
+    textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
+    glVertex2d(p3.x(), p3.y());
+
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+    checkGLError("draw");
+
+    activeTexture(GL_TEXTURE0);
+
+    if(_setupMode){
+        const double w=this->size().width();
+        const double h=this->size().height();
+        const QPoint corner(w/2-100,h/2-100);
+
+        switch (_currentCorner)
+        {
+            case 0: painter.drawImage(corner, _corner0); break;
+            case 1: painter.drawImage(corner, _corner1); break;
+            case 2: painter.drawImage(corner, _corner2); break;
+            case 3: painter.drawImage(corner, _corner3); break;
+            case 4: painter.drawImage(corner, _zoom); break;
+            case 5: painter.drawImage(corner, _move); break;
+        }
+
+
+    }
+    painter.end();
 }
 
 

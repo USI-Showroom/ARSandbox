@@ -7,7 +7,7 @@
 class Point2d {
 public:
   Point2d() 
-    : _x( 0 ), _y( 0 ) {};
+    : _x( 0 ), _y( 0 ) {}
 
   explicit Point2d( const double v )
     : _x( v ), _y( v ) {}

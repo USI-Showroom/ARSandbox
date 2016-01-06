@@ -45,6 +45,7 @@ private:
 	void activeTexture(GLenum texture);
 	void textureCoords(GLenum texture, float u, float v, int i);
 	void reloadTerainTextures(const std::string &terrainIndex);
+	void reloadGameImage();
 
 	Point2d bilinInterp(const Point2d &p);
 
@@ -81,6 +82,7 @@ private:
 	bool _initialized;
 
 	bool _moveTexture;
+	bool _mustReloadGameTexture;
 
 	const QImage *_tmpGameImage;
 

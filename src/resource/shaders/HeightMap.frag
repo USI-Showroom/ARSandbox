@@ -83,7 +83,7 @@ void main()
 
 
 #ifdef NO_KINECT
-    vec4 heightTxt = texture2D(height, txtH.xy);
+    vec4 heightTxt = texture2D(height, txtH.xy)*255.0;
 #else
     uvec4 heightTxt = texture2D(height, txtH.xy);
 #endif

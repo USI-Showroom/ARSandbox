@@ -34,6 +34,9 @@ public:
     void updateTexture();
 
 private:
+    double getHeight(const UINT16 *data, const int x, const int y);
+
+private:
     int _minH, _maxH;
     QTimer *_gameTimer;
     QImage _image;
