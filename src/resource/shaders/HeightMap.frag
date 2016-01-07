@@ -1,4 +1,4 @@
-#define NO_KINECT
+//#define NO_KINECT
 
 //1200 1400
 
@@ -116,6 +116,6 @@ void main()
     weight(heightV,4)*level4Txt;
 
 
-    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a)*bgCol;
+    gl_FragColor = bgCol;//gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a)*bgCol;
 }
 

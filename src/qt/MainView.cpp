@@ -466,7 +466,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
 // void MainView::paintGL()
 void MainView::paintEvent(QPaintEvent *e) 
 {
-    reloadGameImage();
+   // reloadGameImage();
     QPainter painter(this);
     static const double nTiles = 10;
 
