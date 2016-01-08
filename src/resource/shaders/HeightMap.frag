@@ -1,4 +1,4 @@
-#define NO_KINECT
+//#define NO_KINECT
 
 //1200 1400
 
@@ -90,24 +90,22 @@ void main()
 
 
 #ifdef NO_KINECT
-    vec4 heightTxt = 
-                texture2D(height0, txtH.xy)+
-        0.5 *   texture2D(height1, txtH.xy)+
-        0.25 *  texture2D(height2, txtH.xy)+
-        0.125 * texture2D(height3, txtH.xy);
+    float heightV = 
+                texture2D(height0, txtH.xy).r+
+        0.5 *   texture2D(height1, txtH.xy).r+
+        0.25 *  texture2D(height2, txtH.xy).r+
+        0.125 * texture2D(height3, txtH.xy).r;
 
-    heightTxt*=255.0/1.875;
+    heightV*=255.0/1.875;
 #else
-    uvec4 heightTxt = 
-                texture2D(height0, txtH.xy)+
-        0.5 *   texture2D(height1, txtH.xy)+
-        0.25 *  texture2D(height2, txtH.xy)+
-        0.125 * texture2D(height3, txtH.xy);
+    float heightV = 
+                texture2D(height0, txtH.xy).r+
+        0.5 *   texture2D(height1, txtH.xy).r+
+        0.25 *  texture2D(height2, txtH.xy).r+
+        0.125 * texture2D(height3, txtH.xy).r;
 
-    heightTxt/=1.875;
+    heightV/=1.875;
 #endif
-
-    float heightV=heightTxt.r;
 
     heightV=(heightV-minH)/(maxH-minH);
     heightV=min(1.0,heightV);

@@ -77,12 +77,12 @@ void GameManager::keyPress(const int key)
             _position.x() += step;
             break;
         }
-        case Qt::Key_W:
+        case Qt::Key_S:
         {
             _position.y() += step;
             break;
         }
-        case Qt::Key_S:
+        case Qt::Key_W:
         {
             _position.y() -= step;
             break;
@@ -100,14 +100,14 @@ void GameManager::initialize()
 }
 
 void GameManager::updateGame()
-{ 
-        //sample
-    // _image.fill(QColor(0,0,0,0));
-    // QPainter painter;
-    // painter.begin(&_image);
-    // painter.setBrush(QColor(255,0,255,255));
-    // painter.drawEllipse(QPoint(_position.x(),_position.y()),10,10);
-    // painter.end();  
+{
+	//sample
+	_image.fill(QColor(0, 0, 0, 0));
+	QPainter painter;
+	painter.begin(&_image);
+	painter.setBrush(QColor(255, 0, 255, 255));
+	painter.drawEllipse(QPoint(_position.x(), _position.y()), 2, 2);
+	painter.end();
 
-    updateTexture();
+	updateTexture();
 }
