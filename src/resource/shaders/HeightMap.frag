@@ -1,4 +1,4 @@
-//#define NO_KINECT
+#define NO_KINECT
 
 //1200 1400
 
@@ -7,10 +7,17 @@
 
 #version 130
 #extension GL_EXT_gpu_shader4 : enable
-uniform usampler2D height;
+
+uniform usampler2D height0;
+uniform usampler2D height1;
+uniform usampler2D height2;
+uniform usampler2D height3;
 
 #else
-uniform sampler2D height;
+uniform sampler2D height0;
+uniform sampler2D height1;
+uniform sampler2D height2;
+uniform sampler2D height3;
 
 #endif
 
@@ -83,9 +90,21 @@ void main()
 
 
 #ifdef NO_KINECT
-    vec4 heightTxt = texture2D(height, txtH.xy)*255.0;
+    vec4 heightTxt = 
+                texture2D(height0, txtH.xy)+
+        0.5 *   texture2D(height1, txtH.xy)+
+        0.25 *  texture2D(height2, txtH.xy)+
+        0.125 * texture2D(height3, txtH.xy);
+
+    heightTxt*=255.0/1.875;
 #else
-    uvec4 heightTxt = texture2D(height, txtH.xy);
+    uvec4 heightTxt = 
+                texture2D(height0, txtH.xy)+
+        0.5 *   texture2D(height1, txtH.xy)+
+        0.25 *  texture2D(height2, txtH.xy)+
+        0.125 * texture2D(height3, txtH.xy);
+
+    heightTxt/=1.875;
 #endif
 
     float heightV=heightTxt.r;
@@ -116,6 +135,6 @@ void main()
     weight(heightV,4)*level4Txt;
 
 
-    gl_FragColor = bgCol;//gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a)*bgCol;
+    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a)*bgCol;
 }
 

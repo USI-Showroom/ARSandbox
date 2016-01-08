@@ -109,5 +109,5 @@ void GameManager::updateGame()
     // painter.drawEllipse(QPoint(_position.x(),_position.y()),10,10);
     // painter.end();  
 
-    // updateTexture();
+    updateTexture();
 }

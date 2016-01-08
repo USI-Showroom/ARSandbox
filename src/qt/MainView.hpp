@@ -1,3 +1,5 @@
+#include <deque>
+
 #include <QOpenGLWidget>
 #include <QPaintEvent>
 #include <QOpenGLShaderProgram>
@@ -21,6 +23,10 @@ class MainView : public QOpenGLWidget
 	Q_OBJECT
 private:
 	typedef QOpenGLWidget  super;
+
+	static const int nLevels=5;
+	static const int nSmoothing=4;
+	
 public:
 	MainView(QWidget *parent = NULL);
 	~MainView();
@@ -62,14 +68,16 @@ protected:
 private:
 	QOpenGLShaderProgram _shader, _checkerboard;
 
-	bool _setupMode;
+	bool _setupMode, _initialized;
+
+	bool _moveTexture;
+	bool _mustReloadGameTexture;
 
 	float _minH, _maxH;
-	std::vector<QPoint> _positions;
 	int _currentCorner;
 
-	GLuint _txt;
-	GLuint _level0, _level1, _level2, _level3, _level4;
+	std::deque<GLuint> _txt;
+	GLuint _level[nLevels];
 	GLuint _gameTexture;
 
 	QOpenGLFunctions _funs;
@@ -79,12 +87,8 @@ private:
 	Point2d txt0, txt1, txt2, txt3;
 
 
-	bool _initialized;
 
-	bool _moveTexture;
-	bool _mustReloadGameTexture;
-
-	const QImage *_tmpGameImage;
+	const QImage *_gameImage;
 
 	QImage _zoom, _move, _corner0, _corner1, _corner2, _corner3;
 };

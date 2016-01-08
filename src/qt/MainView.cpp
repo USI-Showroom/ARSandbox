@@ -13,9 +13,7 @@
 
 
 MainView::MainView(QWidget *parent)
-: super(parent), _shader(this), _checkerboard(this), _txt(0),
-
-_level0(0), _level1(0), _level2(0), _level3(0), _level4(0), _gameTexture(0),
+: super(parent), _shader(this), _checkerboard(this), _gameTexture(0),
 
 p0(-1,-1), p1(-1,1), p2(1,1), p3(1,-1),
 txt0(0, 0), txt1(0, 1), txt2(1, 1), txt3(1, 0),
@@ -38,20 +36,20 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
     _initialized=false;
     _mustReloadGameTexture=false;
 
-    _tmpGameImage=NULL;
+    _gameImage=NULL;
+
+    for(int i=0; i<nLevels; ++i) {
+        _level[i]=0; 
+    }
 }
 
 MainView::~MainView()
 {
-    if(_txt>0)
-        glDeleteTextures(1, &_txt);
+    for(int i=0; i<_txt.size();++i)
+        glDeleteTextures(1, &_txt[i]);
 
-
-    glDeleteTextures(1, &_level0);
-    glDeleteTextures(1, &_level1);
-    glDeleteTextures(1, &_level2);
-    glDeleteTextures(1, &_level3);
-    glDeleteTextures(1, &_level4);
+    for(int i=0; i<nLevels; ++i)
+        glDeleteTextures(1, &_level[i]);
 
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
@@ -59,35 +57,40 @@ MainView::~MainView()
 
 void MainView::setUniforms()
 {
-    GLuint heightT = _shader.uniformLocation("height");
-
     GLuint gameT = _shader.uniformLocation("gameTexture");
 
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
 
-    GLuint level0T = _shader.uniformLocation("level0");
-    GLuint level1T = _shader.uniformLocation("level1");
-    GLuint level2T = _shader.uniformLocation("level2");
-    GLuint level3T = _shader.uniformLocation("level3");
-    GLuint level4T = _shader.uniformLocation("level4");
+
+    GLuint heightT[nSmoothing];
+    for(int i=0; i<nSmoothing; ++i) {
+        QString tmp("height");
+        tmp+=QString::number(i);
+        heightT[i] = _shader.uniformLocation(tmp.toStdString().c_str());
+    }
 
 
+    GLuint levelT[nLevels];
+    for(int i=0; i<nLevels; ++i) {
+        QString tmp("level");
+        tmp+=QString::number(i);
+        levelT[i] = _shader.uniformLocation(tmp.toStdString().c_str());
+    }
 
-    _shader.setUniformValue(heightT,0);
 
-    _shader.setUniformValue(gameT,6);
+    for(int i=0; i<nSmoothing; ++i) {
+        _shader.setUniformValue(heightT[i],i);
+    }
+
+    for(int i=0; i<nLevels; ++i) {
+        _shader.setUniformValue(levelT[i],nSmoothing + i);
+    }
+    
+    _shader.setUniformValue(gameT,nSmoothing+nLevels);
 
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
-
-    _shader.setUniformValue(level0T,1);
-    _shader.setUniformValue(level1T,2);
-    _shader.setUniformValue(level2T,3);
-    _shader.setUniformValue(level3T,4);
-    _shader.setUniformValue(level4T,5);
-
-
 
     checkGLError("setUniforms");
 }
@@ -143,6 +146,8 @@ void MainView::initializeGL() {
     std::cout << "GLSL version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "Max textures " << maxTxt << std::endl;
 
+    assert(nSmoothing+nLevels+1<=maxTxt);
+
     reloadTerainTextures("0");
 
     _funs.initializeOpenGLFunctions();
@@ -153,46 +158,39 @@ void MainView::initializeGL() {
 
 void MainView::reloadTerainTextures(const std::string &terrainIndex)
 {
-    if(_level0>0)
-        glDeleteTextures(1, &_level0);
-    if(_level1>0)
-        glDeleteTextures(1, &_level1);
-    if(_level2>0)
-        glDeleteTextures(1, &_level2);
-    if(_level3>0)
-        glDeleteTextures(1, &_level3);
-    if(_level4>0)
-        glDeleteTextures(1, &_level4);
+    for(int i=0; i<nLevels;++i){
+        if(_level[i]>0)
+            glDeleteTextures(1, &_level[i]);
+    }
 
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level0"),_level0);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level1"),_level1);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level2"),_level2);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level3"),_level3);
-    createTexture(QString::fromStdString(":/terrain/"+terrainIndex+"/level4"),_level4);
+    for(int i=0; i<nLevels;++i){
+        QString tmp(":/terrain/");
+        tmp+=QString::fromStdString(terrainIndex+"/level");
+        tmp+=QString::number(i);
+
+        createTexture(tmp,_level[i]);
+    }
 }
 
 void MainView::newGameImage(const QImage &img)
 {
-    if(!_initialized)
-    {
-        _tmpGameImage=&img;
-        _mustReloadGameTexture=true;
-        return;
-    }
-
     _mustReloadGameTexture=true;
-    update();
+
+    if(!_gameImage)
+    {
+        _gameImage=&img;
+    }
 }
 
 void MainView::reloadGameImage()
 {
-    if(!_mustReloadGameTexture) return;
+    if(!_mustReloadGameTexture || !_gameImage) return;
     _mustReloadGameTexture=false;
 
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 
-    QImage tmp=QGLWidget::convertToGLFormat(*_tmpGameImage);
+    QImage tmp=QGLWidget::convertToGLFormat(*_gameImage);
     glGenTextures(1, &_gameTexture);
     glBindTexture(GL_TEXTURE_2D, _gameTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -206,13 +204,18 @@ void MainView::reloadGameImage()
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
 {
-    if(_txt>0)
-        glDeleteTextures(1, &_txt);
+    if(_txt.size()>=nSmoothing)
+    {
+        glDeleteTextures(1, &_txt.back());
+        _txt.pop_back();
+    }
+
+    GLuint tmp;
 
 #ifdef WIN32
 #ifndef NO_KINECT
-    glGenTextures(1, &_txt);
-    glBindTexture(GL_TEXTURE_2D, _txt);
+    glGenTextures(1, &tmp);
+    glBindTexture(GL_TEXTURE_2D, tmp);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -220,11 +223,13 @@ void MainView::newKinectData(const UINT16 *data, int w, int h)
     checkGLError("kinect");
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, data);
 #else
-    createTexture(":/test/depth", _txt);
+    createTexture(":/test/depth", tmp);
 #endif
 #else
-    createTexture(":/test/depth",_txt);
+    createTexture(":/test/depth",tmp);
 #endif
+
+    _txt.push_front(tmp);
     checkGLError("new data");
 
     update();
@@ -426,7 +431,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
         case 3: txt3 += dir; break;
         case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
         case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
-	// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
     }
 }
 else{
@@ -438,7 +443,7 @@ else{
         case 3: p3 += dir; break;
         case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
         case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
-	// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
+// case 4: p0-=dir; p2+=dir; p1-=dir; p3+=dir; break;
     }
 }
 
@@ -466,7 +471,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
 // void MainView::paintGL()
 void MainView::paintEvent(QPaintEvent *e) 
 {
-   // reloadGameImage();
+    reloadGameImage();
     QPainter painter(this);
     static const double nTiles = 10;
 
@@ -496,30 +501,24 @@ void MainView::paintEvent(QPaintEvent *e)
         _checkerboard.bind();
     }
 
-    activeTexture(GL_TEXTURE0);
-    if (_txt > 0)
-        glBindTexture(GL_TEXTURE_2D, _txt);
+    for(int i=0;i<nSmoothing;++i){
+        activeTexture(GL_TEXTURE0+i);
+        if (i<_txt.size())
+            glBindTexture(GL_TEXTURE_2D, _txt[i]);
+    }
 
 
-    activeTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _level0);
+    for(int i=0;i<nLevels;++i){
+        activeTexture(GL_TEXTURE0+nSmoothing+i);
+        glBindTexture(GL_TEXTURE_2D, _level[i]);
+    }
 
-    activeTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _level1);
-
-    activeTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, _level2);
-
-    activeTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, _level3);
-
-    activeTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, _level4);
-
-
-    activeTexture(GL_TEXTURE6);
+    activeTexture(GL_TEXTURE0+nSmoothing+nLevels);
     if (_gameTexture > 0)
         glBindTexture(GL_TEXTURE_2D, _gameTexture);
+
+
+    checkGLError("draw -> textures");
 
     glBegin(GL_QUADS);
 
@@ -539,12 +538,11 @@ void MainView::paintEvent(QPaintEvent *e)
     textureCoords(GL_TEXTURE0, txt3.x(), txt3.y(), 3);
     textureCoords(GL_TEXTURE1, txt3.x()*nTiles, txt3.y()*nTiles, 3);
     glVertex2d(p3.x(), p3.y());
-
     glEnd();
 
-    glDisable(GL_TEXTURE_2D);
+    
     glPopMatrix();
-    checkGLError("draw");
+    checkGLError("draw -> quads");
 
     activeTexture(GL_TEXTURE0);
 
@@ -566,6 +564,7 @@ void MainView::paintEvent(QPaintEvent *e)
 
     }
     painter.end();
+    checkGLError("draw -> image");
 }
 
 
