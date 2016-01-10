@@ -13,7 +13,7 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
    _kinectCommunicator.initialize();
    
    
-   this->showFullScreen();
+   // this->showFullScreen();
 
    connect(&_kinectCommunicator, SIGNAL(newData(const UINT16 *, int , int )),
        _ui->mainView, SLOT(newKinectData(const UINT16 *, int , int )));

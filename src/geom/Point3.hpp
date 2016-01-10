@@ -132,7 +132,7 @@ public:
   }
 
   friend std::ostream& operator << ( std::ostream& s, const Point3d& p )  {    
-    s  << p.x() << "," << p.y()<< "," <<p.z() << std::endl;
+    s  << "(" << p.x() << "," << p.y()<< "," <<p.z() << ")";
     return s;
   }
 

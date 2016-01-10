@@ -101,6 +101,7 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
+#ifndef NO_KINECT
 	//sample
 	_image.fill(QColor(0, 0, 0, 0));
 	QPainter painter;
@@ -110,4 +111,5 @@ void GameManager::updateGame()
 	painter.end();
 
 	updateTexture();
+#endif
 }

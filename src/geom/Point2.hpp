@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <ostream>
 
 class Point2d {
 public:
@@ -127,6 +128,11 @@ public:
     const double n = norm();
     _x /= n; _y /= n;
     return *this;
+  }
+
+  friend std::ostream& operator << ( std::ostream& s, const Point2d& p )  {    
+    s  << "(" <<p.x() << "," << p.y()<<")";
+    return s;
   }
 
 

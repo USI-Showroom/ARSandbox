@@ -9,7 +9,8 @@
 #include <iostream>
 #include "MainView.hpp"
 #include <cmath>
-
+#include <fstream>
+#include "Triangulator.hpp"
 
 
 MainView::MainView(QWidget *parent)
@@ -30,6 +31,8 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
 #endif
     _setupMode=true;
     _moveTexture = false;
+
+    _saveNextMesh=false;
 
     _currentCorner=4;
 
@@ -232,6 +235,12 @@ void MainView::newKinectData(const UINT16 *data, int w, int h)
     _txt.push_front(tmp);
     checkGLError("new data");
 
+    if(_saveNextMesh)
+    {
+        _saveNextMesh=false;
+        saveMesh(data);
+    }
+
     update();
 }
 
@@ -322,6 +331,11 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     if (key == Qt::Key_Escape) exit(1);
 
+    if(key == Qt::Key_P)
+    {
+        _saveNextMesh=true;
+    }
+
     if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
         emit toggleSetupMode(_setupMode,_minH,_maxH);
@@ -406,23 +420,23 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
         case Qt::Key_0:
         {
-         p0 = Point2d(-1, -1);
-         p1 = Point2d(-1, 1);
-         p2 = Point2d(1, 1);
-         p3 = Point2d(1, -1);
+           p0 = Point2d(-1, -1);
+           p1 = Point2d(-1, 1);
+           p2 = Point2d(1, 1);
+           p3 = Point2d(1, -1);
 
 
-         txt0 = Point2d(0, 0);
-         txt1 = Point2d(0, 1);
-         txt2 = Point2d(1, 1);
-         txt3 = Point2d(1, 0);
+           txt0 = Point2d(0, 0);
+           txt1 = Point2d(0, 1);
+           txt2 = Point2d(1, 1);
+           txt3 = Point2d(1, 0);
 
-         break;
-     }
- }
+           break;
+       }
+   }
 
- if (_moveTexture)
- {
+   if (_moveTexture)
+   {
     switch (_currentCorner)
     {
         case 0: txt0 += dir; break;
@@ -570,6 +584,65 @@ void MainView::paintEvent(QPaintEvent *e)
 
 
 
+void MainView::saveMesh(const UINT16 *data)
+{
+    const Point2d ip0(txt0.x()*512,(1-txt0.y())*424);
+    const Point2d ip1(txt1.x()*512,(1-txt1.y())*424);
+    const Point2d ip2(txt2.x()*512,(1-txt2.y())*424);
+    const Point2d ip3(txt3.x()*512,(1-txt3.y())*424);
 
+    const Point2d min(MINIMUM(ip0.x(), ip1.x(), ip2.x(), ip3.x()), MINIMUM(ip0.y(), ip1.y(), ip2.y(), ip3.y()));
+    const Point2d max(MAXIMUM(ip0.x(), ip1.x(), ip2.x(), ip3.x()), MAXIMUM(ip0.y(), ip1.y(), ip2.y(), ip3.y()));
+
+    
+    const double A = (ip1.y() - ip0.y()) * (ip2.x() - ip3.x()) - (ip1.x() - ip0.x()) * (ip2.y() - ip3.y());
+
+    // Triangulator triangulator;
+
+
+    std::ofstream file;
+    file.open ("example.xyz");
+
+    for(int y=min.y();y<max.y();++y)
+    {
+        const double ty=y/424.0;
+
+        const int startX = std::ceil(  (1-ty)*ip1.x() + ty*ip0.x());
+        const int endX   = std::floor( (1-ty)*ip2.x() + ty*ip3.x());
+
+        
+
+        for(int x=startX;x<endX;++x)
+        {
+            const double tx=x/512.0;
+            const double startY = (1-tx)*ip1.y() + tx*ip2.y();
+            const double endY   = (1-tx)*ip0.y() + tx*ip3.y();
+
+            if(y<startY || y>endY) continue;
+
+            const double C = (ip0.y() - y) * (ip3.x() - x) - (ip0.x() - x) * (ip3.y() - y);
+            const double B = (ip0.y() - y) * (ip2.x() - ip3.x()) + (ip1.y() - ip0.y()) * (ip3.x() - x) - (ip0.x() - x) * (ip2.y() - ip3.y()) - (ip1.x() - ip0.x()) * (ip3.y() - y);
+            const double D = B * B - 4 * A * C;
+
+            const double u = (-B - sqrt(D)) / (2 * A);
+
+            const double p1x = ip0.x() + (ip1.x() - ip0.x()) * u;
+            const double p2x = ip3.x() + (ip2.x() - ip3.x()) * u;
+
+            const double v = (x - p1x) / (p2x - p1x);
+
+
+            double h=data[x*424+y];
+            h=(h-_minH)/(_maxH-_minH)*100;
+
+            // triangulator.addPoint(Point2d(x,y),h);
+
+            file<<x<<" "<<y<<" "<<h<<"\n";
+        }
+    }
+
+    file.close();
+    // triangulator.save("example.obj");
+}
 
 

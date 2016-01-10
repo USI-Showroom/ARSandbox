@@ -17,6 +17,10 @@
 #include "IKinectProcessor.hpp"
 
 
+#define MINIMUM(a,b,c,d) std::min(a,std::min(b,std::min(c,d)))
+#define MAXIMUM(a,b,c,d) std::max(a,std::max(b,std::max(c,d)))
+
+
 
 class MainView : public QOpenGLWidget
 {
@@ -55,6 +59,7 @@ private:
 
 	Point2d bilinInterp(const Point2d &p);
 
+	void saveMesh(const UINT16 *data);
 
 protected:
 	// void paintGL();
@@ -72,6 +77,7 @@ private:
 
 	bool _moveTexture;
 	bool _mustReloadGameTexture;
+	bool _saveNextMesh;
 
 	float _minH, _maxH;
 	int _currentCorner;
