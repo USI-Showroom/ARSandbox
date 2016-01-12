@@ -103,13 +103,13 @@ void GameManager::updateGame()
 {
 #ifndef NO_KINECT
 	//sample
-	_image.fill(QColor(0, 0, 0, 0));
+	/*_image.fill(QColor(0, 0, 0, 0));
 	QPainter painter;
 	painter.begin(&_image);
 	painter.setBrush(QColor(255, 0, 255, 255));
 	painter.drawEllipse(QPoint(_position.x(), _position.y()), 2, 2);
 	painter.end();
 
-	updateTexture();
+	updateTexture();*/
 #endif
 }

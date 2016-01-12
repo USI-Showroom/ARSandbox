@@ -359,7 +359,8 @@ void MainView::keyPressEvent(QKeyEvent *e)
     switch (key)
     {
         case Qt::Key_F1: reloadTerainTextures("0"); break;
-        case Qt::Key_F2: reloadTerainTextures("1"); break;
+		case Qt::Key_F2: reloadTerainTextures("1"); break;
+		case Qt::Key_F3: reloadTerainTextures("2"); break;
 
         case Qt::Key_1: _currentCorner=0; break;
         case Qt::Key_2: _currentCorner=1; break;
@@ -631,10 +632,11 @@ void MainView::saveMesh(const UINT16 *data)
 
             const double v = (x - p1x) / (p2x - p1x);
 
-
-            double h=data[x*424+y];
-            h=(h-_minH)/(_maxH-_minH)*100;
-
+			double h = data[x  + y*512];
+			h=(h-_minH)/(_maxH-_minH);
+			h = std::min(h, 1.0);
+			h = std::max(h, 0.0);
+			h *= 100;
             // triangulator.addPoint(Point2d(x,y),h);
 
             file<<x<<" "<<y<<" "<<h<<"\n";
