@@ -369,6 +369,9 @@ void MainView::keyPressEvent(QKeyEvent *e)
         case Qt::Key_5: _currentCorner=4; break;
         case Qt::Key_6: _currentCorner=5; break;
 
+        case Qt::Key_9: saveState(); break;
+        case Qt::Key_0: loadState(); break;
+
         case Qt::Key_Space: _moveTexture = !_moveTexture; break;
 ////////////////////////////////////////////
         case Qt::Key_A:
@@ -419,21 +422,21 @@ void MainView::keyPressEvent(QKeyEvent *e)
             break;
         }
 
-        case Qt::Key_0:
-        {
-           p0 = Point2d(-1, -1);
-           p1 = Point2d(-1, 1);
-           p2 = Point2d(1, 1);
-           p3 = Point2d(1, -1);
+       //  case Qt::Key_0:
+       //  {
+       //     p0 = Point2d(-1, -1);
+       //     p1 = Point2d(-1, 1);
+       //     p2 = Point2d(1, 1);
+       //     p3 = Point2d(1, -1);
 
 
-           txt0 = Point2d(0, 0);
-           txt1 = Point2d(0, 1);
-           txt2 = Point2d(1, 1);
-           txt3 = Point2d(1, 0);
+       //     txt0 = Point2d(0, 0);
+       //     txt1 = Point2d(0, 1);
+       //     txt2 = Point2d(1, 1);
+       //     txt3 = Point2d(1, 0);
 
-           break;
-       }
+       //     break;
+       // }
    }
 
    if (_moveTexture)
@@ -648,3 +651,65 @@ void MainView::saveMesh(const UINT16 *data)
 }
 
 
+
+void MainView::saveState()
+{
+    std::ofstream file;
+    file.open ("settings.conf");
+
+    file<<p0<<"\n";
+    file<<p1<<"\n";
+    file<<p2<<"\n";
+    file<<p3<<"\n";
+
+    file<<txt0<<"\n";
+    file<<txt1<<"\n";
+    file<<txt2<<"\n";
+    file<<txt3<<"\n";
+
+    file<<_minH<<" "<<_maxH<<"\n";
+
+    file.close();
+
+}
+
+void MainView::loadState()
+{
+    std::ifstream file;
+    file.open ("settings.conf");
+
+    if(!file.good()) return;
+
+    double x, y;
+    
+    file >> x >> y;
+    p0.x()=x; p0.y()=y;
+
+    file >> x >> y;
+    p1.x()=x; p1.y()=y;
+
+    file >> x >> y;
+    p2.x()=x; p2.y()=y;
+
+    file >> x >> y;
+    p3.x()=x; p3.y()=y;
+
+
+    file >> x >> y;
+    txt0.x()=x; txt0.y()=y;
+
+    file >> x >> y;
+    txt1.x()=x; txt1.y()=y;
+
+    file >> x >> y;
+    txt2.x()=x; txt2.y()=y;
+
+    file >> x >> y;
+    txt3.x()=x; txt3.y()=y;
+
+    file >> x >> y;
+    _minH=x; _maxH=y;
+
+    file.close();
+
+}

@@ -61,6 +61,9 @@ private:
 
 	void saveMesh(const UINT16 *data);
 
+	void saveState();
+	void loadState();
+
 protected:
 	// void paintGL();
 	void initializeGL();

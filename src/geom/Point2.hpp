@@ -131,7 +131,7 @@ public:
   }
 
   friend std::ostream& operator << ( std::ostream& s, const Point2d& p )  {    
-    s  << "(" <<p.x() << "," << p.y()<<")";
+    s  << p.x() << " " << p.y();
     return s;
   }
 
