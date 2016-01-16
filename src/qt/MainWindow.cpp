@@ -12,9 +12,10 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
 
    _kinectCommunicator.initialize();
    
-   
-   // this->showFullScreen();
-
+#ifndef NO_KINECT
+  this->showFullScreen();
+#endif
+  
    connect(&_kinectCommunicator, SIGNAL(newData(const UINT16 *, int , int )),
        _ui->mainView, SLOT(newKinectData(const UINT16 *, int , int )));
 
@@ -27,8 +28,8 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
    connect(&_gameManager, SIGNAL(gameTextureChanged(const QImage&)),
     _ui->mainView, SLOT(newGameImage(const QImage&)));
 
-   connect(_ui->mainView, SIGNAL(toggleSetupMode(const bool, const int, const int)),
-    &_gameManager, SLOT(toggleSetupMode(const bool, const int, const int)));
+   connect(_ui->mainView, SIGNAL(toggleSetupMode(const bool, const int, const int, const UnitSquareMapping &)),
+    &_gameManager, SLOT(toggleSetupMode(const bool, const int, const int, const UnitSquareMapping &)));
 
    _gameManager.initialize();
 }

@@ -7,7 +7,7 @@
 #include <QImage>
 
 #include "Point2.hpp"
-
+#include "UnitSquareMapping.hpp"
 
 class QTimer;
 
@@ -27,20 +27,18 @@ private slots:
 public slots:
     void newKinectData(const UINT16 *data, int w, int h);
     void keyPress(const int key);
-    void toggleSetupMode(const bool isSetup, const int minH, const int maxH);
+    void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping);
 
 public:
     void initialize();
     void updateTexture();
 
 private:
-    double getHeight(const UINT16 *data, const int x, const int y);
-
-private:
     int _minH, _maxH;
     QTimer *_gameTimer;
     QImage _image;
     bool _playing;
+    UnitSquareMapping _mapping;
 
 
     Point2d _position;

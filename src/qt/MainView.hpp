@@ -15,10 +15,7 @@
 #include "Point2.hpp"
 
 #include "IKinectProcessor.hpp"
-
-
-#define MINIMUM(a,b,c,d) std::min(a,std::min(b,std::min(c,d)))
-#define MAXIMUM(a,b,c,d) std::max(a,std::max(b,std::max(c,d)))
+#include "UnitSquareMapping.hpp"
 
 
 
@@ -41,7 +38,7 @@ public:
 
 signals:
 	void keyPress(const int keyCode);
-	void toggleSetupMode(const bool isSetup, const int minH, const int maxH);
+	void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping);
 
 public slots:
 	void newKinectData(const UINT16 *data, int w, int h);

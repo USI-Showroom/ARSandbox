@@ -8,23 +8,27 @@
 class FakeKinectManager : public IKinectManager
 {
 public:
-	FakeKinectManager(IKinectProcessor *processor)
-		: IKinectManager(processor)
-	{
+    FakeKinectManager(IKinectProcessor *processor)
+    : IKinectManager(processor)
+    {
 
         QImage tmp(":/test/depth");
 
-		_w = tmp.width();
-		_h = tmp.height();
-		_data = new UINT16[_w*_h];
-		_count = 0;
+        _w = tmp.width();
+        _h = tmp.height();
+        _data = new UINT16[_w*_h];
+        _count = 0;
 
         int index=0;
-		for (int i = 0; i < _w; ++i){
-            for(int j=0;j<_h;++j)
-			_data[index++] = qRed(tmp.pixel(i,j));
+
+        for(int j=0;j<_h;++j)
+        {
+            for (int i = 0; i < _w; ++i)
+            {
+                _data[index++] = qRed(tmp.pixel(i,j));
+            }
         }
-	}
+    }
 
     virtual ~FakeKinectManager() { 
         delete[] _data;
