@@ -9,12 +9,18 @@
 
 static int w=512;
 static int h=424;
+static int scaling=10;
+
+static int nAnimals=40;
 
 GameManager::GameManager()
-: _image(w,h,QImage::Format_ARGB32), _position(w/2,h/2)
+: _image(w*scaling,h*scaling,QImage::Format_ARGB32), _cowTexture(":/animals/cow")
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
+
+    for(int i=0;i<nAnimals;++i)
+        _animals.push_back(Animal(0.4,0.6));
 }
 
 GameManager::~GameManager()
@@ -30,7 +36,12 @@ void GameManager::updateTexture()
 
 void GameManager::newKinectData(const UINT16 *data, int w, int h)
 {
-    _mapping.setData(data);
+    if(!_playing) return;
+
+    _mapping.setData(data,_minH,_maxH);
+
+    for(size_t i=0;i<_animals.size();++i)
+        _animals[i].update(_mapping);
 }
 
 void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping)
@@ -44,38 +55,15 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
     if(_playing)
         _gameTimer->start(100);
-    else
+    else{
         _gameTimer->stop();
+        _image.fill(QColor(0, 0, 0, 0));
+        updateTexture();   
+    }
 }
 
 void GameManager::keyPress(const int key)
-{
-    static const float step=1;
-
-    switch(key)
-    {
-        case Qt::Key_A:
-        {
-            _position.x() -= step;
-            break;
-        }
-        case Qt::Key_D:
-        {
-            _position.x() += step;
-            break;
-        }
-        case Qt::Key_S:
-        {
-            _position.y() += step;
-            break;
-        }
-        case Qt::Key_W:
-        {
-            _position.y() -= step;
-            break;
-        }
-    }
-}
+{ }
 
 
 void GameManager::initialize()
@@ -88,15 +76,26 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-#ifndef NO_KINECT
-	//sample
-	/*_image.fill(QColor(0, 0, 0, 0));
-	QPainter painter;
-	painter.begin(&_image);
-	painter.setBrush(QColor(255, 0, 255, 255));
-	painter.drawEllipse(QPoint(_position.x(), _position.y()), 2, 2);
-	painter.end();
+    static const int imgSize=10;
+    static const int imgOffset=imgSize/2;
 
-	updateTexture();*/
-#endif
+    _image.fill(QColor(0, 0, 0, 0));
+    QPainter painter;
+    painter.begin(&_image);
+    painter.setBrush(QColor(255, 0, 255, 255));
+
+    for(size_t i=0;i<_animals.size();++i)
+    {
+        const Animal &a=_animals[i];
+        if(a.alive())
+        {
+            Point2d p=_mapping.fromParameterization(a.position());
+            painter.drawImage(QRectF((p.x()+imgOffset)*scaling, (p.y()-imgOffset)*scaling,imgSize*scaling, imgSize*scaling), _cowTexture);
+        }
+    }
+
+
+    painter.end();
+
+    updateTexture();
 }

@@ -5,9 +5,11 @@
 
 #include <QObject>
 #include <QImage>
+#include <vector>
 
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
+#include "Animal.hpp"
 
 class QTimer;
 
@@ -40,8 +42,9 @@ private:
     bool _playing;
     UnitSquareMapping _mapping;
 
+    std::vector<Animal> _animals;
 
-    Point2d _position;
+    QImage _cowTexture;
 };
 #endif
 

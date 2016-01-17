@@ -8,13 +8,13 @@
 class Point2d {
 public:
   Point2d() 
-    : _x( 0 ), _y( 0 ) {}
+  : _x( 0 ), _y( 0 ) {}
 
   explicit Point2d( const double v )
-    : _x( v ), _y( v ) {}
+  : _x( v ), _y( v ) {}
 
   Point2d( const double x , const double y ) 
-    : _x( x ), _y( y ) {}
+  : _x( x ), _y( y ) {}
 
   inline double& x() { return _x; }
   inline const double x() const { return _x; }
@@ -52,7 +52,7 @@ public:
     return Point2d( _x + p.x(), _y + p.y() );
   }
 
-  
+
   inline Point2d& operator += ( const Point2d& p ) {
     _x += p.x(); _y += p.y();
     return *this;
@@ -123,6 +123,20 @@ public:
     return ( *this / norm() );
   }
 
+  inline Point2d rotate() const {
+    return Point2d(-_y,_x);
+  }
+
+  inline void rotated() {
+    const double tmp=_x;
+    _x=-_y;
+    _y=tmp;
+  }
+
+  inline bool isZero()
+  {
+    return fabs(_x)<1e-8 && fabs(_y)<1e-8;
+  }
 
   inline Point2d& normalize() {
     const double n = norm();

@@ -14,13 +14,18 @@ private:
 
     const UINT16 *_data;
 
+    double _minH, _maxH;
+
 public:
     UnitSquareMapping();
     UnitSquareMapping(const Point2d &txt0, const Point2d &txt1, const Point2d &txt2, const Point2d &txt3);
     ~UnitSquareMapping();
 
-    inline void setData(const UINT16 *data)
+    inline void setData(const UINT16 *data, const double minH, const double maxH)
     {
+        _minH=minH;
+        _maxH=maxH;
+
         _data=data;
     }
 
@@ -46,30 +51,40 @@ public:
     }
 
 
-    inline UINT16 getHeight(const int x, const int y)
+    inline double getHeight(const int x, const int y) const
     {
         assert(x>=0 && x<=512);
         assert(y>=0 && y<=424);
         if(!_data) return 0;
 
-        return _data[x  + y*512];
+        return (_data[x  + y*512]-_minH)/(_maxH-_minH);
     }
 
-    inline UINT16 getHeight(const double x, const double y)
+    inline double getHeight(const Point2d &p) const
+    {
+        return getHeight(p.x(),p.y());
+    }
+
+    inline double getHeight(const double x, const double y) const
     {
         const int x1=floor(x);
         const int x2=ceil(x);
         const double tx=x-x1;
 
-        const int y1=floor(x);
-        const int y2=ceil(x);
+        const int y1=floor(y);
+        const int y2=ceil(y);
         const double ty=y-y1;
 
         return (1-tx) * ( (1-ty)*getHeight(x1,y1)+ty*getHeight(x1,y2) )+
         tx * ( (1-ty)*getHeight(x2,y1)+ty*getHeight(x2,y2) );
     }
 
-    inline UINT16 getHeightFromParam(const double u, const double v)
+    inline double getHeightFromParam(const Point2d p) const
+    {
+        return getHeightFromParam(p.x(),p.y());
+    }
+
+    inline double getHeightFromParam(const double u, const double v) const
     {
         assert(u>=0 && u<=1);
         assert(v>=0 && v<=1);
@@ -77,6 +92,11 @@ public:
 
         Point2d p=fromParameterization(u,v);
         return getHeight(p.x(),p.y());
+    }
+
+    inline Point2d fromParameterization(const Point2d &position) const
+    {
+        return fromParameterization(position.x(),position.y());
     }
 
     inline Point2d fromParameterization(const double u, const double v) const
@@ -87,6 +107,20 @@ public:
     inline Point2d toParameterization(const int x, const int y) const
     {
         return Point2d(x/512.0,y/424.0); //fixme
+    }
+
+    inline Point2d paramGrad(const Point2d &p) const
+    {
+        return grad(fromParameterization(p)); //fixme
+    }
+
+    inline Point2d grad(const Point2d &p) const
+    {
+        const double centre=getHeight(p);
+
+        return Point2d(
+            getHeight(p.x()+1,p.y())-centre,
+            getHeight(p.x(),p.y()+1)-centre);
     }
 
 };

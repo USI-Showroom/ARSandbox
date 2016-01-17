@@ -4,6 +4,7 @@
 #include "IKinectManager.hpp"
 
 #include <QImage>
+#include <cassert>
 
 class FakeKinectManager : public IKinectManager
 {
@@ -16,6 +17,10 @@ public:
 
         _w = tmp.width();
         _h = tmp.height();
+
+        assert(_w==512);
+        assert(_h==424);
+
         _data = new UINT16[_w*_h];
         _count = 0;
 

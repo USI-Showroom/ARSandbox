@@ -574,7 +574,7 @@ void MainView::paintEvent(QPaintEvent *e)
 void MainView::saveMesh(const UINT16 *data)
 {
     UnitSquareMapping mapping(txt0,txt1,txt2,txt3);
-    mapping.setData(data);
+    mapping.setData(data,_minH,_maxH);
 
     Point2d min, max;
     mapping.boundingBox(min, max);
@@ -593,9 +593,6 @@ void MainView::saveMesh(const UINT16 *data)
             if(!mapping.isInsideParam(p)) continue;
 
             double h=mapping.getHeight(x,y);
-			h=(h-_minH)/(_maxH-_minH);
-			h = std::min(h, 1.0);
-			h = std::max(h, 0.0);
 			h *= 0.5;
             // triangulator.addPoint(Point2d(x,y),h);
 
