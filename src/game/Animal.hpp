@@ -17,14 +17,18 @@ private:
 public:
     Animal(const double minH, const double maxH);
 
-    void update(const UnitSquareMapping &mapping);
+    void think(const UnitSquareMapping &mapping);
+    void update();
 
     inline const Point2d &position() const { return _position; }
     inline bool alive() const { return _life>0; }
 
 private:
     void resurrect(const UnitSquareMapping &mapping);
-    void move(const UnitSquareMapping &mapping);
+    void newDirection(const UnitSquareMapping &mapping);
+    void move();
+
+    double randRange(const double min, const double max);
 };
 
 #endif //ANIMAL_HPP

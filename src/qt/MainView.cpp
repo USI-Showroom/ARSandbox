@@ -37,9 +37,6 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
     _currentCorner=4;
 
     _initialized=false;
-    _mustReloadGameTexture=false;
-
-    _gameImage=NULL;
 
     for(int i=0; i<nLevels; ++i) {
         _level[i]=0; 
@@ -177,23 +174,12 @@ void MainView::reloadTerainTextures(const std::string &terrainIndex)
 
 void MainView::newGameImage(const QImage &img)
 {
-    _mustReloadGameTexture=true;
-
-    if(!_gameImage)
-    {
-        _gameImage=&img;
-    }
-}
-
-void MainView::reloadGameImage()
-{
-    if(!_mustReloadGameTexture || !_gameImage) return;
-    _mustReloadGameTexture=false;
-
+    if(!_initialized) return;
+    
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 
-    QImage tmp=QGLWidget::convertToGLFormat(*_gameImage);
+    QImage tmp=QGLWidget::convertToGLFormat(img);
     glGenTextures(1, &_gameTexture);
     glBindTexture(GL_TEXTURE_2D, _gameTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -203,6 +189,8 @@ void MainView::reloadGameImage()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tmp.width(), tmp.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tmp.bits());
 
     checkGLError("newGameImage");
+
+    update();
 }
 
 void MainView::newKinectData(const UINT16 *data, int w, int h)
@@ -360,8 +348,8 @@ void MainView::keyPressEvent(QKeyEvent *e)
     switch (key)
     {
         case Qt::Key_F1: reloadTerainTextures("0"); break;
-		case Qt::Key_F2: reloadTerainTextures("1"); break;
-		case Qt::Key_F3: reloadTerainTextures("2"); break;
+        case Qt::Key_F2: reloadTerainTextures("1"); break;
+        case Qt::Key_F3: reloadTerainTextures("2"); break;
 
         case Qt::Key_1: _currentCorner=0; break;
         case Qt::Key_2: _currentCorner=1; break;
@@ -422,35 +410,35 @@ void MainView::keyPressEvent(QKeyEvent *e)
             _maxH -= hstep;
             break;
         }
-   }
-
-   if (_moveTexture)
-   {
-    switch (_currentCorner)
-    {
-        case 0: txt0 += dir; break;
-        case 1: txt1 += dir; break;
-        case 2: txt2 += dir; break;
-        case 3: txt3 += dir; break;
-        case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
-        case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
     }
-}
-else{
-    switch (_currentCorner)
+
+    if (_moveTexture)
     {
-        case 0: p0 += dir; break;
-        case 1: p1 += dir; break;
-        case 2: p2 += dir; break;
-        case 3: p3 += dir; break;
-        case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
-        case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
+        switch (_currentCorner)
+        {
+            case 0: txt0 += dir; break;
+            case 1: txt1 += dir; break;
+            case 2: txt2 += dir; break;
+            case 3: txt3 += dir; break;
+            case 4: txt0 += mult*dir; txt2 -= mult*dir; txt1 -= dir; txt3 += dir; break;
+            case 5: txt0 += dir; txt2 += dir; txt1 += dir; txt3 += dir; break;
+        }
     }
-}
+    else{
+        switch (_currentCorner)
+        {
+            case 0: p0 += dir; break;
+            case 1: p1 += dir; break;
+            case 2: p2 += dir; break;
+            case 3: p3 += dir; break;
+            case 4: p0 += mult*dir; p2 -= mult*dir; p1 -= dir; p3 += dir; break;
+            case 5: p0 += dir; p2 += dir; p1 += dir; p3 += dir; break;
+        }
+    }
 
-std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
+    std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
 
-update();
+    update();
 }
 
 
@@ -472,7 +460,6 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
 // void MainView::paintGL()
 void MainView::paintEvent(QPaintEvent *e) 
 {
-    reloadGameImage();
     QPainter painter(this);
     static const double nTiles = 10;
 
@@ -593,7 +580,7 @@ void MainView::saveMesh(const UINT16 *data)
             if(!mapping.isInsideParam(p)) continue;
 
             double h=mapping.getHeight(x,y);
-			h *= 0.5;
+            h *= 0.5;
             // triangulator.addPoint(Point2d(x,y),h);
 
             file<<p.x()<<" "<<p.y()<<" "<<h<<"\n";

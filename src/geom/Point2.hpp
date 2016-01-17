@@ -138,6 +138,11 @@ public:
     return fabs(_x)<1e-8 && fabs(_y)<1e-8;
   }
 
+  inline bool isNan()
+  {
+    return _x!=_x || _y!=_y;
+  }
+
   inline Point2d& normalize() {
     const double n = norm();
     _x /= n; _y /= n;
