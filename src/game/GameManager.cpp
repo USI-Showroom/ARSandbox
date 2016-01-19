@@ -91,8 +91,13 @@ void GameManager::updateGame()
         a.update();
         if(a.alive())
         {
+            const double angle=a.angle()*180/M_PI;
             Point2d p=_mapping.fromParameterization(a.position());
-            painter.drawImage(QRectF((p.x()+imgOffset)*scaling, (p.y()-imgOffset)*scaling,imgSize*scaling, imgSize*scaling), _cowTexture);
+            painter.translate((p.x()+imgOffset)*scaling,(p.y()+imgOffset)*scaling);
+            painter.rotate(angle);
+            painter.drawImage(QRectF(0, 0,imgSize*scaling, imgSize*scaling), _cowTexture);
+            painter.rotate(-angle);
+            painter.translate(-(p.x()+imgOffset)*scaling,-(p.y()+imgOffset)*scaling);
         }
     }
 

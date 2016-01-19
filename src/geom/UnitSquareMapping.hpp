@@ -1,6 +1,8 @@
 #ifndef UNIT_SQUARE_MAPPING_HPP_
 #define UNIT_SQUARE_MAPPING_HPP_
 
+#include <iostream>
+
 #include "Point2.hpp"
 #include "Matrix3.hpp"
 #include "IKinectProcessor.hpp"
@@ -126,11 +128,9 @@ public:
 
     inline Point2d grad(const Point2d &p) const
     {
-        const double centre=getHeight(p);
-
         return Point2d(
-            getHeight(p.x()+1,p.y())-centre,
-            getHeight(p.x(),p.y()+1)-centre);
+            (getHeight(p.x()-1,p.y())-getHeight(p.x()+1,p.y()))/2.0,
+            (getHeight(p.x(),p.y()-1)-getHeight(p.x(),p.y()+1))/2.0);
     }
 
 };

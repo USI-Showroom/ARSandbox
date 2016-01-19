@@ -45,6 +45,6 @@
 
 
     <qresource prefix="/test">
-        <file alias="depth">depth.jpg</file>
+        <file alias="depth">depth.png</file>
     </qresource>
 </RCC>

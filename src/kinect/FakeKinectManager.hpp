@@ -41,7 +41,7 @@ public:
 
     virtual void update() {
         ++_count;
-        if(_count>10){
+        if(_count>5){
             _count=0;
             _processor->processDepth(0, _data, _w, _h, 0, 255);
         }

@@ -4,7 +4,7 @@
 #include <iostream>
 
 Animal::Animal(const double minH, const double maxH)
-:_life(0), _minH(minH), _maxH(maxH)
+:_life(0), _minH(minH), _maxH(maxH), _resurrected(false)
 { }
 
 void Animal::think(const UnitSquareMapping &mapping)
@@ -13,13 +13,10 @@ void Animal::think(const UnitSquareMapping &mapping)
     {
         resurrect(mapping);
     }
-    else
+    if(alive())
     {
         newDirection(mapping);
         --_decisionTicks;
-
-        
-        
     }
 }
 
@@ -72,9 +69,12 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             grad.rotated();
 
             if(!_direction.isZero() && grad*_direction<0)
+            {
                 grad=-grad;
+            }
         }
-        else if(h>_maxH){ //go down
+        else if(h>_maxH)
+        { //go down
             grad=-grad;
             --_life;
         }
@@ -83,12 +83,38 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             --_life;
         }
 
-        grad.normalize();
-        grad+=Point2d(randRange(-0.05,0.05),randRange(-0.05,0.05));
-        grad.normalize();
+        if(grad.isZero()) {
+            return;
+        }
 
-        _direction=grad;
-        _decisionTicks=3;
+// grad.normalize();
+
+// grad+=Point2d(randRange(-0.05,0.05),randRange(-0.05,0.05));
+// grad.normalize();
+
+// std::cout<<grad<<std::endl;
+
+        const double newAngle=atan2(grad.y(),grad.x());
+        if(_resurrected)
+        {
+            _angle=newAngle;
+        }else
+        {
+
+            if(newAngle>_angle+0.3){
+                _angle+=0.3;
+            }
+            else if(newAngle<_angle-0.3){
+                _angle-=0.3;
+            }
+            else{
+                _angle=newAngle;
+            }
+        }
+
+// std::cout<<_angle<<std::endl;
+        _direction=Point2d(cos(_angle),sin(_angle))*_speed;
+        _decisionTicks=1;
     }
 }
 
@@ -112,6 +138,8 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
             _position.x()=u;
             _position.y()=v;
             _decisionTicks=0;
+            _speed=randRange(1,3);
+            _resurrected=true;
             break;
         }
     }

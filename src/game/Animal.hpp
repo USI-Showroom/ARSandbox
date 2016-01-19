@@ -12,7 +12,9 @@ private:
     int _decisionTicks;
 
     double _minH, _maxH;
-
+    double _speed;
+    double _angle;
+    bool _resurrected;
 
 public:
     Animal(const double minH, const double maxH);
@@ -22,6 +24,8 @@ public:
 
     inline const Point2d &position() const { return _position; }
     inline bool alive() const { return _life>0; }
+
+    inline double angle() const { return _angle; }
 
 private:
     void resurrect(const UnitSquareMapping &mapping);
