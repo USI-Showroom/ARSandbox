@@ -570,20 +570,55 @@ void MainView::saveMesh(const UINT16 *data)
 
 
     std::ofstream file;
-    file.open ("example.xyz");
+    file.open ("example.obj");
+
+    const int stride=max.x()-min.x();
+    std::vector<int> indices((max.y()-min.y())*stride);
+
+    int index=1;
 
     for(int y=min.y();y<max.y();++y)
     {
+        const int indexY=y-min.y();
         for(int x=min.x();x<max.x();++x)
         {
+            const int indexX=x-min.x();
+            const int arrayIndex=indexX+stride*indexY;
+
             const Point2d p=mapping.toParameterization(x,y);
-            if(!mapping.isInsideParam(p)) continue;
+            if(!mapping.isInsideParam(p)){
+                indices[arrayIndex]=-1;
+                continue;
+            }
+            indices[arrayIndex]=index++;
 
             double h=mapping.getHeight(x,y);
             h *= 0.1;
             // triangulator.addPoint(Point2d(x,y),h);
 
-            file<<p.x()<<" "<<p.y()<<" "<<h<<"\n";
+            file<<"v "<<p.x()<<" "<<p.y()<<" "<<h<<"\n";
+        }
+    }
+
+    file<<"\n\n";
+
+    for(int y=min.y();y<max.y()-1;++y)
+    {
+        const int indexY=y-min.y();
+        for(int x=min.x();x<max.x()-1;++x)
+        {
+            const int indexX=x-min.x();
+
+            const int i1=indices[indexX+stride*indexY];
+            const int i2=indices[indexX+1+stride*indexY];
+            const int i3=indices[indexX+1+stride*(indexY+1)];
+            const int i4=indices[indexX+stride*(indexY+1)];
+
+            if(i1>=0 && i2>=0 && i2>=0 && i4>=0)
+            {
+                file<<"f "<<i1<<" "<<i2<<" "<<i3<<" "<<i4<<"\n";
+            }
+
         }
     }
 
