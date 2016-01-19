@@ -580,7 +580,7 @@ void MainView::saveMesh(const UINT16 *data)
             if(!mapping.isInsideParam(p)) continue;
 
             double h=mapping.getHeight(x,y);
-            h *= 0.5;
+            h *= 0.1;
             // triangulator.addPoint(Point2d(x,y),h);
 
             file<<p.x()<<" "<<p.y()<<" "<<h<<"\n";

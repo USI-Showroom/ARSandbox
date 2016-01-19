@@ -2,6 +2,7 @@
 #define UNIT_SQUARE_MAPPING_HPP_
 
 #include "Point2.hpp"
+#include "Matrix3.hpp"
 #include "IKinectProcessor.hpp"
 
 #define MINIMUM(a,b,c,d) std::min(a,std::min(b,std::min(c,d)))
@@ -11,6 +12,7 @@
 class UnitSquareMapping{
 private:
     Point2d _p0, _p1, _p2, _p3;
+    Matrix3d _fromParam, _toParam;
 
     const UINT16 *_data;
 
@@ -94,19 +96,27 @@ public:
         return getHeight(p.x(),p.y());
     }
 
-    inline Point2d fromParameterization(const Point2d &position) const
+    inline Point2d fromParameterization(const Point2d &p) const
     {
-        return fromParameterization(position.x(),position.y());
+        assert(p.x()>=0 && p.x()<=1);
+        assert(p.y()>=0 && p.y()<=1);
+
+        return _fromParam*p;
     }
 
     inline Point2d fromParameterization(const double u, const double v) const
     {
-        return Point2d(u*512,v*424); //fixme
+        return fromParameterization(Point2d(u,v));
+    }
+
+    inline Point2d toParameterization(const Point2d &p) const
+    {
+         return _toParam*p;
     }
 
     inline Point2d toParameterization(const int x, const int y) const
     {
-        return Point2d(x/512.0,y/424.0); //fixme
+        return toParameterization(Point2d(x,y));
     }
 
     inline Point2d paramGrad(const Point2d &p) const

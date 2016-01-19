@@ -43,6 +43,7 @@
         <file alias="cow">animals/cow.png</file>
     </qresource>
 
+
     <qresource prefix="/test">
         <file alias="depth">depth.jpg</file>
     </qresource>

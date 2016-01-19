@@ -149,7 +149,7 @@ public:
     return *this;
   }
 
-  friend std::ostream& operator << ( std::ostream& s, const Point2d& p )  {    
+  friend std::ostream& operator << ( std::ostream& s, const Point2d& p )  {
     s  << p.x() << " " << p.y();
     return s;
   }
