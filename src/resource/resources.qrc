@@ -40,7 +40,7 @@
     </qresource>
 
     <qresource prefix="/animals">
-        <file alias="cow">animals/cow.png</file>
+        <file alias="cow">animals/cow1.png</file>
     </qresource>
 
 

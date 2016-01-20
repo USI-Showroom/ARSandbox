@@ -64,6 +64,11 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         Point2d grad=mapping.paramGrad(_position);
         const double h=mapping.getHeightFromParam(_position);
 
+
+        if(grad.isZero()) {
+            return;
+        }
+
         if(h>=_minH && h<=_maxH)
         {
             grad.rotated();
@@ -73,44 +78,46 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
                 grad=-grad;
             }
         }
-        else if(h>_maxH)
-        { //go down
-            grad=-grad;
-            --_life;
+        else
+        { 
+            if(h>_maxH)
+            { //go down
+
+                --_life;
+            }
+            else //the grad points to go up
+            {
+                grad=-grad; //fixme less than 90degrees
+                --_life;
+            }
+
+            grad.normalize();
+            grad=_direction+0.2*grad;
         }
-        else //the grad points to go up
-        {
-            --_life;
-        }
 
-        if(grad.isZero()) {
-            return;
-        }
 
-// grad.normalize();
-
-// grad+=Point2d(randRange(-0.05,0.05),randRange(-0.05,0.05));
-// grad.normalize();
-
-// std::cout<<grad<<std::endl;
+        // grad+=Point2d(randRange(-0.05,0.05),randRange(-0.05,0.05));
 
         const double newAngle=atan2(grad.y(),grad.x());
         if(_resurrected)
         {
             _angle=newAngle;
+            _resurrected=false;
         }else
         {
+            _angle=0.3*newAngle+0.7*_angle;
 
-            if(newAngle>_angle+0.3){
-                _angle+=0.3;
-            }
-            else if(newAngle<_angle-0.3){
-                _angle-=0.3;
-            }
-            else{
-                _angle=newAngle;
-            }
+            // if(newAngle>_angle+0.3){
+            //     _angle+=0.3;
+            // }
+            // else if(newAngle<_angle-0.3){
+            //     _angle-=0.3;
+            // }
+            // else{
+            //     _angle=newAngle;
+            // }
         }
+
 
 // std::cout<<_angle<<std::endl;
         _direction=Point2d(cos(_angle),sin(_angle))*_speed;
@@ -134,7 +141,7 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
 
         if(h>=_minH && h<=_maxH)
         {
-            _life=10;
+            _life=100;
             _position.x()=u;
             _position.y()=v;
             _decisionTicks=0;

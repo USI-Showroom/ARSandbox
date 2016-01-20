@@ -123,6 +123,18 @@ public:
 
     inline Point2d paramGrad(const Point2d &p) const
     {
+        const double u=p.x();
+        const double v=p.y();
+
+        double denom=_fromParam(2,0) * u + _fromParam(2,1) * v + _fromParam(2,2);
+        denom*=denom;
+        denom=1/denom;
+
+        const double f1u =  (_fromParam(0,0) * _fromParam(2,1) * v + _fromParam(0,0) * _fromParam(2,2) - _fromParam(2,0) * _fromParam(0,1) * v - _fromParam(2,0) * _fromParam(0,2))*denom;
+        const double f1v = -(-_fromParam(0,1) * _fromParam(2,0) * u - _fromParam(0,1) * _fromParam(2,2) + _fromParam(2,1) * _fromParam(0,0) * u + _fromParam(2,1) * _fromParam(0,2))*denom;
+        const double f2u =  (_fromParam(1,0) * _fromParam(2,1) * v + _fromParam(1,0) * _fromParam(2,2) - _fromParam(2,0) * _fromParam(1,1) * v - _fromParam(2,0) * _fromParam(1,2))*denom;
+        const double f2v = -(-_fromParam(1,1) * _fromParam(2,0) * u - _fromParam(1,1) * _fromParam(2,2) + _fromParam(2,1) * _fromParam(1,0) * u + _fromParam(2,1) * _fromParam(1,2))*denom;
+
         return grad(fromParameterization(p)); //fixme
     }
 

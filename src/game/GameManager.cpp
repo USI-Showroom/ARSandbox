@@ -41,8 +41,6 @@ void GameManager::newKinectData(const UINT16 *data, int w, int h)
 
     _mapping.setData(data,_minH,_maxH);
 
-    for(size_t i=0;i<_animals.size();++i)
-        _animals[i].think(_mapping);
 }
 
 void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping)
@@ -77,8 +75,10 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    static const int imgSize=10;
-    static const int imgOffset=imgSize/2;
+    static const double imgWidth=15;
+    static const double imgHeight=imgWidth/242.0*400.0;
+    static const double imgOffsetW=imgWidth/2;
+    static const double imgOffsetH=imgHeight/2;
 
     _image.fill(QColor(0, 0, 0, 0));
     QPainter painter;
@@ -88,16 +88,19 @@ void GameManager::updateGame()
     for(size_t i=0;i<_animals.size();++i)
     {
         Animal &a=_animals[i];
+        a.think(_mapping);
         a.update();
+
+        
         if(a.alive())
         {
             const double angle=a.angle()*180/M_PI;
             Point2d p=_mapping.fromParameterization(a.position());
-            painter.translate((p.x()+imgOffset)*scaling,(p.y()+imgOffset)*scaling);
-            painter.rotate(angle);
-            painter.drawImage(QRectF(0, 0,imgSize*scaling, imgSize*scaling), _cowTexture);
-            painter.rotate(-angle);
-            painter.translate(-(p.x()+imgOffset)*scaling,-(p.y()+imgOffset)*scaling);
+            painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
+            painter.rotate(angle+90);
+            painter.drawImage(QRectF(0, 0,imgWidth*scaling, imgHeight*scaling), _cowTexture);
+            painter.rotate(-angle-90);
+            painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
         }
     }
 
