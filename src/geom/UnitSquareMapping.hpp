@@ -2,7 +2,8 @@
 #define UNIT_SQUARE_MAPPING_HPP_
 
 #include <iostream>
-
+#include <algorithm>
+#include <vector>
 #include "Point2.hpp"
 #include "Matrix3.hpp"
 #include "IKinectProcessor.hpp"
@@ -16,7 +17,7 @@ private:
     Point2d _p0, _p1, _p2, _p3;
     Matrix3d _fromParam, _toParam;
 
-    const UINT16 *_data;
+    std::vector<UINT16> _data;
 
     double _minH, _maxH;
 
@@ -30,7 +31,8 @@ public:
         _minH=minH;
         _maxH=maxH;
 
-        _data=data;
+		for (int i = 0; i < 512 * 424; ++i)
+			_data[i] = data[i];
     }
 
     inline bool isInside(const int x, const int y)
@@ -45,13 +47,13 @@ public:
         return p.x()>=0 && p.y()>=0 && p.x()<=1 && p.y()<=1;
     }
 
-    inline void boundingBox(Point2d &min, Point2d &max) const
+    inline void boundingBox(Point2d &minP, Point2d &maxP) const
     {
-        min.x()=MINIMUM(_p0.x(), _p1.x(), _p2.x(), _p3.x());
-        min.y()=MINIMUM(_p0.y(), _p1.y(), _p2.y(), _p3.y());
+        minP.x()=MINIMUM(_p0.x(), _p1.x(), _p2.x(), _p3.x());
+        minP.y()=MINIMUM(_p0.y(), _p1.y(), _p2.y(), _p3.y());
 
-        max.x()=MAXIMUM(_p0.x(), _p1.x(), _p2.x(), _p3.x());
-        max.y()=MAXIMUM(_p0.y(), _p1.y(), _p2.y(), _p3.y());
+        maxP.x()=MAXIMUM(_p0.x(), _p1.x(), _p2.x(), _p3.x());
+        maxP.y()=MAXIMUM(_p0.y(), _p1.y(), _p2.y(), _p3.y());
     }
 
 
@@ -59,7 +61,7 @@ public:
     {
         assert(x>=0 && x<=512);
         assert(y>=0 && y<=424);
-        if(!_data) return 0;
+        //if(!_data) return 0;
 
         return (_data[x  + y*512]-_minH)/(_maxH-_minH);
     }
@@ -92,7 +94,7 @@ public:
     {
         assert(u>=0 && u<=1);
         assert(v>=0 && v<=1);
-        if(!_data) return 0;
+        //if(!_data) return 0;
 
         Point2d p=fromParameterization(u,v);
         return getHeight(p.x(),p.y());

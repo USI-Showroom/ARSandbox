@@ -1,11 +1,8 @@
-#define NO_KINECT
-
-//1200 1400
-
+//#define NO_KINECT
+#version 130
 
 #ifndef NO_KINECT
 
-#version 130
 #extension GL_EXT_gpu_shader4 : enable
 
 uniform usampler2D height0;
@@ -99,10 +96,10 @@ void main()
     heightV*=255.0/1.875;
 #else
     float heightV = 
-                texture2D(height0, txtH.xy).r+
-        0.5 *   texture2D(height1, txtH.xy).r+
-        0.25 *  texture2D(height2, txtH.xy).r+
-        0.125 * texture2D(height3, txtH.xy).r;
+                float(texture2D(height0, txtH.xy).r)+
+        0.5 *   float(texture2D(height1, txtH.xy).r)+
+        0.25 *  float(texture2D(height2, txtH.xy).r)+
+        0.125 * float(texture2D(height3, txtH.xy).r);
 
     heightV/=1.875;
 #endif

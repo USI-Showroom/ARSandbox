@@ -141,7 +141,7 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
 
         if(h>=_minH && h<=_maxH)
         {
-            _life=100;
+            _life=20;
             _position.x()=u;
             _position.y()=v;
             _decisionTicks=0;

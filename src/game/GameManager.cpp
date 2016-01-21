@@ -5,11 +5,16 @@
 #include <QColor>
 #include <QPainter>
 
+#include <time.h>
+
 #include "Point3.hpp"
+
+#define PI 3.1415926535897932384626433832795
+
 
 static int w=512;
 static int h=424;
-static int scaling=10;
+static int scaling=4;
 
 static int nAnimals=100;
 
@@ -38,6 +43,8 @@ void GameManager::updateTexture()
 void GameManager::newKinectData(const UINT16 *data, int w, int h)
 {
     if(!_playing) return;
+
+	if (w != 512 && h != 424) return;
 
     _mapping.setData(data,_minH,_maxH);
 
@@ -75,7 +82,7 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    static const double imgWidth=15;
+    static const double imgWidth=3;
     static const double imgHeight=imgWidth/242.0*400.0;
     static const double imgOffsetW=imgWidth/2;
     static const double imgOffsetH=imgHeight/2;
@@ -83,7 +90,6 @@ void GameManager::updateGame()
     _image.fill(QColor(0, 0, 0, 0));
     QPainter painter;
     painter.begin(&_image);
-    painter.setBrush(QColor(255, 0, 255, 255));
 
     for(size_t i=0;i<_animals.size();++i)
     {
@@ -94,7 +100,7 @@ void GameManager::updateGame()
         
         if(a.alive())
         {
-            const double angle=a.angle()*180/M_PI;
+            const double angle=a.angle()*180/PI;
             Point2d p=_mapping.fromParameterization(a.position());
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle+90);
