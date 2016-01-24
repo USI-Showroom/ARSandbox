@@ -135,7 +135,11 @@ public:
         const double f2u =  (_fromParam(1,0) * _fromParam(2,1) * v + _fromParam(1,0) * _fromParam(2,2) - _fromParam(2,0) * _fromParam(1,1) * v - _fromParam(2,0) * _fromParam(1,2))*denom;
         const double f2v = -(-_fromParam(1,1) * _fromParam(2,0) * u - _fromParam(1,1) * _fromParam(2,2) + _fromParam(2,1) * _fromParam(1,0) * u + _fromParam(2,1) * _fromParam(1,2))*denom;
 
-        return grad(fromParameterization(p)); //fixme
+        // std::cout<<f1u<<" "<<f1v<<"\n"<<f2u<<" "<<f2v<<std::endl;
+
+        Point2d tmp=grad(fromParameterization(p));
+
+        return Point2d(f1u*tmp.x()+f1v*tmp.y(),f2u*tmp.x()+f2v*tmp.y());
     }
 
     inline Point2d grad(const Point2d &p) const
