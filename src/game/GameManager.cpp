@@ -13,14 +13,14 @@
 #define PI 3.1415926535897932384626433832795
 
 
-static int w=512;
-static int h=424;
-static int scaling=4;
+static const int imgWidth=512;
+static const int imgHeight=424;
+static const int scaling=4;
 
 static int nAnimals=100;
 
 GameManager::GameManager()
-: _image(w*scaling,h*scaling,QImage::Format_ARGB32), _cowTexture(":/animals/cow")
+	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow")
 {
     srand (time(NULL));
     _playing=false;
@@ -83,11 +83,11 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    static const double imgWidth=3;
-    static const double imgHeight=imgWidth/134.0*384.0;
+    static const double textureImgWidth=3;
+	static const double textureImgHeight = textureImgWidth / 134.0*384.0;
 
-    static const double imgOffsetW=imgWidth/2;
-    static const double imgOffsetH=imgHeight/2;
+	static const double imgOffsetW = textureImgWidth / 2;
+	static const double imgOffsetH = textureImgHeight / 2;
 
     _image.fill(QColor(0, 0, 0, 0));
     QPainter painter;
@@ -96,15 +96,22 @@ void GameManager::updateGame()
 	/*for (int i = 0; i < 500; ++i)
 	{
 		for (int j = 0; j < 500; ++j){
-			double h = _mapping.getHeightFromParam(i / 500.0, j / 500.0);
+			double localH = _mapping.getHeightFromParam(i / 500.0, j / 500.0);
 
-			if (h < 0) h = 0;
-			if (h > 1) h = 1;
+			if (localH < 0) localH = 0;
+			if (localH > 1) localH = 1;
 
-			QColor col(int(255 * h), 255,255,255);
-			Point2d p = _mapping.fromParameterization(i / 500.0, 1-j / 500.0);
-			//std::cout << p << std::endl;
-			painter.fillRect(p.x()*scaling, (p.y())*scaling,6,6,col);
+			QColor col(int(255 * localH), 255, 255, 100);
+			Point2d p = _mapping.fromParameterization(i / 500.0, j / 500.0);
+			//p.y() = imgHeight - p.y();
+
+
+			if (p.y() == imgHeight)
+				--p.y();
+			assert(p.y() >= 0);
+			assert(p.y() < imgHeight);
+
+			painter.fillRect(p.x()*scaling, p.y()*scaling, 6, 6, col);
 
 		}
 	}//*/
@@ -120,10 +127,18 @@ void GameManager::updateGame()
         {
             const double angle=a.angle()*180/PI+90;
 
-            Point2d p=_mapping.fromParameterization(a.position().x(),1-a.position().y());
+            Point2d p=_mapping.fromParameterization(a.position());
+			p.y() = imgHeight - p.y();
+
+
+			if (p.y() == imgHeight)
+				--p.y();
+			assert(p.y() >= 0);
+			assert(p.y() < imgHeight);
+
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle);
-            painter.drawImage(QRectF(0, 0,imgWidth*scaling, imgHeight*scaling), _cowTexture);
+            painter.drawImage(QRectF(0, 0,textureImgWidth*scaling, textureImgHeight*scaling), _cowTexture);
             painter.rotate(-angle);
             painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
         }

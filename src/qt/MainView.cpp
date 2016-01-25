@@ -531,6 +531,7 @@ void MainView::paintEvent(QPaintEvent *e)
 
     textureCoords(GL_TEXTURE0, txt0.x(), txt0.y(), 0);
     textureCoords(GL_TEXTURE1, txt0.x()*nTiles, txt0.y()*nTiles, 0);
+	textureCoords(GL_TEXTURE2, txt0.x(), -txt0.y(), 0);
     glVertex2d(p0.x(), p0.y());
 
     textureCoords(GL_TEXTURE0, txt1.x(), txt1.y(), 1);
