@@ -91,7 +91,22 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    for(size_t i=0;i<_animals.size();++i)
+	/*for (int i = 0; i < 500; ++i)
+	{
+		for (int j = 0; j < 500; ++j){
+			double h = _mapping.getHeightFromParam(i / 500.0, j / 500.0);
+
+			if (h < 0) h = 0;
+			if (h > 1) h = 1;
+
+			QColor col(int(255 * h), 255,255,255);
+			Point2d p = _mapping.fromParameterization(i / 500.0, j / 500.0);
+			painter.fillRect(p.x()*scaling, p.y()*scaling,6,6,col);
+
+		}
+	}
+
+    /*for(size_t i=0;i<_animals.size();++i)
     {
         Animal &a=_animals[i];
         a.think(_mapping);
@@ -108,7 +123,7 @@ void GameManager::updateGame()
             painter.rotate(-angle-90);
             painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
         }
-    }
+    }*/
 
 
     painter.end();

@@ -57,10 +57,13 @@ public:
     }
 
 
-    inline double getHeight(const int x, const int y) const
+    inline double getHeight( int x,  int y) const
     {
-        assert(x>=0 && x<=512);
-        assert(y>=0 && y<=424);
+		if (x >= 512) x = 511;
+		if (y >= 424) y = 423;
+
+        assert(x>=0 && x<512);
+        assert(y>=0 && y<424);
         //if(!_data) return 0;
 
         return (_data[x  + y*512]-_minH)/(_maxH-_minH);
