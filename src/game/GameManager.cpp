@@ -4,6 +4,7 @@
 
 #include <QColor>
 #include <QPainter>
+#include <QGLWidget>
 
 #include <time.h>
 
@@ -101,13 +102,14 @@ void GameManager::updateGame()
 			if (h > 1) h = 1;
 
 			QColor col(int(255 * h), 255,255,255);
-			Point2d p = _mapping.fromParameterization(i / 500.0, j / 500.0);
-			painter.fillRect(p.x()*scaling, p.y()*scaling,6,6,col);
+			Point2d p = _mapping.fromParameterization(i / 500.0, 1-j / 500.0);
+			//std::cout << p << std::endl;
+			painter.fillRect(p.x()*scaling, (p.y())*scaling,6,6,col);
 
 		}
-	}
+	}//*/
 
-    /*for(size_t i=0;i<_animals.size();++i)
+    for(size_t i=0;i<_animals.size();++i)
     {
         Animal &a=_animals[i];
         a.think(_mapping);
@@ -116,16 +118,16 @@ void GameManager::updateGame()
         
         if(a.alive())
         {
-            const double angle=a.angle()*180/M_PI+90;
+            const double angle=a.angle()*180/PI+90;
 
-            Point2d p=_mapping.fromParameterization(a.position());
+            Point2d p=_mapping.fromParameterization(a.position().x(),1-a.position().y());
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle);
             painter.drawImage(QRectF(0, 0,imgWidth*scaling, imgHeight*scaling), _cowTexture);
             painter.rotate(-angle);
             painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
         }
-    }*/
+    }//*/
 
 
     painter.end();

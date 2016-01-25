@@ -76,6 +76,7 @@ private:
 
 	bool _moveTexture;
 	bool _saveNextMesh;
+	bool _showSand;
 
 	float _minH, _maxH;
 	int _currentCorner;

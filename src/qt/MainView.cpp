@@ -38,6 +38,8 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
 
     _initialized=false;
 
+	_showSand = false;
+
     for(int i=0; i<nLevels; ++i) {
         _level[i]=0; 
     }
@@ -179,7 +181,7 @@ void MainView::newGameImage(const QImage &img)
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 
-    QImage tmp=QGLWidget::convertToGLFormat(img);
+	const QImage tmp = QGLWidget::convertToGLFormat(img);
     glGenTextures(1, &_gameTexture);
     glBindTexture(GL_TEXTURE_2D, _gameTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -317,12 +319,20 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     const int key=e->key();
 
-    if (key == Qt::Key_Escape) exit(1);
+	if (key == Qt::Key_Escape) {
+		this->close();
+		exit(0);
+	}
 
     if(key == Qt::Key_P)
     {
         _saveNextMesh=true;
     }
+
+	if (key == Qt::Key_Minus)
+	{
+		_showSand = !_showSand;
+	}
 
     if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
@@ -463,6 +473,14 @@ void MainView::paintEvent(QPaintEvent *e)
     QPainter painter(this);
     static const double nTiles = 10;
 
+	if (_showSand)
+	{
+		glClearColor(1, 1, 1, 1);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		return;
+	}
+
     if (_setupMode){
         glClearColor(1, 0, 0, 1);
     }
@@ -472,7 +490,7 @@ void MainView::paintEvent(QPaintEvent *e)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glDisable(GL_BLEND);
+    //glDisable(GL_BLEND);
 
     glPushMatrix();
     glLoadIdentity();
