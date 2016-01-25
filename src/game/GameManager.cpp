@@ -83,7 +83,8 @@ void GameManager::initialize()
 void GameManager::updateGame()
 {
     static const double imgWidth=3;
-    static const double imgHeight=imgWidth/242.0*400.0;
+    static const double imgHeight=imgWidth/134.0*384.0;
+
     static const double imgOffsetW=imgWidth/2;
     static const double imgOffsetH=imgHeight/2;
 
@@ -115,12 +116,13 @@ void GameManager::updateGame()
         
         if(a.alive())
         {
-            const double angle=a.angle()*180/PI;
+            const double angle=a.angle()*180/M_PI+90;
+
             Point2d p=_mapping.fromParameterization(a.position());
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
-            painter.rotate(angle+90);
+            painter.rotate(angle);
             painter.drawImage(QRectF(0, 0,imgWidth*scaling, imgHeight*scaling), _cowTexture);
-            painter.rotate(-angle-90);
+            painter.rotate(-angle);
             painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
         }
     }*/
