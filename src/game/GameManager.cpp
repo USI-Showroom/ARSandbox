@@ -103,7 +103,7 @@ void GameManager::updateGame()
 
 			QColor col(int(255 * localH), 255, 255, 100);
 			Point2d p = _mapping.fromParameterization(i / 500.0, j / 500.0);
-			//p.y() = imgHeight - p.y();
+			p.y() = imgHeight - p.y();
 
 
 			if (p.y() == imgHeight)
