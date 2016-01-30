@@ -3,21 +3,46 @@
 #include <stdlib.h>
 #include <iostream>
 
+Animal::Animal()
+:_life(0), _minH(0), _maxH(0), _resurrected(false), _sound(this)
+{ }
+
 Animal::Animal(const double minH, const double maxH)
-:_life(0), _minH(minH), _maxH(maxH), _resurrected(false)
+:_life(0), _minH(minH), _maxH(maxH), _resurrected(false), _sound(this)
 { }
 
 void Animal::think(const UnitSquareMapping &mapping)
 {
     if(!alive())
-    {
         resurrect(mapping);
-    }
+    
+
     if(alive())
     {
         newDirection(mapping);
         --_decisionTicks;
+        
+
+
+        
+        if(!_sound.isPlaying())
+        {
+            --_soundTicks;
+            if(_soundTicks<=0){
+                const double r=randRange(0,5);
+                if(r>4){
+                    _soundTicks=30;
+                    _sound.play();
+                }
+            }
+
+        }
     }
+}
+
+Animal::~Animal()
+{
+
 }
 
 void Animal::update()
@@ -123,6 +148,11 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
 
         if(h>=_minH && h<=_maxH)
         {
+            QString s=QString::number(round(randRange(1,6)));
+            _sound.setSource(QUrl("qrc:/sounds/cow"+s));
+            _sound.setVolume(randRange(0.5,1.0));
+            _soundTicks=0;
+
             _maxLife=randRange(15,30);
             _life=_maxLife;
             _position.x()=u;

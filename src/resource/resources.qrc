@@ -43,6 +43,17 @@
         <file alias="cow">animals/cow1.png</file>
     </qresource>
 
+    <qresource prefix="/sounds">
+        <file alias="bells">sounds/bells1.wav</file>
+
+        <file alias="cow1">sounds/cow1.wav</file>
+        <file alias="cow2">sounds/cow2.wav</file>
+        <file alias="cow3">sounds/cow3.wav</file>
+        <file alias="cow4">sounds/cow4.wav</file>
+        <file alias="cow5">sounds/cow5.wav</file>
+        <file alias="cow6">sounds/cow6.wav</file>
+    </qresource>
+
 
     <qresource prefix="/test">
         <file alias="depth">depth.png</file>

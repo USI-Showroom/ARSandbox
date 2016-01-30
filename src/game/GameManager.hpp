@@ -41,8 +41,9 @@ private:
     QImage _image;
     bool _playing;
     UnitSquareMapping _mapping;
+    QSoundEffect _sound;
 
-    std::vector<Animal> _animals;
+    std::vector<Animal *> _animals;
 
     QImage _cowTexture;
 };

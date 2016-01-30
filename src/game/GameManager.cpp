@@ -22,18 +22,24 @@ static int nAnimals=10;
 GameManager::GameManager()
 	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow")
 {
+    _sound.setSource(QUrl("qrc:/sounds/bells"));
+    _sound.setLoopCount(QSoundEffect::Infinite);
+    
     srand (time(NULL));
     _playing=false;
     _image.fill(QColor(0,0,0,0));
 
     for(int i=0;i<nAnimals;++i)
-        _animals.push_back(Animal(0.5,0.65));
+        _animals.push_back(new Animal(0.5,0.65));
 }
 
 GameManager::~GameManager()
 {
     if(_gameTimer)
         _gameTimer->stop();
+
+    for(int i=0;i<nAnimals;++i)
+        delete _animals[i];
 }
 
 void GameManager::updateTexture()
@@ -60,9 +66,12 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
     _mapping=mapping;
 
-    if(_playing)
+    if(_playing){
+        _sound.play();
         _gameTimer->start(100);
+    }
     else{
+        _sound.stop();
         _gameTimer->stop();
         _image.fill(QColor(0, 0, 0, 0));
         updateTexture();   
@@ -119,7 +128,7 @@ void GameManager::updateGame()
 
     for(size_t i=0;i<_animals.size();++i)
     {
-        Animal &a=_animals[i];
+        Animal &a=*_animals[i];
         a.think(_mapping);
         a.update();
 
