@@ -17,7 +17,7 @@ static const int imgWidth=512;
 static const int imgHeight=424;
 static const int scaling=10;
 
-static int nAnimals=1;
+static int nAnimals=10;
 
 GameManager::GameManager()
 	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow")
@@ -126,10 +126,13 @@ void GameManager::updateGame()
         
         if(a.alive())
         {
-            const double angle=a.globalAngle()*180/PI+90;
-
             Point2d p=_mapping.fromParameterization(a.position());
 			p.y() = imgHeight - p.y();
+
+            Point2d d=_mapping.fromParameterizationDir(a.direction());
+            d.y() *= -1;
+
+            const double angle=atan2(d.y(),d.x())*180/PI-90;
 
 
 			if (p.y() == imgHeight)
@@ -139,8 +142,9 @@ void GameManager::updateGame()
 
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle);
+
             painter.drawImage(QRectF(-imgOffsetW, -imgOffsetW,textureImgWidth*scaling, textureImgHeight*scaling), _cowTexture);
-            painter.rotate(-angle);
+
             painter.resetTransform();
         }
     }//*/

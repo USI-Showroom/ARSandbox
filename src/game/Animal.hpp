@@ -8,12 +8,12 @@ class Animal
 {
 private:
     Point2d _position, _direction;
-    int _life;
+    int _life, _maxLife;
     int _decisionTicks;
 
     double _minH, _maxH;
     double _speed;
-    double _angle, _globalAngle;
+    double _angle;
     bool _resurrected;
 
 public:
@@ -25,7 +25,7 @@ public:
     inline const Point2d &position() const { return _position; }
     inline bool alive() const { return _life>0; }
 
-    inline double globalAngle() const { return _globalAngle; }
+    inline const Point2d &direction() const { return _direction; }
 
 private:
     void resurrect(const UnitSquareMapping &mapping);

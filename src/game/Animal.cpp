@@ -65,7 +65,9 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         const double h=mapping.getHeightFromParam(_position);
 
 
-        if(grad.isZero()) {
+        if(grad.isZero()) 
+        {
+            --_life;
             return;
         }
 
@@ -73,45 +75,33 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         {
             grad.rotated();
 
-            if(!_direction.isZero() && grad*_direction<0)
-            {
+            if(_life<_maxLife)
+                ++_life;
+
+            if(grad*_direction<0)
                 grad=-grad;
-            }
         }
         else
         { 
-            if(h>_maxH)
-            { //go down
-
-                --_life;
-            }
-            else //the grad points to go up
-            {
+            --_life;
+            if(h<=_maxH) //go down
                 grad=-grad;
-                --_life;
-            }
 
+            _direction.normalize();
             grad.normalize();
             grad=_direction+0.2*grad;
         }
 
-        grad.normalize();
         const double newAngle=atan2(grad.y(),grad.x());
         if(_resurrected)
         {
             _angle=newAngle;
             _resurrected=false;
-        }else
-        {
-            _angle=0.4*newAngle+0.6*_angle;
         }
+        else
+            _angle=0.4*newAngle+0.6*_angle;
 
         _direction=Point2d(cos(_angle),sin(_angle))*_speed;
-
-        const Point2d tmp=mapping.toParameterizationDir(_direction);
-        _globalAngle=atan2(tmp.y(),tmp.x());
-
-        // std::cout<<_angle<<" "<<_globalAngle<<std::endl;
         
         _decisionTicks=1;
     }
@@ -133,7 +123,8 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
 
         if(h>=_minH && h<=_maxH)
         {
-            _life=20;
+            _maxLife=randRange(15,30);
+            _life=_maxLife;
             _position.x()=u;
             _position.y()=v;
             _decisionTicks=0;
