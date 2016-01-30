@@ -13,7 +13,7 @@ private:
 
     double _minH, _maxH;
     double _speed;
-    double _angle;
+    double _angle, _globalAngle;
     bool _resurrected;
 
 public:
@@ -25,7 +25,7 @@ public:
     inline const Point2d &position() const { return _position; }
     inline bool alive() const { return _life>0; }
 
-    inline double angle() const { return _angle; }
+    inline double globalAngle() const { return _globalAngle; }
 
 private:
     void resurrect(const UnitSquareMapping &mapping);

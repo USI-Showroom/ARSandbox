@@ -87,7 +87,7 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             }
             else //the grad points to go up
             {
-                grad=-grad; //fixme less than 90degrees
+                grad=-grad;
                 --_life;
             }
 
@@ -95,9 +95,7 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             grad=_direction+0.2*grad;
         }
 
-
-        // grad+=Point2d(randRange(-0.05,0.05),randRange(-0.05,0.05));
-
+        grad.normalize();
         const double newAngle=atan2(grad.y(),grad.x());
         if(_resurrected)
         {
@@ -105,22 +103,16 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             _resurrected=false;
         }else
         {
-            _angle=0.3*newAngle+0.7*_angle;
-
-            // if(newAngle>_angle+0.3){
-            //     _angle+=0.3;
-            // }
-            // else if(newAngle<_angle-0.3){
-            //     _angle-=0.3;
-            // }
-            // else{
-            //     _angle=newAngle;
-            // }
+            _angle=0.4*newAngle+0.6*_angle;
         }
 
-
-// std::cout<<_angle<<std::endl;
         _direction=Point2d(cos(_angle),sin(_angle))*_speed;
+
+        const Point2d tmp=mapping.toParameterizationDir(_direction);
+        _globalAngle=atan2(tmp.y(),tmp.x());
+
+        // std::cout<<_angle<<" "<<_globalAngle<<std::endl;
+        
         _decisionTicks=1;
     }
 }

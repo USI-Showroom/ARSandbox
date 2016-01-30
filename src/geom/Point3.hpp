@@ -1,12 +1,17 @@
 #ifndef POINT3_H
 #define POINT3_H
 
+#include "Point2.hpp"
 
 class Point3d {
 
 public:
   Point3d() 
   : _x( 0.0 ), _y( 0.0 ), _z( 0.0 ) 
+  {}
+
+  explicit Point3d( const Point2d &p )
+  : _x( p.x() ), _y( p.y() ), _z( 0 ) 
   {}
 
   explicit Point3d( double v )

@@ -111,6 +111,12 @@ public:
         return _fromParam*p;
     }
 
+    inline Point2d toParameterizationDir(const Point2d &dir) const
+    {
+        const Point3d tmp=_toParam*Point3d(dir);
+        return Point2d(tmp.x(),tmp.y());
+    }
+
     inline Point2d fromParameterization(const double u, const double v) const
     {
         return fromParameterization(Point2d(u,v));

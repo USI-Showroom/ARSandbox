@@ -15,9 +15,9 @@
 
 static const int imgWidth=512;
 static const int imgHeight=424;
-static const int scaling=4;
+static const int scaling=10;
 
-static int nAnimals=100;
+static int nAnimals=1;
 
 GameManager::GameManager()
 	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow")
@@ -27,7 +27,7 @@ GameManager::GameManager()
     _image.fill(QColor(0,0,0,0));
 
     for(int i=0;i<nAnimals;++i)
-        _animals.push_back(Animal(0.45,0.6));
+        _animals.push_back(Animal(0.5,0.65));
 }
 
 GameManager::~GameManager()
@@ -83,7 +83,7 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    static const double textureImgWidth=3;
+    static const double textureImgWidth=10;
 	static const double textureImgHeight = textureImgWidth / 134.0*384.0;
 
 	static const double imgOffsetW = textureImgWidth / 2;
@@ -111,7 +111,8 @@ void GameManager::updateGame()
 			assert(p.y() >= 0);
 			assert(p.y() < imgHeight);
 
-			painter.fillRect(p.x()*scaling, p.y()*scaling, 6, 6, col);
+            if(localH>=0.5 && localH<=0.65)
+			 painter.fillRect(p.x()*scaling, p.y()*scaling, 6, 6, col);
 
 		}
 	}//*/
@@ -125,7 +126,7 @@ void GameManager::updateGame()
         
         if(a.alive())
         {
-            const double angle=a.angle()*180/PI+90;
+            const double angle=a.globalAngle()*180/PI+90;
 
             Point2d p=_mapping.fromParameterization(a.position());
 			p.y() = imgHeight - p.y();
@@ -138,9 +139,9 @@ void GameManager::updateGame()
 
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle);
-            painter.drawImage(QRectF(0, 0,textureImgWidth*scaling, textureImgHeight*scaling), _cowTexture);
+            painter.drawImage(QRectF(-imgOffsetW, -imgOffsetW,textureImgWidth*scaling, textureImgHeight*scaling), _cowTexture);
             painter.rotate(-angle);
-            painter.translate(-(p.x()+imgOffsetW)*scaling,-(p.y()+imgOffsetH)*scaling);
+            painter.resetTransform();
         }
     }//*/
 
