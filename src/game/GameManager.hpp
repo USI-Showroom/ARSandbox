@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QImage>
+#include <QMediaPlayer>
 #include <vector>
 
 #include "Point2.hpp"
@@ -41,7 +42,7 @@ private:
     QImage _image;
     bool _playing;
     UnitSquareMapping _mapping;
-    QSoundEffect _sound;
+	QMediaPlayer _sound;
 
     std::vector<Animal *> _animals;
 

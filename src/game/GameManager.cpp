@@ -5,6 +5,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QGLWidget>
+#include <QMediaPlaylist>
 
 #include <time.h>
 
@@ -15,22 +16,32 @@
 
 static const int imgWidth=512;
 static const int imgHeight=424;
-static const int scaling=10;
+static const int scaling=7;
 
-static int nAnimals=10;
+static int nAnimals=30;
 
 GameManager::GameManager()
-	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow")
+	: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow"), _sound(this)
 {
-    _sound.setSource(QUrl("qrc:/sounds/bells"));
-    _sound.setLoopCount(QSoundEffect::Infinite);
+	QMediaPlaylist *playlist = new QMediaPlaylist(this);
+	playlist->addMedia(QUrl("qrc:/sounds/bells"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+	playlist->setCurrentIndex(1);
+	_sound.setPlaylist(playlist);
+
+
+
+
+
+	//_sound.setMedia(QUrl("qrc:/sounds/bells"));
+    //_sound.setLoopCount(QSoundEffect::Infinite);
     
     srand (time(NULL));
     _playing=false;
     _image.fill(QColor(0,0,0,0));
 
     for(int i=0;i<nAnimals;++i)
-        _animals.push_back(new Animal(0.5,0.65));
+        _animals.push_back(new Animal(0.3,0.6));
 }
 
 GameManager::~GameManager()
@@ -71,7 +82,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
         _gameTimer->start(100);
     }
     else{
-        _sound.stop();
+        _sound.pause();
         _gameTimer->stop();
         _image.fill(QColor(0, 0, 0, 0));
         updateTexture();   
@@ -92,7 +103,7 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    static const double textureImgWidth=10;
+    static const double textureImgWidth=3;
 	static const double textureImgHeight = textureImgWidth / 134.0*384.0;
 
 	static const double imgOffsetW = textureImgWidth / 2;
@@ -120,7 +131,7 @@ void GameManager::updateGame()
 			assert(p.y() >= 0);
 			assert(p.y() < imgHeight);
 
-            if(localH>=0.5 && localH<=0.65)
+            if(localH>=0.3 && localH<=0.6)
 			 painter.fillRect(p.x()*scaling, p.y()*scaling, 6, 6, col);
 
 		}

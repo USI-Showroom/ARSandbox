@@ -44,7 +44,7 @@
     </qresource>
 
     <qresource prefix="/sounds">
-        <file alias="bells">sounds/bells1.wav</file>
+        <file alias="bells">sounds/bells1.mp3</file>
 
         <file alias="cow1">sounds/cow1.wav</file>
         <file alias="cow2">sounds/cow2.wav</file>
