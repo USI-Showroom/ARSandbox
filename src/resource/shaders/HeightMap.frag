@@ -1,5 +1,5 @@
-//#define NO_KINECT
-#version 130
+#define NO_KINECT
+// #version 130
 
 #ifndef NO_KINECT
 

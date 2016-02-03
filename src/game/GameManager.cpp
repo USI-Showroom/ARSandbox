@@ -25,7 +25,9 @@ static const int scaling=7;
 static int nAnimals=100;
 
 GameManager::GameManager()
-: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow"), _sound(this), _currentTexture(NULL)
+: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
+ _cowTexture(":/animals/cow"), _fishTexture(":/animals/fish"), _currentTexture(NULL),
+ _sound(this)
 {
 #ifndef NO_KINECT
     QMediaPlaylist *playlist = new QMediaPlaylist(this);
@@ -75,16 +77,29 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
     _mapping=mapping;
 
     if(_playing){
-        if(gameType==0){
-            _currentTexture=&_cowTexture;
-            _animals.resize(nAnimals);
+        switch(gameType){
+            case 0: //swiss terrain
+            {
+                _currentTexture=&_cowTexture;
+                _animals.resize(nAnimals);
 
-            for(int i=0;i<nAnimals;++i)
-                _animals[i]=new Animal(0.4,0.7);
+                for(int i=0;i<nAnimals;++i)
+                    _animals[i]=new Animal(0.4,0.7,true);
 
 #ifndef NO_KINECT
-			_sound.play();
+    			_sound.play();
 #endif
+                break;
+            }
+            case 2:  //fishes
+            {
+                _currentTexture=&_fishTexture;
+                _animals.resize(nAnimals);
+
+                for(int i=0;i<nAnimals;++i)
+                    _animals[i]=new Animal(0.0,0.5,false);
+                break;
+            }
         }
 
         _gameTimer->start(100);

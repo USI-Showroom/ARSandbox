@@ -7,8 +7,8 @@
 // :_life(0), _minH(0), _maxH(0), _resurrected(false), _sound()
 // { }
 
-Animal::Animal(const double minH, const double maxH)
-:_life(0), _minH(minH), _maxH(maxH), _resurrected(false)//, _sound()
+Animal::Animal(const double minH, const double maxH, const bool playSound)
+:_life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
 { }
 
 void Animal::think(const UnitSquareMapping &mapping)
@@ -25,7 +25,7 @@ void Animal::think(const UnitSquareMapping &mapping)
 
 
 
-		if (_sound.state()==QMediaPlayer::StoppedState)
+		if (_playSound && _sound.state()==QMediaPlayer::StoppedState)
 		{
 			--_soundTicks;
 			if (_soundTicks <= 0){
@@ -148,10 +148,12 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
 
         if(h>=_minH && h<=_maxH)
         {
-            QString s=QString::number(round(randRange(1,6)));
-            _sound.setMedia(QUrl("qrc:/sounds/cow"+s));
-            _sound.setVolume(randRange(20,60));
-            _soundTicks=0;
+            if(_playSound){
+                QString s=QString::number(round(randRange(1,6)));
+                _sound.setMedia(QUrl("qrc:/sounds/cow"+s));
+                _sound.setVolume(randRange(20,60));
+                _soundTicks=0;
+            }
 
             _maxLife=randRange(15,30);
             _life=_maxLife;

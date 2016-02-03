@@ -45,8 +45,9 @@ private:
 
     std::vector<Animal *> _animals;
 
+    QImage _cowTexture, _fishTexture;
     QImage *_currentTexture;
-    QImage _cowTexture;
+    
     QMediaPlayer _sound;
 };
 #endif

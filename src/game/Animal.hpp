@@ -21,11 +21,12 @@ private:
     double _angle;
     bool _resurrected;
 
+    bool _playSound;
     QMediaPlayer _sound;
 
 public:
     // Animal();
-    Animal(const double minH, const double maxH);
+    Animal(const double minH, const double maxH, const bool playSound);
     virtual ~Animal();
 
     void think(const UnitSquareMapping &mapping);
