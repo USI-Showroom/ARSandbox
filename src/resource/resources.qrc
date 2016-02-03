@@ -41,6 +41,7 @@
 
     <qresource prefix="/animals">
         <file alias="cow">animals/cow1.png</file>
+        <file alias="fish">animals/fish.png</file>
     </qresource>
 
     <qresource prefix="/sounds">

@@ -25,7 +25,7 @@ static const int scaling=7;
 static int nAnimals=10;
 
 GameManager::GameManager()
-: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow"), _sound(this)
+: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow"), _sound(this), _currentTexture(NULL)
 {
 #ifndef NO_KINECT
     QMediaPlaylist *playlist = new QMediaPlaylist(this);
@@ -76,6 +76,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
     if(_playing){
         if(gameType==0){
+            _currentTexture=&_cowTexture;
             _animals.resize(nAnimals);
 
             for(int i=0;i<nAnimals;++i)
@@ -114,13 +115,18 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
+    
+
+    _image.fill(QColor(0,0,0,0));
+
+    if(!_currentTexture) return;
+
     static const double textureImgWidth=3;
-    static const double textureImgHeight = textureImgWidth / 134.0*384.0;
+    static const double textureImgHeight = textureImgWidth / _currentTexture->width()*_currentTexture->height();
 
     static const double imgOffsetW = textureImgWidth / 2;
     static const double imgOffsetH = textureImgHeight / 2;
 
-    _image.fill(QColor(0,0,0,0));
     QPainter painter;
     painter.begin(&_image);
 
@@ -173,7 +179,7 @@ void GameManager::updateGame()
             painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
             painter.rotate(angle);
 
-            painter.drawImage(QRectF(-imgOffsetW, -imgOffsetW,textureImgWidth*scaling, textureImgHeight*scaling), _cowTexture);
+            painter.drawImage(QRectF(-imgOffsetW, -imgOffsetW,textureImgWidth*scaling, textureImgHeight*scaling), *_currentTexture);
 
             painter.resetTransform();
         }
