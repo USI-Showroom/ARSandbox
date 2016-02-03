@@ -30,7 +30,7 @@ private slots:
 public slots:
     void newKinectData(const UINT16 *data, int w, int h);
     void keyPress(const int key);
-    void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping);
+    void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping);
 
 public:
     void initialize();
@@ -42,11 +42,11 @@ private:
     QImage _image;
     bool _playing;
     UnitSquareMapping _mapping;
-	QMediaPlayer _sound;
 
     std::vector<Animal *> _animals;
 
     QImage _cowTexture;
+    QMediaPlayer _sound;
 };
 #endif
 

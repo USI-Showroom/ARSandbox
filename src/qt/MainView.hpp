@@ -38,7 +38,7 @@ public:
 
 signals:
 	void keyPress(const int keyCode);
-	void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const UnitSquareMapping &mapping);
+	void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping);
 
 public slots:
 	void newKinectData(const UINT16 *data, int w, int h);
@@ -51,7 +51,7 @@ private:
 	void createTexture(const QString &path, GLuint &txtId);
 	void activeTexture(GLenum texture);
 	void textureCoords(GLenum texture, float u, float v, int i);
-	void reloadTerainTextures(const std::string &terrainIndex);
+	void reloadTerainTextures(const int terrainIndex);
 
 	Point2d bilinInterp(const Point2d &p);
 
@@ -80,6 +80,7 @@ private:
 
 	float _minH, _maxH;
 	int _currentCorner;
+	int _currentGame;
 
 	std::deque<GLuint> _txt;
 	GLuint _level[nLevels];

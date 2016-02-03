@@ -66,7 +66,7 @@ public:
         assert(y>=0 && y<424);
         //if(!_data) return 0;
 
-        return (_data[x  + y*512]-_minH)/(_maxH-_minH);
+        return 1-double((_data[x  + y*512]-_minH)/(_maxH-_minH));
     }
 
     inline double getHeight(const Point2d &p) const

@@ -28,8 +28,8 @@ QMainWindow(parent), _ui(new Ui::MainWindow)
    connect(&_gameManager, SIGNAL(gameTextureChanged(const QImage&)),
     _ui->mainView, SLOT(newGameImage(const QImage&)));
 
-   connect(_ui->mainView, SIGNAL(toggleSetupMode(const bool, const int, const int, const UnitSquareMapping &)),
-    &_gameManager, SLOT(toggleSetupMode(const bool, const int, const int, const UnitSquareMapping &)));
+   connect(_ui->mainView, SIGNAL(toggleSetupMode(const bool, const int, const int, const int, const UnitSquareMapping &)),
+    &_gameManager, SLOT(toggleSetupMode(const bool, const int, const int, const int, const UnitSquareMapping &)));
 
    _gameManager.initialize();
 }

@@ -1,7 +1,7 @@
 #ifndef ANIMAL_HPP
 #define ANIMAL_HPP
 
-#include <QSoundEffect>
+#include <QMediaPlayer>
 
 
 #include "Point2.hpp"
@@ -21,10 +21,10 @@ private:
     double _angle;
     bool _resurrected;
 
-    QSoundEffect _sound;
+    QMediaPlayer _sound;
 
 public:
-    Animal();
+    // Animal();
     Animal(const double minH, const double maxH);
     virtual ~Animal();
 

@@ -150,7 +150,7 @@ void MainView::initializeGL() {
 
     assert(nSmoothing+nLevels+1<=maxTxt);
 
-    reloadTerainTextures("0");
+    reloadTerainTextures(0);
 
     _funs.initializeOpenGLFunctions();
     _funs2.initializeOpenGLFunctions();
@@ -158,8 +158,9 @@ void MainView::initializeGL() {
     checkGLError("init");
 }
 
-void MainView::reloadTerainTextures(const std::string &terrainIndex)
+void MainView::reloadTerainTextures(const int terrainIndex)
 {
+    _currentGame=terrainIndex;
     for(int i=0; i<nLevels;++i){
         if(_level[i]>0)
             glDeleteTextures(1, &_level[i]);
@@ -167,7 +168,7 @@ void MainView::reloadTerainTextures(const std::string &terrainIndex)
 
     for(int i=0; i<nLevels;++i){
         QString tmp(":/terrain/");
-        tmp+=QString::fromStdString(terrainIndex+"/level");
+        tmp+=QString::number(terrainIndex)+QString::fromStdString("/level");
         tmp+=QString::number(i);
 
         createTexture(tmp,_level[i]);
@@ -337,7 +338,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
     if(key==Qt::Key_F5){
         _setupMode=!_setupMode;
         UnitSquareMapping mapping(txt0,txt1,txt2,txt3);
-        emit toggleSetupMode(_setupMode,_minH,_maxH, mapping);
+        emit toggleSetupMode(_setupMode, _minH, _maxH, _currentGame, mapping);
     }
 
     if(!_setupMode) 
@@ -357,9 +358,9 @@ void MainView::keyPressEvent(QKeyEvent *e)
 
     switch (key)
     {
-        case Qt::Key_F1: reloadTerainTextures("0"); break;
-        case Qt::Key_F2: reloadTerainTextures("1"); break;
-        case Qt::Key_F3: reloadTerainTextures("2"); break;
+        case Qt::Key_F1: reloadTerainTextures(0); break;
+        case Qt::Key_F2: reloadTerainTextures(1); break;
+        case Qt::Key_F3: reloadTerainTextures(2); break;
 
         case Qt::Key_1: _currentCorner=0; break;
         case Qt::Key_2: _currentCorner=1; break;
