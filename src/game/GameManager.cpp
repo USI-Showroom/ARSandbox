@@ -22,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=10;
+static int nAnimals=100;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32), _cowTexture(":/animals/cow"), _sound(this), _currentTexture(NULL)
@@ -81,10 +81,12 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
             for(int i=0;i<nAnimals;++i)
                 _animals[i]=new Animal(0.4,0.7);
-        }
+
 #ifndef NO_KINECT
-        _sound.play();
+			_sound.play();
 #endif
+        }
+
         _gameTimer->start(100);
     }
     else{

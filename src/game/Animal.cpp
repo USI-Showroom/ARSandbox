@@ -30,8 +30,9 @@ void Animal::think(const UnitSquareMapping &mapping)
 			--_soundTicks;
 			if (_soundTicks <= 0){
 				const double r = randRange(0, 5);
+
+				_soundTicks = 30;
 				if (r > 4.5){
-					_soundTicks = 30;
 					_sound.play();
 				}
 			}
@@ -108,7 +109,7 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         else
         { 
             --_life;
-            if(h>_maxH) //go up
+            if(h<_minH) //go up
                 grad=-grad;
 
             _direction.normalize();
@@ -123,7 +124,7 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
             _resurrected=false;
         }
         else
-            _angle=0.4*newAngle+0.6*_angle;
+            _angle=0.3*newAngle+0.7*_angle;
 
         _direction=Point2d(cos(_angle),sin(_angle))*_speed;
         
