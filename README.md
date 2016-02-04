@@ -1,7 +1,5 @@
 # README #
 
-Brief tutorial on how to make it compile
-
 ## What is this repository for? ##
 
 Virtual 3D sandbox project
