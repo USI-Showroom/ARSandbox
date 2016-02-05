@@ -32,6 +32,11 @@ public slots:
     void keyPress(const int key);
     void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping);
 
+    void mousePress(const int x, const int y);
+    void mouseMove(const int x, const int y);
+    void mouseRelease(const int x, const int y);
+    
+
 public:
     void initialize();
     void updateTexture();

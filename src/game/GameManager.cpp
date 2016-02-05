@@ -122,6 +122,18 @@ void GameManager::keyPress(const int key)
 { }
 
 
+void GameManager::mousePress(const int x, const int y)
+{ }
+
+void GameManager::mouseMove(const int x, const int y)
+{ }
+
+void GameManager::mouseRelease(const int x, const int y)
+{ }
+
+
+
+
 void GameManager::initialize()
 {
     _gameTimer = new QTimer(this);
