@@ -25,6 +25,7 @@ You need:
 * ESC         exit
 * P           save mesh/point cloud
 * F5          toggle set-up mode
+* -           turn off visualisation and show only sand
 
   
 ### In set-up mode ###
