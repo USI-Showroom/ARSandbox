@@ -1,0 +1,18 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/animals">
+        <file alias="cow">animals/cow2.png</file>
+        <file alias="fish">animals/fish.png</file>
+    </qresource>
+
+    <qresource prefix="/sounds">
+        <file alias="bells">sounds/bells1.mp3</file>
+
+        <file alias="cow1">sounds/cow1.mp3</file>
+        <file alias="cow2">sounds/cow2.mp3</file>
+        <file alias="cow3">sounds/cow3.mp3</file>
+        <file alias="cow4">sounds/cow4.mp3</file>
+        <file alias="cow5">sounds/cow5.mp3</file>
+        <file alias="cow6">sounds/cow6.mp3</file>
+    </qresource>
+</RCC>

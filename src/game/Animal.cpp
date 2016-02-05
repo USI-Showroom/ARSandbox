@@ -109,7 +109,7 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         else
         { 
             --_life;
-            if(h<_minH) //go up
+            if(h>_maxH) //go up
                 grad=-grad;
 
             _direction.normalize();

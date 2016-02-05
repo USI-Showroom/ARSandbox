@@ -1,0 +1,26 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/terrain/0">
+        <file alias="level0">terrain/0/level0.png</file>
+        <file alias="level1">terrain/0/level1.png</file>
+        <file alias="level2">terrain/0/level2.png</file>
+        <file alias="level3">terrain/0/level3.png</file>
+        <file alias="level4">terrain/0/level4.png</file>
+    </qresource>
+
+    <qresource prefix="/terrain/1">
+        <file alias="level0">terrain/1/level0.jpg</file>
+        <file alias="level1">terrain/1/level1.jpg</file>
+        <file alias="level2">terrain/1/level2.jpg</file>
+        <file alias="level3">terrain/1/level3.jpg</file>
+        <file alias="level4">terrain/1/level4.png</file>
+    </qresource>
+
+    <qresource prefix="/terrain/2">
+        <file alias="level0">terrain/2/0.jpg</file>
+        <file alias="level1">terrain/2/1.jpg</file>
+        <file alias="level2">terrain/2/2.jpg</file>
+        <file alias="level3">terrain/2/3.jpg</file>
+        <file alias="level4">terrain/2/4.jpg</file>
+    </qresource>
+</RCC>
