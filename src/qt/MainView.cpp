@@ -448,6 +448,7 @@ void MainView::keyPressEvent(QKeyEvent *e)
     }
 
     std::cout <<"min h: "<< _minH << " max h: " << _maxH << std::endl;
+    std::cout <<"min h: "<< txt0 << " max h: " << txt1 << std::endl;
 
     update();
 }
@@ -614,7 +615,7 @@ void MainView::saveMesh(const UINT16 *data)
 
             double h=mapping.getHeight(x,y);
 
-            h *= 0.1;
+            h *= 2;
             // triangulator.addPoint(Point2d(x,y),h);
 
             file<<"v "<<p.x()<<" "<<p.y()<<" "<<h<<"\n";
