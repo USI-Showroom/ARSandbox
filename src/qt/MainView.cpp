@@ -6,6 +6,7 @@
 #include <gl\GLU.h>
 #endif
 #include <QGLWidget>
+#include <QDateTime>
 #include <iostream>
 #include "MainView.hpp"
 #include <cmath>
@@ -615,7 +616,10 @@ void MainView::saveMesh(const UINT16 *data)
 
 
     std::ofstream file;
-    file.open ("example.obj");
+    const QDateTime date=QDateTime::currentDateTime();
+    const std::string fileName="mesh_"+date.toString("dd.MM.yyyy hh:mm:ss").toStdString()+".obj";
+    
+    file.open(fileName);
 
     const int stride=max.x()-min.x();
     std::vector<int> indices((max.y()-min.y())*stride);
