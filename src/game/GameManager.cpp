@@ -22,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=100;
+static int nAnimals=50;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -76,34 +76,46 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
     _mapping=mapping;
 
-    if(_playing){
-        switch(gameType){
-            case 0: //swiss terrain
-            {
-                _currentTexture=&_cowTexture;
-                _animals.resize(nAnimals);
+	if (_playing){
+		switch (gameType){
+		case 0: //swiss terrain
+		{
+			_currentTexture = &_cowTexture;
+			_animals.resize(nAnimals);
+			_textureImgWidth = 3;
 
-                for(int i=0;i<nAnimals;++i)
-                    _animals[i]=new Animal(0.4,0.7,true);
+			for (int i = 0; i < nAnimals; ++i)
+				_animals[i] = new Animal(0.4, 0.7, true);
 
 #ifndef NO_KINECT
-    			_sound.play();
+			_sound.play();
 #endif
-                break;
-            }
-            case 2:  //fishes
-            {
-                _currentTexture=&_fishTexture;
-                _animals.resize(nAnimals);
+			break;
+		}
+		case 2:  //fishes
+		{
+			_currentTexture = &_fishTexture;
+			_animals.resize(nAnimals);
+			_textureImgWidth = 1;
 
-                for(int i=0;i<nAnimals;++i)
-                    _animals[i]=new Animal(0.0,0.5,false);
-                break;
-            }
-        }
+			for (int i = 0; i < nAnimals; ++i)
+				_animals[i] = new Animal(0.0, 0.4, false);
+			break;
+		}
+		default:
+		{
+			_currentTexture = NULL;
+		}
+		}
 
-        _gameTimer->start(100);
-    }
+		if (_currentTexture)
+			_textureImgHeight = _textureImgWidth / _currentTexture->width()*_currentTexture->height();
+
+		_imgOffsetW = _textureImgWidth / 2;
+		_imgOffsetH = _textureImgHeight / 2;
+
+		_gameTimer->start(100);
+	}
     else{
 
         for(size_t i=0;i<_animals.size();++i)
@@ -149,12 +161,8 @@ void GameManager::updateGame()
     _image.fill(QColor(0,0,0,0));
 
     if(!_currentTexture) return;
-
-    static const double textureImgWidth=3;
-    static const double textureImgHeight = textureImgWidth / _currentTexture->width()*_currentTexture->height();
-
-    static const double imgOffsetW = textureImgWidth / 2;
-    static const double imgOffsetH = textureImgHeight / 2;
+	
+    
 
     QPainter painter;
     painter.begin(&_image);
@@ -205,10 +213,10 @@ void GameManager::updateGame()
             assert(p.y() >= 0);
             assert(p.y() < imgHeight);
 
-            painter.translate((p.x()+imgOffsetW)*scaling,(p.y()+imgOffsetH)*scaling);
+            painter.translate((p.x()+_imgOffsetW)*scaling,(p.y()+_imgOffsetH)*scaling);
             painter.rotate(angle);
 
-            painter.drawImage(QRectF(-imgOffsetW, -imgOffsetW,textureImgWidth*scaling, textureImgHeight*scaling), *_currentTexture);
+            painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,_textureImgWidth*scaling, _textureImgHeight*scaling), *_currentTexture);
 
             painter.resetTransform();
         }

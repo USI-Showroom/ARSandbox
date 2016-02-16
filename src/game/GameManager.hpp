@@ -47,6 +47,7 @@ private:
     QImage _image;
     bool _playing;
     UnitSquareMapping _mapping;
+	double _textureImgWidth, _textureImgHeight, _imgOffsetW, _imgOffsetH;
 
     std::vector<Animal *> _animals;
 
