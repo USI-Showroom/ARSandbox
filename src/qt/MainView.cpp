@@ -466,8 +466,33 @@ Point2d MainView::bilinInterp(const Point2d &p)
     return res;
 }
 
+void MainView::mousePressEvent(QMouseEvent *e)
+{
+    if(!_setupMode) 
+    {
+        emit mousePress(e->x(),e->y());
+        return;
+    }
+}
+
+void MainView::mouseMoveEvent(QMouseEvent *e)
+{
+    if(!_setupMode) 
+    {
+        emit mouseMove(e->x(),e->y());
+        return;
+    }
+}
+
+
 void MainView::mouseReleaseEvent(QMouseEvent *e)
-{ }
+{ 
+    if(!_setupMode) 
+    {
+        emit mouseRelease(e->x(),e->y());
+        return;
+    }
+}
 
 // void MainView::paintGL()
 void MainView::paintEvent(QPaintEvent *e) 

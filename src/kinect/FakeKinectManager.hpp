@@ -30,7 +30,7 @@ public:
         {
             for (int i = 0; i < _w; ++i)
             {
-                _data[index++] = qRed(tmp.pixel(i,_h-j-1));
+                _data[index++] = 255-qRed(tmp.pixel(i,_h-j-1));
             }
         }
     }

@@ -1,0 +1,22 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/shaders">
+        <file alias="HeightMap.vert">shaders/HeightMap.vert</file>
+        <file alias="HeightMap.frag">shaders/HeightMap.frag</file>
+        <file alias="Checkerboard.frag">shaders/Checkerboard.frag</file>
+    </qresource>
+
+    <qresource prefix="/interaction">
+        <file alias="zoom">interaction/zoom.png</file>
+        <file alias="move">interaction/move.png</file>
+        <file alias="0">interaction/0.png</file>
+        <file alias="1">interaction/1.png</file>
+        <file alias="2">interaction/2.png</file>
+        <file alias="3">interaction/3.png</file>
+    </qresource>
+
+
+    <qresource prefix="/test">
+        <file alias="depth">depth.png</file>
+    </qresource>
+</RCC>
