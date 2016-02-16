@@ -22,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=100;
+static int nAnimals=50;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),

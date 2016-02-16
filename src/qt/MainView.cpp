@@ -617,21 +617,34 @@ void MainView::saveMesh(const UINT16 *data)
 
     std::ofstream file;
     const QDateTime date=QDateTime::currentDateTime();
-    const std::string fileName="mesh_"+date.toString("dd.MM.yyyy hh:mm:ss").toStdString()+".obj";
-    
-    file.open(fileName);
+	std::string fileName = "mesh_"+QString::number(date.toTime_t()).toStdString()+".obj";
+#ifdef WIN32
+	fileName = "C:\\meshes\\"+ fileName;
+#endif
+	std::cout << fileName << std::endl;
+    file.open(fileName.c_str());
 
-    const int stride=max.x()-min.x();
-    std::vector<int> indices((max.y()-min.y())*stride);
+	if (!file.good())
+	{
+		std::cout << "problem" << std::endl;
+		return;
+	}
+
+	const int maxx = floor(max.x()), maxy = floor(max.y());
+	const int minx = ceil(min.x()),  miny = ceil(min.y());
+
+    const int stride=maxx-minx;
+    std::vector<int> indices((maxy-miny)*stride);
 
     int index=1;
 
-    for(int y=min.y();y<max.y();++y)
+	for (int y = miny; y<maxy; ++y)
     {
-        const int indexY=y-min.y();
-        for(int x=min.x();x<max.x();++x)
+		const int indexY = y - miny;
+		for (int x = minx; x<maxx; ++x)
         {
-            const int indexX=x-min.x();
+            const int indexX=x-minx;
+			assert(indexX < stride);
             const int arrayIndex=indexX+stride*indexY;
 
             const Point2d p=mapping.toParameterization(x,y);
@@ -641,9 +654,9 @@ void MainView::saveMesh(const UINT16 *data)
             }
             indices[arrayIndex]=index++;
 
-            double h=mapping.getHeight(x,y);
+            double h=1-mapping.getHeight(x,y);
 
-            h *= 0.1;
+            h *= 0.2;
             // triangulator.addPoint(Point2d(x,y),h);
 
             file<<"v "<<p.x()<<" "<<p.y()<<" "<<h<<"\n";
@@ -652,21 +665,22 @@ void MainView::saveMesh(const UINT16 *data)
 
     file<<"\n\n";
 
-    for(int y=min.y();y<max.y()-1;++y)
-    {
-        const int indexY=y-min.y();
-        for(int x=min.x();x<max.x()-1;++x)
-        {
-            const int indexX=x-min.x();
+	for (int y = miny; y<maxy - 1; ++y)
+	{
+		const int indexY = y - miny;
+		for (int x = minx; x<maxx - 1; ++x)
+		{
+			const int indexX = x - minx;
+			assert(indexX+1 < stride);
 
-            const int i1=indices[indexX+stride*indexY];
-            const int i2=indices[indexX+1+stride*indexY];
-            const int i3=indices[indexX+1+stride*(indexY+1)];
-            const int i4=indices[indexX+stride*(indexY+1)];
+			const int i1 = indices[indexX + stride*indexY];
+			const int i2 = indices[indexX + 1 + stride*indexY];
+			const int i3 = indices[indexX + 1 + stride*(indexY + 1)];
+			const int i4 = indices[indexX + stride*(indexY + 1)];
 
-            if(i1>=0 && i2>=0 && i2>=0 && i4>=0)
+			if (i1>0 && i2>0 && i3>0 && i4>0)
             {
-                file<<"f "<<i1<<" "<<i2<<" "<<i3<<" "<<i4<<"\n";
+				file << "f " << i1 << " " << i2 << " " << i3 << " " << i4 << "\n";
             }
 
         }
