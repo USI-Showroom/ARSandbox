@@ -7,6 +7,10 @@ IF(WIN32)
 	SET(CMAKE_PREFIX_PATH "C:\\Qt\\5.5\\msvc2013")
 ENDIF()
 
+IF(APPLE)
+    SET(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt5/5.5.1_2/")
+ENDIF()
+
 
 ###########################
 # Sources

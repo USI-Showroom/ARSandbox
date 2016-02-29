@@ -22,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=50;
+static int nAnimals=1;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -216,7 +216,16 @@ void GameManager::updateGame()
             painter.translate((p.x()+_imgOffsetW)*scaling,(p.y()+_imgOffsetH)*scaling);
             painter.rotate(angle);
 
-            painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,_textureImgWidth*scaling, _textureImgHeight*scaling), *_currentTexture);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            
+            QPen pen(Qt::red, 2);
+            painter.setPen(pen);
+            
+            QBrush brush(Qt::red);
+            painter.setBrush(brush);
+
+            // painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,_textureImgWidth*scaling, _textureImgHeight*scaling), *_currentTexture);
+            painter.drawEllipse(QPointF(p.x(), p.y()), 10, 10);
 
             painter.resetTransform();
         }
