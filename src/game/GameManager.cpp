@@ -135,7 +135,17 @@ void GameManager::keyPress(const int key)
 
 
 void GameManager::mousePress(const int x, const int y)
-{ }
+{
+    // normalize the points
+    const double normalizedX = (double)x / imgWidth;
+    const double normalizedY = (double)y / imgHeight;
+    std::cout << "mousePress: " << normalizedX << ", " << normalizedY << "\n";
+
+    _animals.erase(_animals.begin());
+    _animals.push_back(new Animal(Point2d(normalizedX, normalizedY), 0.4, 0.7, true));
+
+    updateGame();
+}
 
 void GameManager::mouseMove(const int x, const int y)
 { }

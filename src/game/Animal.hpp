@@ -25,7 +25,7 @@ private:
     QMediaPlayer _sound;
 
 public:
-    // Animal();
+    Animal(const Point2d newPosition, const double minH, const double maxH, const bool playSound);
     Animal(const double minH, const double maxH, const bool playSound);
     virtual ~Animal();
 
@@ -43,6 +43,8 @@ private:
     void move();
 
     double randRange(const double min, const double max);
+
+    void checkPosition();
 };
 
 #endif //ANIMAL_HPP

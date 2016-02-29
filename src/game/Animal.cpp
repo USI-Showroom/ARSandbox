@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include <iostream>
 
+Animal::Animal(const Point2d newPosition, const double minH, const double maxH, const bool playSound)
+: _position(newPosition), _life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
+{ }
 
 Animal::Animal(const double minH, const double maxH, const bool playSound)
-:_life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
+: _position(Point2d(0.55, 0.65)), _life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
 { }
 
 void Animal::think(const UnitSquareMapping &mapping)
@@ -60,6 +63,11 @@ void Animal::move()
         _life=0;
     }
 
+    checkPosition();
+}
+
+void Animal::checkPosition()
+{
     if(_position.x()<0.05) {
         --_life;
         _position.x()=0.05;
@@ -75,8 +83,8 @@ void Animal::move()
     }
     if(_position.y()>0.95){
         --_life;
-        _position.y()=0.95;  
-    } 
+        _position.y()=0.95;
+    }
 }
 
 void Animal::newDirection(const UnitSquareMapping &mapping)
@@ -139,9 +147,9 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
     static const int nTrials=5;
     for(int i=0;i<nTrials;++i)
     {
-        const double u=0.64;
-        const double v=0.94;
-        //std::cout << Point2d(u,v) << "\n";
+        const double u=_position.x();
+        const double v=_position.y();
+        checkPosition();
         const double h=mapping.getHeightFromParam(u,v);
 
         if(h>=_minH && h<=_maxH)
