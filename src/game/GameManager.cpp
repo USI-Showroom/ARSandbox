@@ -167,29 +167,6 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    /*for (int i = 0; i < 500; ++i)
-    {
-        for (int j = 0; j < 500; ++j){
-            double localH = _mapping.getHeightFromParam(i / 500.0, j / 500.0);
-
-            if (localH < 0) localH = 0;
-            if (localH > 1) localH = 1;
-
-            QColor col(int(255 * localH), 255, 255, 100);
-            Point2d p = _mapping.fromParameterization(i / 500.0, j / 500.0);
-            p.y() = imgHeight - p.y();
-
-            if (p.y() == imgHeight)
-                --p.y();
-            assert(p.y() >= 0);
-            assert(p.y() < imgHeight);
-
-            if(localH>=0.4 && localH<=0.7)
-                painter.fillRect(p.x()*scaling, p.y()*scaling, 6, 6, col);
-
-        }
-    }// */
-
     for(size_t i=0;i<_animals.size();++i)
     {
         Animal &a=*_animals[i];

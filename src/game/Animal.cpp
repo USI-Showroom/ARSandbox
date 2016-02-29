@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-// Animal::Animal()
-// :_life(0), _minH(0), _maxH(0), _resurrected(false), _sound()
-// { }
 
 Animal::Animal(const double minH, const double maxH, const bool playSound)
 :_life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
@@ -47,7 +44,7 @@ Animal::~Animal()
 
 void Animal::update()
 {
-    move();
+    //move();
 }
 
 void Animal::move()
@@ -142,8 +139,9 @@ void Animal::resurrect(const UnitSquareMapping &mapping)
     static const int nTrials=5;
     for(int i=0;i<nTrials;++i)
     {
-        const double u=randRange(0.05,0.95);
-        const double v=randRange(0.05,0.95);
+        const double u=0.64;
+        const double v=0.94;
+        //std::cout << Point2d(u,v) << "\n";
         const double h=mapping.getHeightFromParam(u,v);
 
         if(h>=_minH && h<=_maxH)
