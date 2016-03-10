@@ -5,7 +5,6 @@
 
 #include <QObject>
 #include <QImage>
-#include <QMediaPlayer>
 #include <vector>
 
 #include "Point2.hpp"
@@ -53,8 +52,6 @@ private:
 
     QImage _cowTexture, _fishTexture;
     QImage *_currentTexture;
-    
-    QMediaPlayer _sound;
 };
 #endif
 

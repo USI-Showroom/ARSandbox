@@ -22,12 +22,11 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=1;
+static int nDrops=1;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
- _cowTexture(":/animals/cow"), _fishTexture(":/animals/fish"), _currentTexture(NULL),
- _sound(this)
+ _cowTexture(":/animals/cow"), _fishTexture(":/animals/fish"), _currentTexture(NULL)
 {
     srand (time(NULL));
     _playing=false;
@@ -73,24 +72,20 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 		case 0: //swiss terrain
 		{
 			_currentTexture = &_cowTexture;
-			_drops.resize(nAnimals);
+			_drops.resize(nDrops);
 			_textureImgWidth = 3;
 
-			for (int i = 0; i < nAnimals; ++i)
+			for (int i = 0; i < nDrops; ++i)
 				_drops[i] = new WaterDrop(0.4, 0.7);
-
-#ifndef NO_KINECT
-			_sound.play();
-#endif
 			break;
 		}
 		case 2:  //fishes
 		{
 			_currentTexture = &_fishTexture;
-			_drops.resize(nAnimals);
+			_drops.resize(nDrops);
 			_textureImgWidth = 1;
 
-			for (int i = 0; i < nAnimals; ++i)
+			for (int i = 0; i < nDrops; ++i)
 				_drops[i] = new WaterDrop (0.0, 0.4);
 			break;
 		}
@@ -114,9 +109,6 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
         for(size_t i=0;i<_drops.size();++i)
             delete _drops[i];
         _drops.clear();
-#ifndef NO_KINECT
-        _sound.pause();
-#endif
         _gameTimer->stop();
         _image.fill(QColor(0, 0, 0, 0));
         updateTexture();   
