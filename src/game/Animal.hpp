@@ -35,6 +35,17 @@ public:
     inline const Point2d &position() const { return _position; }
     inline bool alive() const { return _life>0; }
 
+    inline void setPosition(const double newX, const double newY)
+    {
+        _position.x() = newX;
+        _position.y() = newY;
+    }
+
+    inline void setLife(const int newLife)
+    {
+        _life = newLife;
+    }
+
     inline const Point2d &direction() const { return _direction; }
 
 private:
@@ -44,7 +55,6 @@ private:
 
     double randRange(const double min, const double max);
 
-    void checkPosition();
 };
 
 #endif //ANIMAL_HPP

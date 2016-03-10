@@ -84,52 +84,63 @@ void main()
 
     vec4 gameTxt = texture2D(gameTexture, txtH);
 
+#ifdef NO_KINECT
+    float heightV = 
+                texture2D(height0, txtH.xy).r+
+        0.5 *   texture2D(height1, txtH.xy).r+
+        0.25 *  texture2D(height2, txtH.xy).r+
+        0.125 * texture2D(height3, txtH.xy).r;
+
+    heightV*=255.0/1.875;
+#else
+    float heightV = 
+                float(texture2D(height0, txtH.xy).r)+
+        0.5 *   float(texture2D(height1, txtH.xy).r)+
+        0.25 *  float(texture2D(height2, txtH.xy).r)+
+        0.125 * float(texture2D(height3, txtH.xy).r);
+
+    heightV/=1.875;
+#endif
+
+    heightV=(heightV-minH)/(maxH-minH);
+    heightV=min(1.0,heightV);
+    heightV=max(0.0,heightV);
+
+#ifndef NO_KINECT
+    heightV=1-heightV;
+#endif
 
 
-//#ifdef NO_KINECT
-//    float heightV =
-//                texture2D(height0, txtH.xy).r+
-//        0.5 *   texture2D(height1, txtH.xy).r+
-//        0.25 *  texture2D(height2, txtH.xy).r+
-//        0.125 * texture2D(height3, txtH.xy).r;
-//
-//    heightV*=255.0/1.875;
-//#else
-//    float heightV =
-//                float(texture2D(height0, txtH.xy).r)+
-//        0.5 *   float(texture2D(height1, txtH.xy).r)+
-//        0.25 *  float(texture2D(height2, txtH.xy).r)+
-//        0.125 * float(texture2D(height3, txtH.xy).r);
-//
-//    heightV/=1.875;
-//#endif
-//
-//    heightV=(heightV-minH)/(maxH-minH);
-//    heightV=min(1.0,heightV);
-//    heightV=max(0.0,heightV);
-//
-//#ifndef NO_KINECT
-//    heightV=1-heightV;
-//#endif
-//
-//
-//    vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
-//
-//
-//    vec4 level0Txt = texture2D(level0, txt);
-//    vec4 level1Txt = texture2D(level1, txt);
-//    vec4 level2Txt = texture2D(level2, txt);
-//    vec4 level3Txt = texture2D(level3, txt);
-//    vec4 level4Txt = texture2D(level4, txt);
-//
-//    vec4 bgCol=
-//    weight(heightV,0)*level0Txt+
-//    weight(heightV,1)*level1Txt+
-//    weight(heightV,2)*level2Txt+
-//    weight(heightV,3)*level3Txt+
-//    weight(heightV,4)*level4Txt;
+    vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
-    vec4 red_color = vec4(1.0, 0.0, 0.0, 1.0);
-    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a);
+
+    vec4 level0Txt = texture2D(level0, txt);
+    vec4 level1Txt = texture2D(level1, txt);
+    vec4 level2Txt = texture2D(level2, txt);
+    vec4 level3Txt = texture2D(level3, txt);
+    vec4 level4Txt = texture2D(level4, txt);
+
+    vec4 bgCol=
+    weight(heightV,0)*level0Txt+
+    weight(heightV,1)*level1Txt+
+    weight(heightV,2)*level2Txt+
+    weight(heightV,3)*level3Txt+
+    weight(heightV,4)*level4Txt;
+
+
+    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb,1)+(1.0-gameTxt.a)*bgCol;
+
+    // isolines
+    float isoH = 0.005;
+    for ( int i=0; i<10; i++) {
+        float iF=float (i);
+        float minIso = iF * (1.0 - isoH) / 9.0;
+        float maxIso = minIso+isoH;
+
+        if (heightV > minIso && heightV < maxIso) {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            break;
+        }
+    }
 }
 

@@ -42,9 +42,9 @@ public:
 signals:
 	void keyPress(const int keyCode);
 
-	void mousePress(const int x, const int y);
-	void mouseMove(const int x, const int y);
-	void mouseRelease(const int x, const int y);
+	void mousePress(const int x, const int y, const int w, const int h);
+	void mouseMove(const int x, const int y, const int w, const int h);
+	void mouseRelease(const int x, const int y, const int w, const int h);
 	
 	void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping);
 

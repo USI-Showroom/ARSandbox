@@ -67,7 +67,8 @@ void GameManager::newKinectData(const UINT16 *data, int w, int h)
 
 }
 
-void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping)
+void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int maxH,
+                                  const int gameType, const UnitSquareMapping &mapping)
 {
     _minH=minH;
     _maxH=maxH;
@@ -109,7 +110,8 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 		}
 
 		if (_currentTexture)
-			_textureImgHeight = _textureImgWidth / _currentTexture->width()*_currentTexture->height();
+			_textureImgHeight = _textureImgWidth /
+                    _currentTexture->width()*_currentTexture->height();
 
 		_imgOffsetW = _textureImgWidth / 2;
 		_imgOffsetH = _textureImgHeight / 2;
@@ -133,24 +135,27 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 void GameManager::keyPress(const int key)
 { }
 
-
-void GameManager::mousePress(const int x, const int y)
+void GameManager::mousePress(const int x, const int y,  const int w, const int h)
 {
-    // normalize the points
-    const double normalizedX = (double)x / imgWidth;
-    const double normalizedY = (double)y / imgHeight;
-    std::cout << "mousePress: " << normalizedX << ", " << normalizedY << "\n";
+    double normalisedX = ((double)x / (double)w);
+    double normalisedY = ((double)y / (double)h);
 
-    _animals.erase(_animals.begin());
-    _animals.push_back(new Animal(Point2d(normalizedX, normalizedY), 0.4, 0.7, true));
+    if (normalisedX < 0.05) normalisedX = 0.05;
+    if (normalisedY < 0.05) normalisedY = 0.05;
 
-    updateGame();
+    if (normalisedX > 0.95) normalisedX = 0.95;
+    if (normalisedY > 0.95) normalisedY = 0.95;
+
+    std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
+
+    _animals[0]->setPosition(normalisedX, normalisedY);
+    _animals.at(0)->setLife(1);
 }
 
-void GameManager::mouseMove(const int x, const int y)
+void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
 { }
 
-void GameManager::mouseRelease(const int x, const int y)
+void GameManager::mouseRelease(const int x, const int y,  const int w, const int h)
 { }
 
 
@@ -168,7 +173,7 @@ void GameManager::updateGame()
 {
     
 
-    _image.fill(QColor(0,0,0,0));
+    //  _image.fill(QColor(0,0,0,0));
 
     if(!_currentTexture) return;
 	
@@ -186,22 +191,28 @@ void GameManager::updateGame()
 
         if(a.alive())
         {
+            std::cout<<a.position()<<std::endl;
             Point2d p=_mapping.fromParameterization(a.position());
             p.y() = imgHeight - p.y();
 
-            Point2d d=_mapping.fromParameterizationDir(a.direction());
-            d.y() *= -1;
 
-            const double angle=atan2(d.y(),d.x())*180/PI-90;
+            std::cout<<p<<std::endl;
 
+//            Point2d d=_mapping.fromParameterizationDir(a.direction());
+//            d.y() *= -1;
+//
+//            const double angle=atan2(d.y(),d.x())*180/PI-90;
+//
 
             if (p.y() == imgHeight)
                 --p.y();
             assert(p.y() >= 0);
             assert(p.y() < imgHeight);
 
-            painter.translate((p.x()+_imgOffsetW)*scaling,(p.y()+_imgOffsetH)*scaling);
-            painter.rotate(angle);
+            p*=scaling;
+
+//            painter.translate((p.x()+_imgOffsetW)*scaling,(p.y()+_imgOffsetH)*scaling);
+//            painter.rotate(angle);
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             
@@ -211,10 +222,11 @@ void GameManager::updateGame()
             QBrush brush(Qt::red);
             painter.setBrush(brush);
 
-            // painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,_textureImgWidth*scaling, _textureImgHeight*scaling), *_currentTexture);
-            painter.drawEllipse(QPointF(p.x(), p.y()), 10, 10);
+            // painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,
+            // _textureImgWidth*scaling,_textureImgHeight*scaling), *_currentTexture);
+            painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
 
-            painter.resetTransform();
+//            painter.resetTransform();
         }
     }//*/
 
