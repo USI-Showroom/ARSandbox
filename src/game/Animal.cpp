@@ -13,31 +13,7 @@ Animal::Animal(const double minH, const double maxH, const bool playSound)
 
 void Animal::think(const UnitSquareMapping &mapping)
 {
-	if (!alive())
-		resurrect(mapping);
-
-
-	if (alive())
-	{
-		newDirection(mapping);
-		--_decisionTicks;
-
-
-
-
-		if (_playSound && _sound.state()==QMediaPlayer::StoppedState)
-		{
-			--_soundTicks;
-			if (_soundTicks <= 0){
-				const double r = randRange(0, 5);
-
-				_soundTicks = 30;
-				if (r > 4.5){
-					_sound.play();
-				}
-			}
-		}
-	}
+    _position+=Point2d(0.001);
 }
 
 Animal::~Animal()
@@ -47,7 +23,6 @@ Animal::~Animal()
 
 void Animal::update()
 {
-    move();
 }
 
 void Animal::move()

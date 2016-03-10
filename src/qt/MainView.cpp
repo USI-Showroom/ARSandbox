@@ -471,7 +471,7 @@ void MainView::mousePressEvent(QMouseEvent *e)
 {
     if(!_setupMode) 
     {
-        emit mousePress(e->x(),e->y());
+        emit mousePress(e->x(),e->y(), this->width(), this->height());
         return;
     }
 }
@@ -480,7 +480,7 @@ void MainView::mouseMoveEvent(QMouseEvent *e)
 {
     if(!_setupMode) 
     {
-        emit mouseMove(e->x(),e->y());
+        emit mouseMove(e->x(),e->y(), this->width(), this->height());
         return;
     }
 }
@@ -490,7 +490,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
 { 
     if(!_setupMode) 
     {
-        emit mouseRelease(e->x(),e->y());
+        emit mouseRelease(e->x(),e->y(), this->width(), this->height());
         return;
     }
 }
