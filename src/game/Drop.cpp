@@ -1,18 +1,18 @@
-#include "Animal.hpp"
+#include "Drop.hpp"
 
-WaterDrop::WaterDrop(const double minH, const double maxH)
+Drop::Drop(const double minH, const double maxH)
 : _position(Point2d(0.55, 0.65)), _life(0), _minH(minH), _maxH(maxH), _resurrected(false)
 { }
 
-void WaterDrop::update(const UnitSquareMapping &mapping)
+void Drop::update(const UnitSquareMapping &mapping)
 {
     _position += Point2d(0.001);
 }
 
-WaterDrop::~WaterDrop()
+Drop::~Drop()
 { }
 
-void WaterDrop::newDirection(const UnitSquareMapping &mapping)
+void Drop::newDirection(const UnitSquareMapping &mapping)
 {
     if(_decisionTicks<=0)
     {

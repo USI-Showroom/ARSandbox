@@ -57,8 +57,9 @@ void GameManager::newKinectData(const UINT16 *data, int w, int h)
 
 }
 
-void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int maxH,
-                                  const int gameType, const UnitSquareMapping &mapping)
+void GameManager::toggleSetupMode(const bool isSetup, const int minH,
+                                  const int maxH, const int gameType,
+                                  const UnitSquareMapping &mapping)
 {
     _minH=minH;
     _maxH=maxH;
@@ -69,30 +70,30 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 
 	if (_playing){
 		switch (gameType){
-		case 0: //swiss terrain
-		{
-			_currentTexture = &_cowTexture;
-			_drops.resize(nDrops);
-			_textureImgWidth = 3;
+    		case 0: //swiss terrain
+    		{
+    			_currentTexture = &_cowTexture;
+    			_drops.resize(nDrops);
+    			_textureImgWidth = 3;
 
-			for (int i = 0; i < nDrops; ++i)
-				_drops[i] = new WaterDrop(0.4, 0.7);
-			break;
-		}
-		case 2:  //fishes
-		{
-			_currentTexture = &_fishTexture;
-			_drops.resize(nDrops);
-			_textureImgWidth = 1;
+    			for (int i = 0; i < nDrops; ++i)
+    				_drops[i] = new Drop(0.4, 0.7);
+    			break;
+    		}
+    		case 2:  //fishes
+    		{
+    			_currentTexture = &_fishTexture;
+    			_drops.resize(nDrops);
+    			_textureImgWidth = 1;
 
-			for (int i = 0; i < nDrops; ++i)
-				_drops[i] = new WaterDrop (0.0, 0.4);
-			break;
-		}
-		default:
-		{
-			_currentTexture = NULL;
-		}
+    			for (int i = 0; i < nDrops; ++i)
+    				_drops[i] = new Drop (0.0, 0.4);
+    			break;
+    		}
+    		default:
+    		{
+    			_currentTexture = NULL;
+    		}
 		}
 
 		if (_currentTexture)
@@ -141,9 +142,6 @@ void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
 void GameManager::mouseRelease(const int x, const int y,  const int w, const int h)
 { }
 
-
-
-
 void GameManager::initialize()
 {
     _gameTimer = new QTimer(this);
@@ -154,36 +152,20 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
-    
-
-    //  _image.fill(QColor(0,0,0,0));
-
     if(!_currentTexture) return;
 	
-    
-
     QPainter painter;
     painter.begin(&_image);
 
     for(size_t i=0;i<_drops.size();++i)
     {
-        WaterDrop &a=*_drops[i];
+        Drop &a=*_drops[i];
         a.update(_mapping);
 
         if(a.alive())
         {
-            std::cout<<a.position()<<std::endl;
             Point2d p=_mapping.fromParameterization(a.position());
             p.y() = imgHeight - p.y();
-
-
-            std::cout<<p<<std::endl;
-
-//            Point2d d=_mapping.fromParameterizationDir(a.direction());
-//            d.y() *= -1;
-//
-//            const double angle=atan2(d.y(),d.x())*180/PI-90;
-//
 
             if (p.y() == imgHeight)
                 --p.y();
@@ -191,9 +173,6 @@ void GameManager::updateGame()
             assert(p.y() < imgHeight);
 
             p*=scaling;
-
-//            painter.translate((p.x()+_imgOffsetW)*scaling,(p.y()+_imgOffsetH)*scaling);
-//            painter.rotate(angle);
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             
@@ -203,16 +182,11 @@ void GameManager::updateGame()
             QBrush brush(Qt::red);
             painter.setBrush(brush);
 
-            // painter.drawImage(QRectF(-_imgOffsetW, -_imgOffsetW,
-            // _textureImgWidth*scaling,_textureImgHeight*scaling), *_currentTexture);
             painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
 
-//            painter.resetTransform();
         }
-    }//*/
-
+    }
 
     painter.end();
-
     updateTexture();
 }

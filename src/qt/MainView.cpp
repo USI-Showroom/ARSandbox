@@ -495,7 +495,7 @@ void MainView::mouseReleaseEvent(QMouseEvent *e)
     }
 }
 
-// void MainView::paintGL()
+
 void MainView::paintEvent(QPaintEvent *e) 
 {
     QPainter painter(this);

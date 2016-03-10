@@ -1,11 +1,11 @@
-#ifndef WATERDROP_HPP
-#define WATERDROP_HPP
+#ifndef DROP_HPP
+#define DROP_HPP
 
 #include <QObject>
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
 
-class WaterDrop : QObject
+class Drop : QObject
 {
     Q_OBJECT
 private:
@@ -22,8 +22,8 @@ private:
     bool _resurrected;
 
 public:
-    WaterDrop(const double minH, const double maxH);
-    virtual ~WaterDrop();
+    Drop(const double minH, const double maxH);
+    virtual ~Drop();
 
     void update(const UnitSquareMapping &mapping);
 
@@ -44,7 +44,6 @@ public:
     inline const Point2d &direction() const { return _direction; }
 
 private:
-    void resurrect(const UnitSquareMapping &mapping);
     void newDirection(const UnitSquareMapping &mapping);
 };
 

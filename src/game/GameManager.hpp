@@ -9,7 +9,7 @@
 
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
-#include "Animal.hpp"
+#include "Drop.hpp"
 
 class QTimer;
 
@@ -41,15 +41,15 @@ public:
     void updateTexture();
 
 private:
+    std::vector<Drop *> _drops;
     int _minH, _maxH;
-    QTimer *_gameTimer;
-    QImage _image;
+    
     bool _playing;
     UnitSquareMapping _mapping;
 	double _textureImgWidth, _textureImgHeight, _imgOffsetW, _imgOffsetH;
 
-    std::vector<WaterDrop *> _drops;
-
+    QTimer *_gameTimer;
+    QImage _image;
     QImage _cowTexture, _fishTexture;
     QImage *_currentTexture;
 };
