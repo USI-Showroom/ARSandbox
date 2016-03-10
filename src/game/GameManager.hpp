@@ -28,9 +28,10 @@ private slots:
 
 public slots:
     void newKinectData(const UINT16 *data, int w, int h);
-    void keyPress(const int key);
+    
     void toggleSetupMode(const bool isSetup, const int minH, const int maxH, const int gameType, const UnitSquareMapping &mapping);
-
+    
+    void keyPress(const int key);
     void mousePress(const int x, const int y, const int w, const int h);
     void mouseMove(const int x, const int y,  const int w, const int h);
     void mouseRelease(const int x, const int y, const int w, const int h);
