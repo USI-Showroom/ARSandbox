@@ -1,67 +1,18 @@
 #include "Animal.hpp"
-#include <time.h> 
-#include <stdlib.h>
-#include <iostream>
 
-Animal::Animal(const Point2d newPosition, const double minH, const double maxH, const bool playSound)
-: _position(newPosition), _life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
+WaterDrop::WaterDrop(const double minH, const double maxH)
+: _position(Point2d(0.55, 0.65)), _life(0), _minH(minH), _maxH(maxH), _resurrected(false)
 { }
 
-Animal::Animal(const double minH, const double maxH, const bool playSound)
-: _position(Point2d(0.55, 0.65)), _life(0), _minH(minH), _maxH(maxH), _resurrected(false), _playSound(playSound)
+void WaterDrop::update(const UnitSquareMapping &mapping)
+{
+    _position += Point2d(0.001);
+}
+
+WaterDrop::~WaterDrop()
 { }
 
-void Animal::think(const UnitSquareMapping &mapping)
-{
-    _position+=Point2d(0.001);
-}
-
-Animal::~Animal()
-{
-    _sound.stop();
-}
-
-void Animal::update()
-{ }
-
-void Animal::move()
-{
-    if(!alive()) return;
-
-    static const double dt=0.001;
-
-    _position+=dt*_direction;
-
-    if(_position.isNan())
-    {
-        _life=0;
-    }
-
-    checkPosition();
-}
-
-void Animal::checkPosition()
-{
-    if(_position.x()<0.05) {
-        --_life;
-        _position.x()=0.05;
-    }
-    if(_position.y()<0.05) {
-        --_life;
-        _position.y()=0.05;
-    }
-
-    if(_position.x()>0.95) {
-        --_life;
-        _position.x()=0.95;
-    }
-    if(_position.y()>0.95){
-        --_life;
-        _position.y()=0.95;
-    }
-}
-
-void Animal::newDirection(const UnitSquareMapping &mapping)
+void WaterDrop::newDirection(const UnitSquareMapping &mapping)
 {
     if(_decisionTicks<=0)
     {
@@ -108,41 +59,5 @@ void Animal::newDirection(const UnitSquareMapping &mapping)
         _direction=Point2d(cos(_angle),sin(_angle))*_speed;
         
         _decisionTicks=1;
-    }
-}
-
-double Animal::randRange(const double min, const double max)
-{
-    return (double(rand())/RAND_MAX)*(max-min)+min;
-}
-
-void Animal::resurrect(const UnitSquareMapping &mapping)
-{
-    static const int nTrials=5;
-    for(int i=0;i<nTrials;++i)
-    {
-        const double u=_position.x();
-        const double v=_position.y();
-        checkPosition();
-        const double h=mapping.getHeightFromParam(u,v);
-
-        if(h>=_minH && h<=_maxH)
-        {
-            if(_playSound){
-                QString s=QString::number(round(randRange(1,6)));
-                _sound.setMedia(QUrl("qrc:/sounds/cow"+s));
-                _sound.setVolume(randRange(20,60));
-                _soundTicks=0;
-            }
-
-            _maxLife=randRange(15,30);
-            _life=_maxLife;
-            _position.x()=u;
-            _position.y()=v;
-            _decisionTicks=0;
-            _speed=randRange(1,3);
-            _resurrected=true;
-            break;
-        }
     }
 }

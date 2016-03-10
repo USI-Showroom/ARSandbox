@@ -49,7 +49,7 @@ private:
     UnitSquareMapping _mapping;
 	double _textureImgWidth, _textureImgHeight, _imgOffsetW, _imgOffsetH;
 
-    std::vector<Animal *> _animals;
+    std::vector<WaterDrop *> _drops;
 
     QImage _cowTexture, _fishTexture;
     QImage *_currentTexture;

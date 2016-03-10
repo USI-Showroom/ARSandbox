@@ -29,15 +29,6 @@ GameManager::GameManager()
  _cowTexture(":/animals/cow"), _fishTexture(":/animals/fish"), _currentTexture(NULL),
  _sound(this)
 {
-#ifndef NO_KINECT
-    QMediaPlaylist *playlist = new QMediaPlaylist(this);
-    playlist->addMedia(QUrl("qrc:/sounds/bells"));
-    playlist->setPlaybackMode(QMediaPlaylist::Loop);
-    playlist->setCurrentIndex(1);
-    _sound.setPlaylist(playlist);
-#endif
-
-
     srand (time(NULL));
     _playing=false;
     _image.fill(QColor(0,0,0,0));
@@ -48,8 +39,8 @@ GameManager::~GameManager()
     if(_gameTimer)
         _gameTimer->stop();
 
-    for(size_t i=0;i<_animals.size();++i)
-        delete _animals[i];
+    for(size_t i=0;i<_drops.size();++i)
+        delete _drops[i];
 }
 
 void GameManager::updateTexture()
@@ -82,11 +73,11 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 		case 0: //swiss terrain
 		{
 			_currentTexture = &_cowTexture;
-			_animals.resize(nAnimals);
+			_drops.resize(nAnimals);
 			_textureImgWidth = 3;
 
 			for (int i = 0; i < nAnimals; ++i)
-				_animals[i] = new Animal(0.4, 0.7, true);
+				_drops[i] = new WaterDrop(0.4, 0.7);
 
 #ifndef NO_KINECT
 			_sound.play();
@@ -96,11 +87,11 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 		case 2:  //fishes
 		{
 			_currentTexture = &_fishTexture;
-			_animals.resize(nAnimals);
+			_drops.resize(nAnimals);
 			_textureImgWidth = 1;
 
 			for (int i = 0; i < nAnimals; ++i)
-				_animals[i] = new Animal(0.0, 0.4, false);
+				_drops[i] = new WaterDrop (0.0, 0.4);
 			break;
 		}
 		default:
@@ -120,9 +111,9 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 	}
     else{
 
-        for(size_t i=0;i<_animals.size();++i)
-            delete _animals[i];
-        _animals.clear();
+        for(size_t i=0;i<_drops.size();++i)
+            delete _drops[i];
+        _drops.clear();
 #ifndef NO_KINECT
         _sound.pause();
 #endif
@@ -148,8 +139,8 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 
     std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
 
-    _animals[0]->setPosition(normalisedX, normalisedY);
-    _animals.at(0)->setLife(1);
+    _drops[0]->setPosition(normalisedX, normalisedY);
+    _drops.at(0)->setLife(1);
 }
 
 void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
@@ -182,12 +173,10 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    for(size_t i=0;i<_animals.size();++i)
+    for(size_t i=0;i<_drops.size();++i)
     {
-        Animal &a=*_animals[i];
-        a.think(_mapping);
-        a.update();
-
+        WaterDrop &a=*_drops[i];
+        a.update(_mapping);
 
         if(a.alive())
         {
