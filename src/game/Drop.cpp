@@ -1,13 +1,17 @@
 #include "Drop.hpp"
 
 Drop::Drop(const double minH, const double maxH)
-: _position(Point2d(0.55, 0.65)), _life(0),
-  _minH(minH), _maxH(maxH), _resurrected(false)
+: _position(Point2d(0.55, 0.65)), 
+  _life(0), _maxLife(3), _decisionTicks(0),
+  _minH(minH), _maxH(maxH),
+  _dt(0.001),
+  _resurrected(false)
 { }
 
 void Drop::update(const UnitSquareMapping &mapping)
 {
-    _position += Point2d(0.001);
+    _position += Point2d(_dt);
+    newDirection(mapping);
 }
 
 Drop::~Drop()

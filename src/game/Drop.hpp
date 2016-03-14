@@ -25,11 +25,11 @@ private:
 
     int _life, _maxLife;
     int _decisionTicks;
-    int _soundTicks;
 
     double _minH, _maxH;
     double _speed;
     double _angle;
+    double _dt;
 
     bool _resurrected;
     
