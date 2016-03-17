@@ -9,9 +9,7 @@ Drop::Drop(const double minH, const double maxH)
   _life(0), _maxLife(3),
   _minH(minH), _maxH(maxH),
   _mass(0.5), _speed(0.5), _angle(2.0), _dt(0.001)
-{
-    std::cout << "life: " << _life << std::endl;
-}
+{ }
 
 void Drop::update(const UnitSquareMapping &mapping)
 {
@@ -38,9 +36,6 @@ void Drop::newDirection(const UnitSquareMapping &mapping)
     if(h>=_minH && h<=_maxH)
     {
         grad.rotated();
-
-        if(_life<_maxLife)
-            ++_life;
 
         if(grad*_direction<0)
             grad=-grad;
@@ -80,7 +75,6 @@ const Point2d& Drop::direction() const
 
 bool Drop::alive() const
 {
-    //assert(_life == 0);
     return _life > 0;
 }
 
