@@ -25,8 +25,7 @@ static const int scaling=7;
 static int nDrops=1;
 
 GameManager::GameManager()
-: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
- _cowTexture(":/animals/cow"), _fishTexture(":/animals/fish"), _currentTexture(NULL)
+: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32)
 {
     srand (time(NULL));
     _playing=false;
@@ -61,54 +60,24 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
                                   const int maxH, const int gameType,
                                   const UnitSquareMapping &mapping)
 {
-    _minH=minH;
-    _maxH=maxH;
+    _minH    = minH;
+    _maxH    = maxH;
+    _playing = !isSetup;
+    _mapping = mapping;
 
-    _playing=!isSetup;
+	if (_playing)
+    {
+        _drops.resize(nDrops);
+		for (int i = 0; i < nDrops; ++i)
+			_drops[i] = new Drop(0.4, 0.7);
 
-    _mapping=mapping;
-
-	if (_playing){
-		switch (gameType){
-    		case 0: //swiss terrain
-    		{
-    			_currentTexture = &_cowTexture;
-    			_drops.resize(nDrops);
-    			_textureImgWidth = 3;
-
-    			for (int i = 0; i < nDrops; ++i)
-    				_drops[i] = new Drop(0.4, 0.7);
-    			break;
-    		}
-    		case 2:  //fishes
-    		{
-    			_currentTexture = &_fishTexture;
-    			_drops.resize(nDrops);
-    			_textureImgWidth = 1;
-
-    			for (int i = 0; i < nDrops; ++i)
-    				_drops[i] = new Drop (0.0, 0.4);
-    			break;
-    		}
-    		default:
-    		{
-    			_currentTexture = NULL;
-    		}
-		}
-
-		if (_currentTexture)
-			_textureImgHeight = _textureImgWidth /
-                    _currentTexture->width()*_currentTexture->height();
-
-		_imgOffsetW = _textureImgWidth / 2;
-		_imgOffsetH = _textureImgHeight / 2;
-
-		_gameTimer->start(100);
+        _gameTimer->start(100);
 	}
-    else{
-
+    else
+    {
         for(size_t i=0;i<_drops.size();++i)
             delete _drops[i];
+        
         _drops.clear();
         _gameTimer->stop();
         _image.fill(QColor(0, 0, 0, 0));
@@ -151,9 +120,7 @@ void GameManager::initialize()
 }
 
 void GameManager::updateGame()
-{
-    if(!_currentTexture) return;
-	
+{	
     QPainter painter;
     painter.begin(&_image);
 

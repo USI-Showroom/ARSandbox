@@ -47,12 +47,9 @@ private:
     
     bool _playing;
     UnitSquareMapping _mapping;
-	double _textureImgWidth, _textureImgHeight, _imgOffsetW, _imgOffsetH;
 
     QTimer *_gameTimer;
     QImage _image;
-    QImage _cowTexture, _fishTexture;
-    QImage *_currentTexture;
 };
 #endif
 

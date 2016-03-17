@@ -24,14 +24,14 @@ private:
     Point2d _position, _direction;
 
     int _life, _maxLife;
-    int _decisionTicks;
 
     double _minH, _maxH;
+    double _mass;
     double _speed;
     double _angle;
     double _dt;
 
-    bool _resurrected;
+    static double rndparam;
     
     void newDirection(const UnitSquareMapping &);
 };
