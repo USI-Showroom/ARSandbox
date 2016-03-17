@@ -127,10 +127,11 @@ void GameManager::updateGame()
     for(size_t i=0;i<_drops.size();++i)
     {
         Drop &a=*_drops[i];
-        a.update(_mapping);
 
         if(a.alive())
         {
+            a.update(_mapping);
+            
             Point2d p=_mapping.fromParameterization(a.position());
             p.y() = imgHeight - p.y();
 

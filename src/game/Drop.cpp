@@ -51,16 +51,11 @@ void Drop::newDirection(const UnitSquareMapping &mapping)
         grad=_direction+0.2*grad;
     }
 
-    // const double newAngle=atan2(grad.y(),grad.x());
-    // if(_resurrected)
-    // {
-    //     _angle=newAngle;
-    //     _resurrected=false;
-    // }
-    // else
-    //     _angle=0.3*newAngle+0.7*_angle;
-
-    _direction=Point2d(cos(_angle),sin(_angle))*_speed;
+    const double newAngle = atan2(grad.y(),grad.x());
+    _angle = 0.3 * newAngle + 0.6 * _angle;
+    
+    const Point2d new_direction = Point2d(cos(_angle),sin(_angle));
+    _direction = new_direction * _speed;
 }
 
 const Point2d& Drop::position() const
