@@ -30,7 +30,7 @@ private:
     double _speed;
     double _angle;
     double _dt;
-        
+
     void newDirection(const UnitSquareMapping &);
 };
 

@@ -8,7 +8,7 @@ IF(WIN32)
 ENDIF()
 
 IF(APPLE)
-    SET(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt5/5.5.1_2/")
+    SET(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt5/5.6.0/")
 ENDIF()
 
 

@@ -22,40 +22,19 @@ Drop::~Drop()
 
 void Drop::newDirection(const UnitSquareMapping &mapping)
 {
-    Point2d grad=mapping.paramGrad(_position);
-    const double h=mapping.getHeightFromParam(_position);
-
-
-
-    if(grad.isZero())
+    Point2d      gradient = mapping.paramGrad(_position);
+    const double height   = mapping.getHeightFromParam(_position);
+    
+    if(gradient.isZero())
     {
         --_life;
         return;
     }
 
-    if(h>=_minH && h<=_maxH)
+    if ( height >= _minH )
     {
-        grad.rotated();
-
-        if(grad*_direction<0)
-            grad=-grad;
+        _direction = gradient;
     }
-    else
-    { 
-        --_life;
-        if(h<_minH) //go up
-            grad=-grad;
-
-        _direction.normalize();
-        grad.normalize();
-        grad=_direction+0.2*grad;
-    }
-
-    const double newAngle = atan2(grad.y(),grad.x());
-    _angle = 0.3 * newAngle + 0.6 * _angle;
-    
-    const Point2d new_direction = Point2d(cos(_angle),sin(_angle));
-    _direction = new_direction * _speed;
 }
 
 const Point2d& Drop::position() const
