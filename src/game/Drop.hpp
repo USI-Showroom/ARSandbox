@@ -23,7 +23,7 @@ public:
 private:
     Point2d _position, _direction;
 
-    int _life, _maxLife;
+    int _life;
 
     double _minH, _maxH;
     double _mass;

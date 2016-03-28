@@ -6,7 +6,7 @@
 
 Drop::Drop(const double minH, const double maxH)
 : _position(Point2d(0.55, 0.65)), 
-  _life(0), _maxLife(3),
+  _life(0),
   _minH(minH), _maxH(maxH),
   _mass(0.5), _speed(0.5), _angle(2.0), _dt(0.001)
 { }
@@ -24,17 +24,16 @@ void Drop::newDirection(const UnitSquareMapping &mapping)
 {
     Point2d      gradient = mapping.paramGrad(_position);
     const double height   = mapping.getHeightFromParam(_position);
-    
+
     if(gradient.isZero())
     {
         --_life;
         return;
     }
 
-    if ( height >= _minH )
-    {
-        _direction = gradient;
-    }
+    const double acceleration = GRAVITY * height;
+    // gradient has already the sign
+    _direction = acceleration * gradient;
 }
 
 const Point2d& Drop::position() const
