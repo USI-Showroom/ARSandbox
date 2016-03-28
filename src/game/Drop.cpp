@@ -31,7 +31,8 @@ void Drop::newDirection(const UnitSquareMapping &mapping)
         return;
     }
 
-    const double acceleration = GRAVITY * height;
+    const double smorzamento = ( 1.0 / height * 0.25 );
+    const double acceleration = GRAVITY * height * _mass * smorzamento;
     // gradient has already the sign
     _direction = acceleration * gradient;
 }

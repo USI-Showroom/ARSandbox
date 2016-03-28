@@ -144,10 +144,10 @@ void GameManager::updateGame()
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             
-            QPen pen(Qt::red, 2);
+            QPen pen(Qt::white, 2);
             painter.setPen(pen);
             
-            QBrush brush(Qt::red);
+            QBrush brush(Qt::white);
             painter.setBrush(brush);
 
             painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
