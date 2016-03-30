@@ -12,26 +12,26 @@ public:
     Drop(const double, const double);
     virtual ~Drop();
 
-    void update(const UnitSquareMapping &);
-    void setLife(const int);
-    void setPosition(const double, const double);
+    void update      (const UnitSquareMapping &);
+    void setLife     (const int);
+    void setPosition (const double, const double);
 
-    const Point2d &direction() const;
-    const Point2d &position()  const;
-    bool alive() const;
+    bool           alive     ()  const;
+
+    const Point2d& direction ()  const;
+    const Point2d& position  ()  const;
 
 private:
-    Point2d _position, _direction;
+    Point2d _position, _direction, _velocity, _acceleration;
 
     int _life;
 
     double _minH, _maxH;
     double _mass;
-    double _speed;
-    double _angle;
     double _dt;
 
-    void updatePosition(const UnitSquareMapping &);
+    void updatePosition   (const UnitSquareMapping &);
+    void clampCoordinates (Point2d&, const double, const double);
 };
 
 #endif
