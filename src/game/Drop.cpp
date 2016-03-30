@@ -1,6 +1,5 @@
 #include "Drop.hpp"
-#include "RK4.hpp"
-
+#include "Point3.hpp"
 
 #ifndef GRAVITY
 #define GRAVITY 9.8
@@ -12,7 +11,8 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(0.5), _dt(0.001)
+    _mass(0.5), _friction(0.006),
+    _dt(0.001)
 { }
 
 void Drop::update(const UnitSquareMapping &mapping)
@@ -37,12 +37,15 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
         return;
     }
 
-    Point2d newDirection = gradient.normalize();
+    Point3d ag = Point3d(0.0, GRAVITY, 0.0) / _mass;
+    Point2d pg = _position + gradient;
+    
+    Point3d n = Point3d(_position.x(), _position.y(), height) ^ Point3d(pg.x(), pg.y(), height);
+    Point3d c = - ( ag * n ) * n;
 
-    // euler method
-    double acceleration = height * GRAVITY / _mass;
-    _velocity += acceleration * _dt;
-    _position += newDirection * _velocity * _dt;
+    _acceleration = ag - c;
+
+    
 }
 
 const Point2d& Drop::position() const

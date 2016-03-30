@@ -22,12 +22,13 @@ public:
     const Point2d& position  ()  const;
 
 private:
-    Point2d _position, _direction, _velocity, _acceleration;
+    Point2d _position, _direction, _velocity;
+    Point3d _acceleration;
 
     int _life;
 
     double _minH, _maxH;
-    double _mass;
+    double _mass, _friction;
     double _dt;
 
     void updatePosition   (const UnitSquareMapping &);
