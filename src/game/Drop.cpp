@@ -1,4 +1,6 @@
 #include "Drop.hpp"
+#include "RK4.hpp"
+
 
 #ifndef GRAVITY
 #define GRAVITY 9.8
@@ -8,19 +10,18 @@ Drop::Drop(const double minH, const double maxH)
 : _position(Point2d(0.55, 0.65)), 
   _life(0),
   _minH(minH), _maxH(maxH),
-  _mass(0.5), _speed(0.5), _angle(2.0), _dt(0.001)
+  _mass(0.5), _speed(0.0), _angle(0.0), _dt(0.001)
 { }
 
 void Drop::update(const UnitSquareMapping &mapping)
 {
-    newDirection(mapping);
-    _position += _dt*_direction;
+    updatePosition(mapping);
 }
 
 Drop::~Drop()
 { }
 
-void Drop::newDirection(const UnitSquareMapping &mapping)
+void Drop::updatePosition(const UnitSquareMapping &mapping)
 {
     Point2d      gradient = mapping.paramGrad(_position);
     const double height   = mapping.getHeightFromParam(_position);
@@ -31,10 +32,15 @@ void Drop::newDirection(const UnitSquareMapping &mapping)
         return;
     }
 
-    const double smorzamento = ( 1.0 / height * 0.25 );
-    const double acceleration = GRAVITY * height * _mass * smorzamento;
-    // gradient has already the sign
-    _direction = acceleration * gradient;
+    Point2d newDirection = gradient.normalize();
+
+    // euler method
+    double acceleration = height * GRAVITY / _mass;
+    _speed += acceleration * _dt;
+    _position += ( newDirection * _speed * _dt ) / 2.0;
+
+    // runge kutta
+
 }
 
 const Point2d& Drop::position() const

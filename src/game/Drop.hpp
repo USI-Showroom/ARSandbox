@@ -31,7 +31,7 @@ private:
     double _angle;
     double _dt;
 
-    void newDirection(const UnitSquareMapping &);
+    void updatePosition(const UnitSquareMapping &);
 };
 
 #endif
