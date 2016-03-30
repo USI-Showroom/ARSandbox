@@ -69,7 +69,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
     {
         _drops.resize(nDrops);
 		for (int i = 0; i < nDrops; ++i)
-			_drops[i] = new Drop(0.0, 0.7);
+			_drops[i] = new Drop(0.4, 0.7);
 
         _gameTimer->start(100);
 	}
