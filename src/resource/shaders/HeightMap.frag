@@ -127,19 +127,19 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    gl_FragColor = gameTxt.a+(1.0-gameTxt.a)*bgCol;
+    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb, 1.0)+(1.0-gameTxt.a)*bgCol;
 
     // isolines
-    float isoH = 0.0025;
-    for ( int i=0; i<10; i++) {
-        float iF=float (i);
-        float minIso = iF * (1.0 - isoH) / 9.0;
-        float maxIso = minIso+isoH;
+    // float isoH = 0.0025;
+    // for ( int i=0; i<10; i++) {
+    //     float iF=float (i);
+    //     float minIso = iF * (1.0 - isoH) / 9.0;
+    //     float maxIso = minIso+isoH;
 
-        if (heightV > minIso && heightV < maxIso) {
-            gl_FragColor = vec4(0.46, 0.55, 0.3, 0.6);
-            break;
-        }
-    }
+    //     if (heightV > minIso && heightV < maxIso) {
+    //         gl_FragColor = vec4(0.64, 0.35, 0.25, 0.2);
+    //         break;
+    //     }
+    // }
 }
 

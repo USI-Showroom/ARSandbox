@@ -10,7 +10,7 @@ Drop::Drop(const double minH, const double maxH)
 : _position(Point2d(0.55, 0.65)), 
   _life(0),
   _minH(minH), _maxH(maxH),
-  _mass(0.5), _speed(0.0), _angle(0.0), _dt(0.001)
+  _mass(0.2), _speed(0.4), _angle(0.0), _dt(0.001)
 { }
 
 void Drop::update(const UnitSquareMapping &mapping)
