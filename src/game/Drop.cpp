@@ -37,15 +37,28 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
         return;
     }
 
-    Point3d ag = Point3d(0.0, GRAVITY, 0.0) / _mass;
-    Point2d pg = _position + gradient;
+    const Point3d ag = Point3d(0.0, GRAVITY, 0.0) / _mass;
     
-    Point3d n = Point3d(_position.x(), _position.y(), height) ^ Point3d(pg.x(), pg.y(), height);
-    Point3d c = - ( ag * n ) * n;
+    const Point2d pg = _position + gradient;
 
+    const Point3d p1 = Point3d(_position.x(), _position.y(), 0.0);
+    const Point3d p2 = Point3d(pg.x(), pg.y(), 0.0);
+    const Point3d p3 = Point3d(0.0, 0.0, height);
+    
+    const Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
+    const Point3d c = - ( ag * n ) * n;
+
+    std::cout << std::endl;
+    std::cout << "_position: " << _position << std::endl;
+    std::cout << "height: " << height << std::endl;
+    std::cout << "position+gradient: " << pg  << std::endl;
+    std::cout << "normal: " << n << std::endl;
+    std::cout << std::endl;
+    
     _acceleration = ag - c;
 
-    
+    _velocity    += Point2d(_acceleration.x(), _acceleration.y()) * _dt;
+    _position    += _velocity * _dt;
 }
 
 const Point2d& Drop::position() const
