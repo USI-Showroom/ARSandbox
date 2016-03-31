@@ -48,12 +48,12 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     const Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
     const Point3d c = - ( ag * n ) * n;
 
-    std::cout << std::endl;
-    std::cout << "_position: " << _position << std::endl;
-    std::cout << "height: " << height << std::endl;
-    std::cout << "position+gradient: " << pg  << std::endl;
-    std::cout << "normal: " << n << std::endl;
-    std::cout << std::endl;
+    // std::cout << std::endl;
+    // std::cout << "_position: " << _position << std::endl;
+    // std::cout << "height: " << height << std::endl;
+    // std::cout << "position+gradient: " << pg  << std::endl;
+    // std::cout << "normal: " << n << std::endl;
+    // std::cout << std::endl;
     
     _acceleration = ag - c;
 
