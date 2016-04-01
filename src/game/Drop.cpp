@@ -11,7 +11,7 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(0.5), _friction(0.006),
+    _mass(1.0), _friction(0.006),
     _dt(0.001)
 { }
 
@@ -38,27 +38,40 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     }
 
     const Point3d ag = Point3d(0.0, GRAVITY, 0.0) / _mass;
-    
-    const Point2d pg = _position + gradient;
 
-    const Point3d p1 = Point3d(_position.x(), _position.y(), 0.0);
-    const Point3d p2 = Point3d(pg.x(), pg.y(), 0.0);
-    const Point3d p3 = Point3d(0.0, 0.0, height);
-    
+    const Point2d pg = _position + gradient;
+    const Point2d po = _position + gradient.rotate();
+
+    const Point3d p1 = Point3d(_position.x(), _position.y(), height);
+    const Point3d p2 = Point3d(pg.x(),        pg.y(),        height);
+    const Point3d p3 = Point3d(po.x(),        po.y(),        height);
+
     const Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
     const Point3d c = - ( ag * n ) * n;
 
-    // std::cout << std::endl;
-    // std::cout << "_position: " << _position << std::endl;
-    // std::cout << "height: " << height << std::endl;
-    // std::cout << "position+gradient: " << pg  << std::endl;
-    // std::cout << "normal: " << n << std::endl;
-    // std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "_position: " << _position << std::endl;
+    std::cout << "gradient: " << gradient << std::endl;
+    std::cout << "height: " << height << std::endl;
     
-    _acceleration = ag - c;
+    std::cout << "ag: " << ag << std::endl;
+    std::cout << "pg: " << pg << std::endl;
+    std::cout << "po: " << po << std::endl;
+    
+    std::cout << std::endl;
+    std::cout << "p1: " << p1 << std::endl;
+    std::cout << "p2: " << p2 << std::endl;
+    std::cout << "p3: " << p3 << std::endl;
 
-    _velocity    += Point2d(_acceleration.x(), _acceleration.y()) * _dt;
+    std::cout << "n: " << n << std::endl;
+    std::cout << "c: " << c << std::endl;
+    std::cout << std::endl;
+
+    _acceleration = ag - c;
+    _velocity    += Point2d(_acceleration.x(), _acceleration.z()) * _dt;
     _position    += _velocity * _dt;
+
+    // assert(true==false);
 }
 
 const Point2d& Drop::position() const

@@ -16,10 +16,10 @@ public:
     void setLife     (const int);
     void setPosition (const double, const double);
 
-    bool           alive     ()  const;
+    bool alive() const;
 
-    const Point2d& direction ()  const;
-    const Point2d& position  ()  const;
+    const Point2d& direction () const;
+    const Point2d& position  () const;
 
 private:
     Point2d _position, _direction, _velocity;
