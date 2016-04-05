@@ -11,6 +11,8 @@
 
 #include "Point3.hpp"
 
+#include "grid.hpp"
+
 #define PI 3.1415926535897932384626433832795
 
 
@@ -144,10 +146,10 @@ void GameManager::updateGame()
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             
-            QPen pen(Qt::white, 2);
+            QPen pen(Qt::red, 2);
             painter.setPen(pen);
             
-            QBrush brush(Qt::white);
+            QBrush brush(Qt::red);
             painter.setBrush(brush);
 
             painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);

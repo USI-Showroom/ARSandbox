@@ -2,7 +2,7 @@
 #include "Point3.hpp"
 
 #ifndef GRAVITY
-#define GRAVITY 9.8
+#define GRAVITY 1.0
 #endif
 
 Drop::Drop(const double minH, const double maxH)
@@ -11,7 +11,7 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(1.0), _friction(0.006),
+    _mass(1.0), _friction(0.25),
     _dt(0.001)
 { }
 
@@ -31,47 +31,34 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     Point2d      gradient = mapping.paramGrad(_position);
     const double height   = mapping.getHeightFromParam(_position);
 
-    if(gradient.isZero())
-    {
-        --_life;
-        return;
-    }
+    static const Point3d ag = Point3d(0.0, 0.0, -GRAVITY) / _mass;
 
-    const Point3d ag = Point3d(0.0, GRAVITY, 0.0) / _mass;
+    const Point2d a1 = _position;
+    const Point2d a2 = _position + Point2d(0.1,0.0);
+    const Point2d a3 = _position + Point2d(0.0,0.1);
 
-    const Point2d pg = _position + gradient;
-    const Point2d po = _position + gradient.rotate();
+    const double  h1 = height;
+    const double  h2 = mapping.getHeightFromParam(a2);
+    const double  h3 = mapping.getHeightFromParam(a3);
 
-    const Point3d p1 = Point3d(_position.x(), _position.y(), height);
-    const Point3d p2 = Point3d(pg.x(),        pg.y(),        height);
-    const Point3d p3 = Point3d(po.x(),        po.y(),        height);
+    const Point3d p1 = Point3d(a1.x(), a1.y(), h1);
+    const Point3d p2 = Point3d(a2.x(), a2.y(), h2);
+    const Point3d p3 = Point3d(a3.x(), a3.y(), h3);
 
-    const Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
-    const Point3d c = - ( ag * n ) * n;
+    Point3d  n = ( p2 - p1 ) ^ ( p3 - p1 );
+    n.normalize();
 
-    std::cout << std::endl;
-    std::cout << "_position: " << _position << std::endl;
-    std::cout << "gradient: " << gradient << std::endl;
-    std::cout << "height: " << height << std::endl;
-    
-    std::cout << "ag: " << ag << std::endl;
-    std::cout << "pg: " << pg << std::endl;
-    std::cout << "po: " << po << std::endl;
-    
-    std::cout << std::endl;
-    std::cout << "p1: " << p1 << std::endl;
-    std::cout << "p2: " << p2 << std::endl;
-    std::cout << "p3: " << p3 << std::endl;
+    const Point3d c = (ag * n) * n;
 
-    std::cout << "n: " << n << std::endl;
-    std::cout << "c: " << c << std::endl;
-    std::cout << std::endl;
+    _acceleration += (ag - c) * 10.0 - _friction * _acceleration;
 
-    _acceleration = ag - c;
-    _velocity    += Point2d(_acceleration.x(), _acceleration.z()) * _dt;
-    _position    += _velocity * _dt;
+    std::cout << "normalized acceleration: " << _acceleration.norm() << std::endl;
+    std::cout << "ag*n: " << ag * n << std::endl;
 
-    // assert(true==false);
+    if(gradient.norm()>1e-8)
+        _velocity     += _acceleration.norm() * gradient.normalized() * _dt;
+
+    _position     += _velocity * _dt * 0.5;
 }
 
 const Point2d& Drop::position() const
@@ -100,13 +87,6 @@ void Drop::setPosition(const double newX, const double newY)
     _position.y() = newY;
 }
 
-/**
- * @brief      Clamp x and y coordinates to minValue and maxValue
- *
- * @param      position  A Point2d with x and y coordinates
- * @param[in]  minValue  lower bound on the coordinates (double)
- * @param[in]  maxValue  upper boudn on the coordinates (double)
- */
 void Drop::clampCoordinates(Point2d& position,
                             const double minValue,
                             const double maxValue)
