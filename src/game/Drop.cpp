@@ -11,7 +11,7 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(1.0), _friction(0.25),
+    _mass(1.0), _friction(0.2),
     _dt(0.001)
 { }
 
@@ -51,9 +51,6 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     const Point3d c = (ag * n) * n;
 
     _acceleration += (ag - c) * 10.0 - _friction * _acceleration;
-
-    std::cout << "normalized acceleration: " << _acceleration.norm() << std::endl;
-    std::cout << "ag*n: " << ag * n << std::endl;
 
     if(gradient.norm()>1e-8)
         _velocity     += _acceleration.norm() * gradient.normalized() * _dt;
