@@ -1,5 +1,6 @@
 #include "Drop.hpp"
 #include "Point3.hpp"
+#include "util.hpp"
 
 #ifndef GRAVITY
 #define GRAVITY 1.0
@@ -26,7 +27,7 @@ Drop::~Drop()
 
 void Drop::updatePosition(const UnitSquareMapping &mapping)
 {
-    clampCoordinates(_position, 0.05, 0.95);
+    util::clamp(_position, 0.05, 0.95);
 
     Point2d      gradient = mapping.paramGrad(_position);
     const double height   = mapping.getHeightFromParam(_position);
@@ -45,7 +46,7 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     const Point3d p2 = Point3d(a2.x(), a2.y(), h2);
     const Point3d p3 = Point3d(a3.x(), a3.y(), h3);
 
-    Point3d  n = ( p2 - p1 ) ^ ( p3 - p1 );
+    Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
     n.normalize();
 
     const Point3d c = (ag * n) * n;
@@ -73,24 +74,13 @@ bool Drop::alive() const
     return _life > 0;
 }
 
-void Drop::setLife(const int newLife)
+void Drop::setAlive()
 {
-    _life = newLife;
+    _life = 1;
 }
 
 void Drop::setPosition(const double newX, const double newY)
 {
     _position.x() = newX;
     _position.y() = newY;
-}
-
-void Drop::clampCoordinates(Point2d& position,
-                            const double minValue,
-                            const double maxValue)
-{
-    if (position.x() < minValue) position.x() = minValue;
-    if (position.y() < minValue) position.y() = minValue;
-
-    if (position.x() > maxValue) position.x() = maxValue;
-    if (position.y() > maxValue) position.y() = maxValue;
 }

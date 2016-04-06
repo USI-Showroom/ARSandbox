@@ -13,7 +13,7 @@ public:
     virtual ~Drop();
 
     void update      (const UnitSquareMapping &);
-    void setLife     (const int);
+    void setAlive    ();
     void setPosition (const double, const double);
 
     bool alive() const;
@@ -31,8 +31,7 @@ private:
     double _mass, _friction;
     double _dt;
 
-    void updatePosition   (const UnitSquareMapping &);
-    void clampCoordinates (Point2d&, const double, const double);
+    void updatePosition(const UnitSquareMapping &);
 };
 
 #endif

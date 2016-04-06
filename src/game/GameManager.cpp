@@ -10,9 +10,11 @@
 #include <time.h>
 
 #include "Point3.hpp"
+#include "util.hpp"
 
 #define PI 3.1415926535897932384626433832795
 
+#define RADIUS 0.0065
 
 static const int imgWidth=512;
 static const int imgHeight=424;
@@ -22,12 +24,11 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nDrops=1;
+static int nDrops=360;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32)
 {
-    srand (time(NULL));
     _playing=false;
     _image.fill(QColor(0,0,0,0));
 }
@@ -69,14 +70,21 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
     {
         _drops.resize(nDrops);
 		for (int i = 0; i < nDrops; ++i)
+        {
+#ifdef DEBUG
+            std::cout << "(" << i << ") new drop" << std::endl;
+#endif
 			_drops[i] = new Drop(0.4, 0.7);
+        }
 
         _gameTimer->start(100);
 	}
     else
     {
         for(size_t i=0;i<_drops.size();++i)
+        {
             delete _drops[i];
+        }
         
         _drops.clear();
         _gameTimer->stop();
@@ -93,16 +101,22 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     double normalisedX = ((double)x / (double)w);
     double normalisedY = ((double)y / (double)h);
 
-    if (normalisedX < 0.05) normalisedX = 0.05;
-    if (normalisedY < 0.05) normalisedY = 0.05;
+    util::clamp(normalisedX, 0.05, 0.95);
+    util::clamp(normalisedY, 0.05, 0.95);
 
-    if (normalisedX > 0.95) normalisedX = 0.95;
-    if (normalisedY > 0.95) normalisedY = 0.95;
-
+#ifdef DEBUG
     std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
+#endif
 
-    _drops[0]->setPosition(normalisedX, normalisedY);
-    _drops.at(0)->setLife(1);
+    for(size_t i = 0; i <_drops.size(); ++i)
+    {
+        Drop& theDrop = *_drops[i];
+        theDrop.setPosition(normalisedX + RADIUS * cos(i), normalisedY + RADIUS * sin(i));
+#ifdef DEBUG
+        std::cout << "new drop position: " << theDrop.position() << std::endl;
+#endif
+        theDrop.setAlive();
+    }
 }
 
 void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
@@ -124,15 +138,15 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    for(size_t i=0;i<_drops.size();++i)
+    for(size_t i = 0; i <_drops.size(); ++i)
     {
-        Drop &a=*_drops[i];
+        Drop& d = *_drops[i];
 
-        if(a.alive())
+        if(d.alive())
         {
-            a.update(_mapping);
+            d.update(_mapping);
             
-            Point2d p=_mapping.fromParameterization(a.position());
+            Point2d p=_mapping.fromParameterization(d.position());
             p.y() = imgHeight - p.y();
 
             if (p.y() == imgHeight)
@@ -144,10 +158,10 @@ void GameManager::updateGame()
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             
-            QPen pen(Qt::red, 2);
+            QPen pen(Qt::blue, 2);
             painter.setPen(pen);
             
-            QBrush brush(Qt::red);
+            QBrush brush(Qt::blue);
             painter.setBrush(brush);
 
             painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
