@@ -32,6 +32,8 @@ private:
     double _dt;
 
     void updatePosition(const UnitSquareMapping &);
+    void erodeTerrain(const UnitSquareMapping &);
+    void evaporate(const UnitSquareMapping &);
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include "util.hpp"
 
 #ifndef GRAVITY
-#define GRAVITY 1.0
+#define GRAVITY 9.81
 #endif
 
 Drop::Drop(const double minH, const double maxH)
@@ -12,13 +12,15 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(1.0), _friction(0.2),
+    _mass(1.0), _friction(0.8),
     _dt(0.001)
 { }
 
 void Drop::update(const UnitSquareMapping &mapping)
 {
     updatePosition(mapping);
+    erodeTerrain(mapping);
+    evaporate(mapping);
 }
 
 Drop::~Drop()
@@ -51,12 +53,42 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
 
     const Point3d c = (ag * n) * n;
 
-    _acceleration += (ag - c) * 10.0 - _friction * _acceleration;
+    _acceleration += (ag - c) * 5.0 - _friction * _acceleration;
 
-    if(gradient.norm()>1e-8)
+    if(gradient.norm()>1e-3)
         _velocity     += _acceleration.norm() * gradient.normalized() * _dt;
 
     _position     += _velocity * _dt * 0.5;
+}
+
+void Drop::erodeTerrain(const UnitSquareMapping &mapping)
+{
+    const double Kc = 25.0;  // sediment capacity constant
+    const double Ks = 0.001; // dissolving constant
+    const double Kd = 0.001; // deposition constant
+    const double st = 0.5;   // suspended sediment amount
+
+    Point2d gradient = mapping.paramGrad(_position);
+    const double angle = gradient * _position;
+
+    // sediment transport capacity
+    const double C = Kc * angle * _velocity.norm();
+
+    if(C > st) {
+        // erode
+        
+    } else {
+        // deposit
+        
+    }
+}
+
+void Drop::evaporate(const UnitSquareMapping &mapping)
+{
+    const float Ke = 0.0003; // evaporation constant
+
+    // update water height or amount
+    double wh = 0.25 * (1 - Ke * _dt);
 }
 
 const Point2d& Drop::position() const
