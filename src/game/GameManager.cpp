@@ -14,7 +14,7 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define RADIUS 0.0065
+#define RADIUS 0.0045
 
 static const int imgWidth=512;
 static const int imgHeight=424;
@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nDrops=360;
+static int nDrops=720;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32)
@@ -88,8 +88,8 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
         
         _drops.clear();
         _gameTimer->stop();
-        _image.fill(QColor(0, 0, 0, 0));
-        updateTexture();   
+        //_image.fill(QColor(0, 0, 0, 0));
+        //updateTexture();   
     }
 }
 
@@ -165,7 +165,6 @@ void GameManager::updateGame()
             painter.setBrush(brush);
 
             painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
-
         }
     }
 

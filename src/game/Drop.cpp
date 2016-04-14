@@ -12,7 +12,7 @@ Drop::Drop(const double minH, const double maxH)
     _direction(0.0), _velocity(0.0), _acceleration(0.0),
     _life(0),
     _minH(minH), _maxH(maxH),
-    _mass(1.0), _friction(0.8),
+    _mass(1.0), _friction(1.2),
     _dt(0.001)
 { }
 
@@ -32,7 +32,7 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     util::clamp(_position, 0.05, 0.95);
 
     Point2d      gradient = mapping.paramGrad(_position);
-    const double height   = mapping.getHeightFromParam(_position);
+                 height   = mapping.getHeightFromParam(_position);
 
     static const Point3d ag = Point3d(0.0, 0.0, -GRAVITY) / _mass;
 
@@ -53,7 +53,7 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
 
     const Point3d c = (ag * n) * n;
 
-    _acceleration += (ag - c) * 5.0 - _friction * _acceleration;
+    _acceleration += (ag - c) * 10.0 - _friction * _acceleration;
 
     if(gradient.norm()>1e-3)
         _velocity     += _acceleration.norm() * gradient.normalized() * _dt;

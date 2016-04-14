@@ -12,14 +12,14 @@ public:
     Drop(const double, const double);
     virtual ~Drop();
 
-    void update      (const UnitSquareMapping &);
-    void setAlive    ();
-    void setPosition (const double, const double);
+    void update(const UnitSquareMapping &);
+    void setAlive();
+    void setPosition(const double, const double);
 
     bool alive() const;
 
-    const Point2d& direction () const;
-    const Point2d& position  () const;
+    const Point2d& direction() const;
+    const Point2d& position() const;
 
 private:
     Point2d _position, _direction, _velocity;
