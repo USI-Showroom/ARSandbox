@@ -32,7 +32,7 @@ void Drop::updatePosition(const UnitSquareMapping &mapping)
     util::clamp(_position, 0.05, 0.95);
 
     Point2d      gradient = mapping.paramGrad(_position);
-                 height   = mapping.getHeightFromParam(_position);
+    const double height   = mapping.getHeightFromParam(_position);
 
     static const Point3d ag = Point3d(0.0, 0.0, -GRAVITY) / _mass;
 
