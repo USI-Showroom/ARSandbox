@@ -31,18 +31,6 @@ private:
 	vector<double> _s;
 	vector<double> _fl, _fr, _ft, _fb;
 	vector<double> _u, _v;
-
-	double b(int x, int y) const;
-	double d(int x, int y) const;
-	double s(int x, int y) const;
-	
-	double fl(int x, int y) const;
-	double fr(int x, int y) const;
-	double ft(int x, int y) const;
-	double fb(int x, int y) const;
-	
-	double u(int x, int y) const;
-	double v(int x, int y) const;
 };
 
 #endif // SIMULATION_HPP_INCLUDED

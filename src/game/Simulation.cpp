@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Simulation.hpp"
 
 Simulation::Simulation(int newWidth, int newHeight)
@@ -45,11 +46,11 @@ void Simulation::computeOutflowFlux(double dt)
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
-	const int x = static_cast<int>(center.x());
-	const int y = static_cast<int>(center.y());
+	const int x = round(center.x());
+	const int y = round(center.y());
 	for(int i = -radius; i < radius; ++i) {
-		unsigned int idx = y * _height + x + i;
-		_b[idx] = amount;
+		unsigned int idx = y * _height + x * i;
+		_d[idx] = amount;
 	}
 }
 
@@ -59,53 +60,8 @@ QByteArray Simulation::getWaterField()
 {
 	QByteArray data;
 	QDataStream stream(&data, QIODevice::WriteOnly);
-	for (double x : _d) {
-		stream << x;
+	for (size_t i = 0; i < _d.size(); ++i) {
+		stream << _d.at(i);
 	}
 	return data;
-}
-
-double Simulation::b(int x, int y) const
-{
-	return _b.at( y * _height + x );
-}
-
-double Simulation::d(int x, int y) const
-{
-	return _d.at( y * _height + x );
-}
-
-double Simulation::s(int x, int y) const
-{
-	return _s.at( y * _height + x );
-}
-
-double Simulation::fl(int x, int y) const
-{
-	return _fl.at( y * _height + x );
-}
-
-double Simulation::fr(int x, int y) const
-{
-	return _fr.at( y * _height + x );
-}
-
-double Simulation::ft(int x, int y) const
-{
-	return _ft.at( y * _height + x );
-}
-
-double Simulation::fb(int x, int y) const
-{
-	return _fb.at( y * _height + x );
-}
-
-double Simulation::u(int x, int y) const
-{
-	return _u.at( y * _height + x );
-}
-
-double Simulation::v(int x, int y) const
-{
-	return _v.at( y * _height + x );
 }
