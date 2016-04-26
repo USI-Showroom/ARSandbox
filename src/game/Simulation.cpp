@@ -4,9 +4,9 @@
 Simulation::Simulation(int newWidth, int newHeight)
 	:	_width(newWidth),
 		_height(newHeight),
-		_b(_width * _height),
+		_b(_width * _height, 0.0),
 		_d(_width * _height, 0.0),
-		_s(_width * _height),
+		_s(_width * _height, 0.0),
 		_fl(_width * _height),
 		_fr(_width * _height),
 		_ft(_width * _height),
@@ -49,9 +49,14 @@ void Simulation::addWaterSource(const Point2d &center, const int radius, const d
 	const int x = round(center.x());
 	const int y = round(center.y());
 	for(int i = -radius; i < radius; ++i) {
-		unsigned int idx = y * _height + x * i;
-		_d[idx] = amount;
+		unsigned int index = y * _height + x * i;
+		_d[index] = amount;
 	}
+}
+
+const double Simulation::getWaterAt(int x, int y)
+{
+	return _d.at(y * _height + x);
 }
 
 // http://stackoverflow.com/a/26843664

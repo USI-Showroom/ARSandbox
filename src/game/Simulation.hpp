@@ -21,6 +21,8 @@ public:
 
 	void addWaterSource(const Point2d &center, const int radius, const double amount);
 
+	const double getWaterAt(int x, int y);
+
 	QByteArray getWaterField();
 
 private:
