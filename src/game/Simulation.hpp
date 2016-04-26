@@ -5,18 +5,18 @@
 #include <QByteArray>
 #include <QDataStream>
 #include "Point2.hpp"
+#include "UnitSquareMapping.hpp"
 
 using namespace std;
 
 class Simulation
 {
 public:
-	Simulation(int newWidth, int newHeight);
+	Simulation(int newWidth, int newHeight, const UnitSquareMapping &);
 	~Simulation();
 
 	void update(double dt);
 	void incrementWater(double dt);
-	void simulateFlow(double dt);
 	void computeOutflowFlux(double dt);
 
 	void addWaterSource(const Point2d &center, const int radius, const double amount);
@@ -33,6 +33,10 @@ private:
 	vector<double> _s;
 	vector<double> _fl, _fr, _ft, _fb;
 	vector<double> _u, _v;
+
+	double _temporaryWaterAmount;
+
+	const UnitSquareMapping _mapping;
 };
 
 #endif // SIMULATION_HPP_INCLUDED

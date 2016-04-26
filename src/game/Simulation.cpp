@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Simulation.hpp"
 
-Simulation::Simulation(int newWidth, int newHeight)
+Simulation::Simulation(int newWidth, int newHeight, const UnitSquareMapping& mapping)
 	:	_width(newWidth),
 		_height(newHeight),
 		_b(_width * _height, 0.0),
@@ -12,7 +12,8 @@ Simulation::Simulation(int newWidth, int newHeight)
 		_ft(_width * _height),
 		_fb(_width * _height),
 		_u(_width * _height),
-		_v(_width * _height)
+		_v(_width * _height),
+		_mapping(mapping)
 {}
 
 Simulation::~Simulation()
@@ -21,9 +22,8 @@ Simulation::~Simulation()
 void Simulation::update(double dt)
 {
 	incrementWater(dt);
-	simulateFlow(dt);
 	computeOutflowFlux(dt);
-	// updateWaterSurface(dt);
+	updateWaterSurface(dt);
 	// updateVelocityField(dt);
 	// simulateErosion(dt);
 	// transportSediment(dt);
@@ -31,21 +31,39 @@ void Simulation::update(double dt)
 
 void Simulation::incrementWater(double dt)
 {
-
-}
-
-void Simulation::simulateFlow(double dt)
-{
-
+	addWaterSource(Point2d(0.5, 0.5), 10, 0.20);
 }
 
 void Simulation::computeOutflowFlux(double dt)
 {
+	for (int x = 0; x < _width; ++x) {
+		for (int y = 0; y < _height; ++y) {
+			const int index = y * _height + x;
+			
+			const double A = 0.25;
+			const double dh = _mapping.getHeightFromParam(Point2d(x,y));
+			const double b =  9.81 * dh / 0.15;
+			
+			_fl[index] = std::max(0.0, _fl[index] + dt * A * b);
+			_fb[index] = std::max(0.0, _fb[index] + dt * A * b);
+			_ft[index] = std::max(0.0, _ft[index] + dt * A * b);
+			_fr[index] = std::max(0.0, _fr[index] + dt * A * b);
+		}
+	}
+}
 
+void Simulation::updateWaterSurface(dt)
+{
+	for (int x = 0; x < _width; ++x) {
+		for (int y = 0; y < _height; ++y) {
+
+		}
+	}
 }
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
+	_temporaryWaterAmount = amount;
 	const int x = round(center.x());
 	const int y = round(center.y());
 	for(int i = -radius; i < radius; ++i) {
