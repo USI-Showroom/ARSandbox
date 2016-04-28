@@ -17,10 +17,8 @@ public:
 
 	void update(double dt);
 	void incrementWater(double dt);
-	void computeOutflowFlux(double dt);
-
+	void updateWaterSurface(double dt);
 	void addWaterSource(const Point2d &center, const int radius, const double amount);
-
 	const double getWaterAt(int x, int y);
 
 	QByteArray getWaterField();
@@ -28,10 +26,10 @@ public:
 private:
 	int _width, _height;
 
-	vector<double> _b;
-	vector<double> _d;
-	vector<double> _s;
-	vector<double> _fl, _fr, _ft, _fb;
+	vector<double> terrain;
+	vector<double> water;
+	vector<double> sediment;
+	vector<double> leftFlux, rightFlux, topFlux, bottomFlux;
 	vector<double> _u, _v;
 
 	double _temporaryWaterAmount;
