@@ -40,7 +40,7 @@ void Simulation::updateWaterSurface(double dt)
 		for (int y = 0; y < _height; ++y) {
 			
 			// computing indices of cells
-			const int index = y * _height + x;
+			const int currentCell = y * _height + x;
 			const int top = (y-1) * _height + x;
 			const int bottom = (y+1 * _height) + x;
 			const int left = y * _height + x - 1;
@@ -48,12 +48,15 @@ void Simulation::updateWaterSurface(double dt)
 			
 			// cross sectional area of the pipe
 			const double A = 0.25;
-			
-			// current water height
-			const double d1 = water.at(index);
-			
+			// length of virtual pipe
+			const double l = 0.15;
+			// gravity
+			const double g = 9.81;
 			// flux factor
-			const double b =  9.81 * d1 / 0.15;
+			double b = g * A / l;
+
+			// current water height
+			const double d1 = water.at(currentCell);
 
 			// height difference between left, right, top and bottom neighbor
 			const double lth = _mapping.getHeightFromParam(Point2d(x-1,y));
@@ -62,18 +65,19 @@ void Simulation::updateWaterSurface(double dt)
 			const double bth = _mapping.getHeightFromParam(Point2d(x,y+1));
 			
 			// compute flow out
-			leftFlux[index] = std::max(0.0, leftFlux[index] + dt * A * b);
-			bottomFlux[index] = std::max(0.0, bottomFlux[index] + dt * A * b);
-			topFlux[index] = std::max(0.0, topFlux[index] + dt * A * b);
-			rightFlux[index] = std::max(0.0, rightFlux[index] + dt * A * b);
-			double flowOut = leftFlux[index] + bottomFlux[index] + topFlux[index] + rightFlux[index];
+			leftFlux[currentCell]   = std::max(0.0, leftFlux[currentCell]   + dt * A * b * lth);
+			rightFlux[currentCell]  = std::max(0.0, rightFlux[currentCell]  + dt * A * b * rth);
+			topFlux[currentCell]    = std::max(0.0, topFlux[currentCell]    + dt * A * b * tth);
+			bottomFlux[currentCell] = std::max(0.0, bottomFlux[currentCell] + dt * A * b * bth);
+			
+			double flowOut = leftFlux[currentCell] + bottomFlux[currentCell] + topFlux[currentCell] + rightFlux[currentCell];
 
 			// smooth the flow out
 			const double K = std::min(1.0, (d1 * _width * _height) / flowOut * dt);
-			leftFlux[index] *= K;
-			bottomFlux[index] *= K;
-			topFlux[index] *= K;
-			rightFlux[index] *= K;
+			leftFlux[currentCell] *= K;
+			bottomFlux[currentCell] *= K;
+			topFlux[currentCell] *= K;
+			rightFlux[currentCell] *= K;
 			
 			
 			// compute flow in
@@ -81,13 +85,23 @@ void Simulation::updateWaterSurface(double dt)
 			
 			// compute net volume change for water
 			const double DV = dt * (flowIn - flowOut);
-			water[index] = d1 + ( DV / (_width * _height) );
+			water[currentCell] = d1 + ( DV / (_width * _height) );
 
 			// compute average flux velocity in the X and Y direction
-			double avgWaterX = rightFlux[left] - leftFlux[index] + rightFlux[index] - leftFlux[right];
+			double avgWaterX = rightFlux[left] - leftFlux[currentCell] + rightFlux[currentCell] - leftFlux[right];
 			avgWaterX *= 0.5;
-			double avgWaterY = rightFlux[top] - leftFlux[index] + rightFlux[index] - leftFlux[bottom];
+			double avgWaterY = rightFlux[top] - leftFlux[currentCell] + rightFlux[currentCell] - leftFlux[bottom];
 			avgWaterY *= 0.5;
+
+			double avgWater = avgWaterX + avgWaterY;
+
+			// update velocity fields
+			if (avgWater == 0.0) {
+                _u.at(currentCell) = _v.at(currentCell) = 0.0;
+            } else {
+            	_u.at(currentCell) = avgWaterX;
+            	_v.at(currentCell) = avgWaterY;
+            }
 		}
 	}
 }
