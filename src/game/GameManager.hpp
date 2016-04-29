@@ -11,6 +11,7 @@
 #include "UnitSquareMapping.hpp"
 #include "Drop.hpp"
 #include "Simulation.hpp"
+#include "Grid.hpp"
 
 class QTimer;
 
@@ -53,6 +54,7 @@ private:
     QImage _image;
 
     Simulation *_simulation;
+    Grid *_grid;
 };
 #endif
 
