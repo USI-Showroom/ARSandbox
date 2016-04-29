@@ -44,33 +44,36 @@ void Simulation::updateWaterSurface(double dt)
 		return;
 	}
 
+	// cross sectional area of the pipe
+	const double A = 0.25;
+	// length of virtual pipe
+	const double l = 0.15;
+	// gravity
+	const double g = 9.81;
+	// flux factor
+	double b = g * A / l;
+
 	for (int x = 0; x < _width; ++x) {
 		for (int y = 0; y < _height; ++y) {
-			
-			// computing indices of cells
-			const int currentCell = y * _height + x;
-			const int top = (y-1) * _height + x;
-			const int bottom = (y+1 * _height) + x;
-			const int left = y * _height + x - 1;
-			const int right = y * _height + x + 1;
-			
-			// cross sectional area of the pipe
-			const double A = 0.25;
-			// length of virtual pipe
-			const double l = 0.15;
-			// gravity
-			const double g = 9.81;
-			// flux factor
-			double b = g * A / l;
 
+			// computing indices of cells
+			const int currentCell = y * _width + x;
+			const int top = (y-1) * _width + x;
+			const int bottom = (y+1 * _width) + x;
+			const int left = y * _width + x - 1;
+			const int right = y * _width + x + 1;
+			
 			// current water height
 			const double d1 = water.at(currentCell);
+			// current terrain height
+			const double h1 = _grid->getHeight(x,y);
 
-			// height difference between left, right, top and bottom neighbor
-			const double lth = _mapping.getHeightFromParam(Point2d(x-1,y));
-			const double rth = _mapping.getHeightFromParam(Point2d(x+1,y));
-			const double tth = _mapping.getHeightFromParam(Point2d(x,y-1));
-			const double bth = _mapping.getHeightFromParam(Point2d(x,y+1));
+			// height (water height + terrain height) difference between
+			// current cell and left, right, top and bottom cells
+			const double lth = h1 - _grid->getHeight();
+			const double rth = h1 - _grid->getHeight();
+			const double tth = h1 - _grid->getHeight();
+			const double bth = h1 - _grid->getHeight();
 			
 			// compute flow out
 			leftFlux[currentCell]   = std::max(0.0, leftFlux[currentCell]   + dt * A * b * lth);
