@@ -33,9 +33,13 @@ double Grid::getHeight(int x, int y)
 
 	const int npoints = 9;
 	double perc = 1e-2;
-	std::vector<double> samples = { 10.0, 40.0, 90.0 };
+	
+	std::vector<double> samples;
+	samples.push_back(10.0);
+	samples.push_back(40.0);
+	samples.push_back(90.0);
+	
 	double avg = 0;
-
 	double h, a, b;
 	for (int i = 0; i < npoints; ++i) {
 		a = samples.at(i/3);
