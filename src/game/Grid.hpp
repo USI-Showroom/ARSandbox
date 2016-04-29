@@ -5,18 +5,29 @@
 #include <QPainter>
 #include "UnitSquareMapping.hpp"
 
+class Cell
+{
+
+};
+
 class Grid
 {
 public:
-	Grid(int newSize);
+	Grid(int newSize, const UnitSquareMapping *newMapping);
 	~Grid();
 
 	int& size();
 	void draw(QPainter &painter);
+	double getHeight(int x, int y);
 
 private:
 	int _size;
 	int _cellSize;
+
+	const int xStep;
+	const int yStep;
+
+	const UnitSquareMapping *mapping;
 };
 
 #endif // GRID_HPP

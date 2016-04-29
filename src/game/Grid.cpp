@@ -8,8 +8,10 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-Grid::Grid(int newSize)
-	:	_size(newSize)
+Grid::Grid(int newSize, const UnitSquareMapping *newMapping)
+	:	_size(newSize),
+		xStep(512 / _size), yStep(424 / _size),
+		mapping(newMapping)
 {
 
 }
@@ -24,11 +26,31 @@ int& Grid::size()
 	return _size;
 }
 
+double Grid::getHeight(int x, int y)
+{
+	assert(x < _size);
+	assert(y < _size);
+
+	const int npoints = 9;
+	double perc = 1e-2;
+	std::vector<double> samples = { 10.0, 40.0, 90.0 };
+	double avg = 0;
+
+	double h, a, b;
+	for (int i = 0; i < npoints; ++i) {
+		a = samples.at(i/3);
+		b = samples.at(i%3);
+		Point2d p( a * xStep * perc, b * yStep * perc );
+		h = mapping->getHeightFromParam(p);
+		avg += h;
+	}
+
+	avg /= 9.0;
+	return avg;
+}
+
 void Grid::draw(QPainter &painter)
 {
-	const int xStep = 512 / _size;
-	const int yStep = 424 / _size;
-
 	for (int i = 0; i < _size; ++i) {
 		for (int j = 0; j < _size; ++j) {
 

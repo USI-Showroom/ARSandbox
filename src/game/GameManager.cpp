@@ -29,7 +29,7 @@ static int nDrops=720;
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
   _simulation(new Simulation(imgWidth, imgHeight, _mapping)),
-  _grid(new Grid(3))
+  _grid(new Grid(3, &_mapping))
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
