@@ -7,7 +7,7 @@
 
 class Cell
 {
-
+	void draw(QPainter &painter);
 };
 
 class Grid
@@ -22,10 +22,9 @@ public:
 
 private:
 	int _size;
-	int _cellSize;
 
-	const int xStep;
-	const int yStep;
+	const double xStep;
+	const double yStep;
 
 	const UnitSquareMapping *mapping;
 };

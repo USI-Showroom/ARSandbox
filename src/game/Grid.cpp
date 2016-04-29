@@ -10,7 +10,7 @@ static const int scaling=7;
 
 Grid::Grid(int newSize, const UnitSquareMapping *newMapping)
 	:	_size(newSize),
-		xStep(512 / _size), yStep(424 / _size),
+		xStep(1.0 / _size), yStep(1.0 / _size),
 		mapping(newMapping)
 {
 
@@ -44,10 +44,13 @@ double Grid::getHeight(int x, int y)
 	double avg = 0;
 	double h, a, b;
 	for (int i = 0; i < npoints; ++i) {
+		
 		a = samples.at(i/sw);
 		b = samples.at(i%sh);
-		Point2d p( a * xStep * perc * (x + 1), b * yStep * perc * (y + 1) );
+		
+		Point2d p( a * xStep * perc * (x + 1.0), b * yStep * perc * (y + 1.0) );
 		h = mapping->getHeightFromParam(p);
+		
 		avg += h;
 	}
 
@@ -69,8 +72,8 @@ void Grid::draw(QPainter &painter)
             p1*=scaling;
             p2*=scaling;
 
-			painter.drawRect(p1.x(), p1.y(), p2.x(), p2.y());
 // #ifdef DEBUG
+//          painter.drawRect(p1.x(), p1.y(), p2.x(), p2.y());
 // 			std::cout << "Rect @(" << i << ", " << j << ") " << std::endl;
 // #endif
 		}

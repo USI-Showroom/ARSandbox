@@ -14,7 +14,8 @@ Simulation::Simulation(int newWidth, int newHeight, const UnitSquareMapping& map
 		bottomFlux(_width * _height),
 		_u(_width * _height),
 		_v(_width * _height),
-		_mapping(mapping)
+		_mapping(mapping),
+		_grid(nullptr)
 {}
 
 Simulation::~Simulation()
@@ -36,6 +37,13 @@ void Simulation::incrementWater(double dt)
 
 void Simulation::updateWaterSurface(double dt)
 {
+	if (_grid == nullptr) {
+#ifdef DEBUG
+		std::cout << "ERROR: no grid found for simulation" << std::endl;
+#endif
+		return;
+	}
+
 	for (int x = 0; x < _width; ++x) {
 		for (int y = 0; y < _height; ++y) {
 			
@@ -132,4 +140,9 @@ QByteArray Simulation::getWaterField()
 		stream << water.at(i);
 	}
 	return data;
+}
+
+void Simulation::setGrid(const Grid *newGrid)
+{
+	_grid = newGrid;
 }

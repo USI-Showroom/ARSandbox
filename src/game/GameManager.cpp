@@ -33,6 +33,7 @@ GameManager::GameManager()
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
+    _simulation->setGrid(_grid);
 }
 
 GameManager::~GameManager()
@@ -41,6 +42,7 @@ GameManager::~GameManager()
         _gameTimer->stop();
 
     delete _simulation;
+    delete _grid;
 }
 
 void GameManager::updateTexture()

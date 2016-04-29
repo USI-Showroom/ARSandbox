@@ -6,6 +6,7 @@
 #include <QDataStream>
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
+#include "Grid.hpp"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ public:
 	void incrementWater(double dt);
 	void updateWaterSurface(double dt);
 	void addWaterSource(const Point2d &center, const int radius, const double amount);
+	void setGrid(const Grid *);
+	
 	const double getWaterAt(int x, int y);
 
 	QByteArray getWaterField();
@@ -35,6 +38,7 @@ private:
 	double _temporaryWaterAmount;
 
 	const UnitSquareMapping _mapping;
+	const Grid *_grid;
 };
 
 #endif // SIMULATION_HPP_INCLUDED
