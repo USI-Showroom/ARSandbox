@@ -31,7 +31,9 @@ double Grid::getHeight(int x, int y)
 	assert(x < _size);
 	assert(y < _size);
 
-	const int npoints = 9;
+	const int sw = 3;
+	const int sh = 3;
+	const int npoints = sw*sh;
 	double perc = 1e-2;
 	
 	std::vector<double> samples;
@@ -42,14 +44,14 @@ double Grid::getHeight(int x, int y)
 	double avg = 0;
 	double h, a, b;
 	for (int i = 0; i < npoints; ++i) {
-		a = samples.at(i/3);
-		b = samples.at(i%3);
-		Point2d p( a * xStep * perc, b * yStep * perc );
+		a = samples.at(i/sw);
+		b = samples.at(i%sh);
+		Point2d p( a * xStep * perc * (x + 1), b * yStep * perc * (y + 1) );
 		h = mapping->getHeightFromParam(p);
 		avg += h;
 	}
 
-	avg /= 9.0;
+	avg /= npoints;
 	return avg;
 }
 
@@ -68,9 +70,9 @@ void Grid::draw(QPainter &painter)
             p2*=scaling;
 
 			painter.drawRect(p1.x(), p1.y(), p2.x(), p2.y());
-#ifdef DEBUG
-			std::cout << "Rect @(" << i << ", " << j << ") " << std::endl;
-#endif
+// #ifdef DEBUG
+// 			std::cout << "Rect @(" << i << ", " << j << ") " << std::endl;
+// #endif
 		}
 	}
 }
