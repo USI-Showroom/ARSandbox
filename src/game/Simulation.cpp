@@ -45,57 +45,81 @@ void Simulation::updateWaterSurface(double dt)
 	}
 
 	// cross sectional area of the pipe
-	const double A = 0.25;
+	const double A = 0.0025;
 	// length of virtual pipe
 	const double l = 0.15;
 	// gravity
 	const double g = 9.81;
 	// flux factor
-	double b = g * A / l;
+	double fluxFactor = g * A / l;
+	// cell size
+	double lx = ly = 1.0;
 
 	for (int x = 0; x < _width; ++x) {
 		for (int y = 0; y < _height; ++y) {
 
-			// computing indices of cells
-			const int currentCell = y * _width + x;
-			const int top = (y-1) * _width + x;
-			const int bottom = (y+1 * _width) + x;
-			const int left = y * _width + x - 1;
-			const int right = y * _width + x + 1;
-			
+			double inFlow = 0.0;
+			double outFlow = 0.0;
+			int currentCell = y * _width  + x;
+
 			// current water height
 			const double d1 = water.at(currentCell);
 			// current terrain height
 			const double h1 = _grid->getHeight(x,y);
+			double heightDiff = 0.0;
 
-			// height (water height + terrain height) difference between
-			// current cell and left, right, top and bottom cells
-			const double lth = h1 - _grid->getHeight();
-			const double rth = h1 - _grid->getHeight();
-			const double tth = h1 - _grid->getHeight();
-			const double bth = h1 - _grid->getHeight();
-			
-			// compute flow out
-			leftFlux[currentCell]   = std::max(0.0, leftFlux[currentCell]   + dt * A * b * lth);
-			rightFlux[currentCell]  = std::max(0.0, rightFlux[currentCell]  + dt * A * b * rth);
-			topFlux[currentCell]    = std::max(0.0, topFlux[currentCell]    + dt * A * b * tth);
-			bottomFlux[currentCell] = std::max(0.0, bottomFlux[currentCell] + dt * A * b * bth);
-			
-			double flowOut = leftFlux[currentCell] + bottomFlux[currentCell] + topFlux[currentCell] + rightFlux[currentCell];
+			// there is flow from left
+			if (x > 0) {
+				// height diff between current cell and left cell
+				heightDiff = h1 - _grid->getHeight(x - 1, y)
+				leftFlux[currentCell] = std::max(0.0, leftFlux[currentCell] + (fluxFactor * heightDiff) );
+				outFlow += leftFlux[currentCell];
+			} else {
+				leftFlux[currentCell] = 0.0;
+			}
 
-			// smooth the flow out
-			const double K = std::min(1.0, (d1 * _width * _height) / flowOut * dt);
+			// there is flow from right
+			if (x < _width - 1) {
+				heighDiff = h1 - _grid->getHeight(x + 1, y);
+				rightFlux[currentCell] = std::max(0.0, rightFlux[currentCell] + (fluxFactor * heightDiff) );
+				outFlow += rightFlux[currentCell];
+			} else {
+				rightFlux[currentCell] = 0.0;
+			}
+
+			// there is flow from above
+			if (y > 0) {
+				heighDiff = h1 - _grid->getHeight(x, y - 1);
+				topFlux[currentCell] = std::max(0.0, topFlux[currentCell] + (fluxFactor * heightDiff) );
+				outFlow += topFlux[currentCell];
+			} else {
+				topFlux[currentCell] = 0.0;
+			}
+
+			// there is flow from bottom
+			if (y < _height - 1) {
+				heighDiff = h1 - _grid->getHeight(x, y + 1);
+				bottomFlux[currentCell] = std::max(0.0, bottomFlux[currentCell] + (fluxFactor * heightDiff) );
+				outFlow += bottomFlux[currentCell];
+			} else {
+				bottomFlux[currentCell] = 0.0;
+			}
+
+			// compute scaling factor
+			double z = (water[currentCell]*lx*ly) / (outFlow * dt);
+			double K = std::min(1.0, z);
+
+			// scale the flows
 			leftFlux[currentCell] *= K;
 			bottomFlux[currentCell] *= K;
 			topFlux[currentCell] *= K;
 			rightFlux[currentCell] *= K;
-			
-			
+
 			// compute flow in
-			double flowIn = leftFlux[left] + bottomFlux[bottom] + topFlux[top] + rightFlux[right];
-			
+			double inFlow = leftFlux[left] + bottomFlux[bottom] + topFlux[top] + rightFlux[right];
+
 			// compute net volume change for water
-			const double DV = dt * (flowIn - flowOut);
+			const double DV = dt * (inFlow - outFlow);
 			water[currentCell] = d1 + ( DV / (_width * _height) );
 
 			// compute average flux velocity in the X and Y direction
@@ -134,7 +158,7 @@ const double Simulation::getWaterAt(int x, int y)
 }
 
 // http://stackoverflow.com/a/26843664
-// 
+//
 QByteArray Simulation::getWaterField()
 {
 	QByteArray data;
