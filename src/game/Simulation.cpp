@@ -53,7 +53,8 @@ void Simulation::updateWaterSurface(double dt)
 	// flux factor
 	double fluxFactor = g * A / l;
 	// cell size
-	double lx = ly = 1.0;
+	double lx, ly;
+	lx = ly = 1.0;
 
 	for (int x = 0; x < _width; ++x) {
 		for (int y = 0; y < _height; ++y) {
@@ -68,39 +69,52 @@ void Simulation::updateWaterSurface(double dt)
 			const double h1 = _grid->getHeight(x,y);
 			double heightDiff = 0.0;
 
+			// flow difference between left and right flux
+			double dflowRightLeft = 0.0;
+			// flow difference between top and bottom flux
+			double dflowTopBottom = 0.0;
+
 			// there is flow from left
 			if (x > 0) {
 				// height diff between current cell and left cell
-				heightDiff = h1 - _grid->getHeight(x - 1, y)
+				heightDiff = h1 - _grid->getHeight(x - 1, y);
 				leftFlux[currentCell] = std::max(0.0, leftFlux[currentCell] + (fluxFactor * heightDiff) );
 				outFlow += leftFlux[currentCell];
+				inFlow += rightFlux[y * _width + x - 1];
+				dflowRightLeft = rightFlux[y * _width + x - 1];
 			} else {
 				leftFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from right
 			if (x < _width - 1) {
-				heighDiff = h1 - _grid->getHeight(x + 1, y);
+				heightDiff = h1 - _grid->getHeight(x + 1, y);
 				rightFlux[currentCell] = std::max(0.0, rightFlux[currentCell] + (fluxFactor * heightDiff) );
 				outFlow += rightFlux[currentCell];
+				inFlow += leftFlux[y * _width + x + 1];
+				dflowRightLeft = - leftFlux[y * _width + x + 1];
 			} else {
 				rightFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from above
 			if (y > 0) {
-				heighDiff = h1 - _grid->getHeight(x, y - 1);
+				heightDiff = h1 - _grid->getHeight(x, y - 1);
 				topFlux[currentCell] = std::max(0.0, topFlux[currentCell] + (fluxFactor * heightDiff) );
 				outFlow += topFlux[currentCell];
+				inFlow += bottomFlux[(y+1) * _width + x];
+				dflowTopBottom = bottomFlux[(y+1) * _width + x];
 			} else {
 				topFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from bottom
 			if (y < _height - 1) {
-				heighDiff = h1 - _grid->getHeight(x, y + 1);
+				heightDiff = h1 - _grid->getHeight(x, y + 1);
 				bottomFlux[currentCell] = std::max(0.0, bottomFlux[currentCell] + (fluxFactor * heightDiff) );
 				outFlow += bottomFlux[currentCell];
+				inFlow += topFlux[(y-1) * _width + x];
+				dflowTopBottom = topFlux[(y-1) * _width + x];
 			} else {
 				bottomFlux[currentCell] = 0.0;
 			}
@@ -115,27 +129,24 @@ void Simulation::updateWaterSurface(double dt)
 			topFlux[currentCell] *= K;
 			rightFlux[currentCell] *= K;
 
-			// compute flow in
-			double inFlow = leftFlux[left] + bottomFlux[bottom] + topFlux[top] + rightFlux[right];
+			// update water velocity field with net volume change for water
+			double dv = dt * (inFlow - outFlow);
+			double d2 = dv / (lx * ly);
+			water[currentCell] = d1 + d2;
 
-			// compute net volume change for water
-			const double DV = dt * (inFlow - outFlow);
-			water[currentCell] = d1 + ( DV / (_width * _height) );
-
-			// compute average flux velocity in the X and Y direction
-			double avgWaterX = rightFlux[left] - leftFlux[currentCell] + rightFlux[currentCell] - leftFlux[right];
-			avgWaterX *= 0.5;
-			double avgWaterY = rightFlux[top] - leftFlux[currentCell] + rightFlux[currentCell] - leftFlux[bottom];
-			avgWaterY *= 0.5;
+			// calculate average amount of water that passes through cell
+			double dwx = dflowRightLeft - leftFlux[currentCell] + rightFlux[currentCell];
+			double dwy = dflowTopBottom - topFlux[currentCell] + bottomFlux[currentCell];
+			double avgWaterX = 0.5 * dwx;
+			double avgWaterY = 0.5 * dwy;
 
 			double avgWater = avgWaterX + avgWaterY;
-
 			// update velocity fields
 			if (avgWater == 0.0) {
-                _u.at(currentCell) = _v.at(currentCell) = 0.0;
+                _u[currentCell] = _v.at(currentCell) = 0.0;
             } else {
-            	_u.at(currentCell) = avgWaterX;
-            	_v.at(currentCell) = avgWaterY;
+            	_u[currentCell] = avgWaterX;
+            	_v[currentCell] = avgWaterY;
             }
 		}
 	}

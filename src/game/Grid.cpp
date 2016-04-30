@@ -26,7 +26,7 @@ int& Grid::size()
 	return _size;
 }
 
-double Grid::getHeight(int x, int y)
+double Grid::getHeight(int x, int y) const
 {
 	assert(x < _size);
 	assert(y < _size);
@@ -35,22 +35,22 @@ double Grid::getHeight(int x, int y)
 	const int sh = 3;
 	const int npoints = sw*sh;
 	double perc = 1e-2;
-	
+
 	std::vector<double> samples;
 	samples.push_back(10.0);
 	samples.push_back(40.0);
 	samples.push_back(90.0);
-	
+
 	double avg = 0;
 	double h, a, b;
 	for (int i = 0; i < npoints; ++i) {
-		
+
 		a = samples.at(i/sw);
 		b = samples.at(i%sh);
-		
+
 		Point2d p( a * xStep * perc * (x + 1.0), b * yStep * perc * (y + 1.0) );
 		h = mapping->getHeightFromParam(p);
-		
+
 		avg += h;
 	}
 

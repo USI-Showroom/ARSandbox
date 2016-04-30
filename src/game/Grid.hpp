@@ -18,7 +18,7 @@ public:
 
 	int& size();
 	void draw(QPainter &painter);
-	double getHeight(int x, int y);
+	double getHeight(int x, int y) const;
 
 private:
 	int _size;
