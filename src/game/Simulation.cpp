@@ -25,9 +25,6 @@ void Simulation::update(double dt)
 {
 	incrementWater(dt);
 	updateWaterSurface(dt);
-	// updateVelocityField(dt);
-	// simulateErosion(dt);
-	// transportSediment(dt);
 }
 
 void Simulation::incrementWater(double dt)
@@ -149,18 +146,23 @@ void Simulation::updateWaterSurface(double dt)
             	_v[currentCell] = avgWaterY;
             }
 		}
+	} // end for loop
+#ifdef DEBUG
+	std::cout << std::endl;
+	// print out the grid values
+	for (int x = 0; x < _width; ++x) {
+		for (int y = 0; y < _height; ++y) {
+			std::cout << water[y * _width + x] << ",  ";
+		}
+		std::cout << std::endl;
 	}
+	std::cout << std::endl;
+#endif
 }
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
-	_temporaryWaterAmount = amount;
-	const int x = round(center.x());
-	const int y = round(center.y());
-	for(int i = -radius; i < radius; ++i) {
-		unsigned int index = y * _height + x * i;
-		water[index] = amount;
-	}
+	water[4] = 0.20;
 }
 
 const double Simulation::getWaterAt(int x, int y)

@@ -28,7 +28,7 @@ static int nDrops=720;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(imgWidth, imgHeight, _mapping)),
+  _simulation(new Simulation(3, 3, _mapping)),
   _grid(new Grid(3, &_mapping))
 {
     _playing=false;
@@ -74,7 +74,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
         _gameTimer->start(100);
 	}
     else
-    {   
+    {
         _drops.clear();
         _gameTimer->stop();
         //_image.fill(QColor(0, 0, 0, 0));
@@ -114,7 +114,7 @@ void GameManager::initialize()
 }
 
 void GameManager::updateGame()
-{	
+{
     QPainter painter;
     painter.begin(&_image);
 
@@ -125,7 +125,7 @@ void GameManager::updateGame()
     //     if(d.alive())
     //     {
     //         d.update(_mapping);
-            
+
     //         Point2d p=_mapping.fromParameterization(d.position());
     //         p.y() = imgHeight - p.y();
 
@@ -137,10 +137,10 @@ void GameManager::updateGame()
     //         p*=scaling;
 
     //         painter.setRenderHint(QPainter::Antialiasing, true);
-            
+
     //         QPen pen(Qt::blue, 2);
     //         painter.setPen(pen);
-            
+
     //         QBrush brush(Qt::blue);
     //         painter.setBrush(brush);
 
@@ -148,7 +148,7 @@ void GameManager::updateGame()
     //     }
     // }
 
-    _grid->draw(painter);
+    _simulation->update(0.001);
 
     painter.end();
     updateTexture();
