@@ -11,6 +11,7 @@ static const int scaling=7;
 Grid::Grid(int newSize, const UnitSquareMapping *newMapping)
 	:	_size(newSize),
 		xStep(1.0 / _size), yStep(1.0 / _size),
+		imgHeight(424),
 		mapping(newMapping)
 {
 
@@ -66,16 +67,26 @@ void Grid::draw(QPainter &painter)
 			Point2d p1(i*xStep, j*yStep);
 			Point2d p2(xStep, yStep);
 
-            assert(p1.y() >= 0);
-            assert(p1.y() < 424);
+			for (int nx = 0; nx < 10; ++nx) {
+				for (int ny = 0; ny < 10; ++ny) {
+					Point2d p_ = p1 + Point2d(nx/9.0 * xStep, ny / 9.0 * yStep);
+					Point2d p = mapping->fromParameterization(p_);
+					p.y() = imgHeight - p.y();
 
-            p1*=scaling;
-            p2*=scaling;
+					if (p.y() == imgHeight)
+						--p.y();
+					assert(p.y() >= 0);
+					assert(p.y() < imgHeight);
+					p*=scaling;
+					QPen pen(Qt::blue, 2);
+					painter.setPen(pen);
 
-// #ifdef DEBUG
-//          painter.drawRect(p1.x(), p1.y(), p2.x(), p2.y());
-// 			std::cout << "Rect @(" << i << ", " << j << ") " << std::endl;
-// #endif
+					QBrush brush(Qt::blue);
+					painter.setBrush(brush);
+
+					painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
+				}
+			}
 		}
 	}
 }

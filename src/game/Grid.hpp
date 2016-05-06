@@ -26,6 +26,8 @@ private:
 	const double xStep;
 	const double yStep;
 
+	const int imgHeight;
+
 	const UnitSquareMapping *mapping;
 };
 
