@@ -24,6 +24,8 @@ public:
 	
 	const double getWaterAt(int x, int y);
 
+	void draw(QPainter &, const UnitSquareMapping &);
+
 	QByteArray getWaterField();
 
 private:

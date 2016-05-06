@@ -150,6 +150,7 @@ void GameManager::updateGame()
 
     _simulation->update(0.001);
     _grid->draw(painter);
+    _simulation->draw(painter, _mapping);
 
     painter.end();
     updateTexture();
