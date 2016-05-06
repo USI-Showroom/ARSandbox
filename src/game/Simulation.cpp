@@ -58,6 +58,7 @@ void Simulation::updateWaterSurface(double dt)
 
 			double inFlow = 0.0;
 			double outFlow = 0.0;
+			double l = 0.0;
 			int currentCell = y * _width  + x;
 
 			// current water height
@@ -74,8 +75,9 @@ void Simulation::updateWaterSurface(double dt)
 			// there is flow from left
 			if (x > 0) {
 				// height diff between current cell and left cell
-				heightDiff = h1 - _grid->getHeight(x - 1, y);
-				leftFlux[currentCell] = std::max(0.0, leftFlux[currentCell] + (fluxFactor * heightDiff) );
+				heightDiff = (h1+d1) - (_grid->getHeight(x - 1, y) + water.at(y * _width + x - 1));
+				l = leftFlux[currentCell] + (fluxFactor * heightDiff);
+				leftFlux[currentCell] = std::max(0.0, l);
 				outFlow += leftFlux[currentCell];
 				inFlow += rightFlux[y * _width + x - 1];
 				dflowRightLeft = rightFlux[y * _width + x - 1];
@@ -85,47 +87,55 @@ void Simulation::updateWaterSurface(double dt)
 
 			// there is flow from right
 			if (x < _width - 1) {
-				heightDiff = h1 - _grid->getHeight(x + 1, y);
-				rightFlux[currentCell] = std::max(0.0, rightFlux[currentCell] + (fluxFactor * heightDiff) );
+				heightDiff = (h1+d1) - (_grid->getHeight(x + 1, y) + water.at(y * _width + x + 1));
+				l = rightFlux[currentCell] + (fluxFactor * heightDiff);
+				rightFlux[currentCell] = std::max(0.0, l);
 				outFlow += rightFlux[currentCell];
 				inFlow += leftFlux[y * _width + x + 1];
-				dflowRightLeft = - leftFlux[y * _width + x + 1];
+				dflowRightLeft -= leftFlux[y * _width + x + 1];
 			} else {
 				rightFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from above
 			if (y > 0) {
-				heightDiff = h1 - _grid->getHeight(x, y - 1);
-				topFlux[currentCell] = std::max(0.0, topFlux[currentCell] + (fluxFactor * heightDiff) );
+				heightDiff = (h1+d1) - (_grid->getHeight(x, y - 1) + water.at((y - 1) * _width + x));
+				l = topFlux[currentCell] + (fluxFactor * heightDiff);
+				topFlux[currentCell] = std::max(0.0, l);
 				outFlow += topFlux[currentCell];
-				inFlow += bottomFlux[(y+1) * _width + x];
-				dflowTopBottom = bottomFlux[(y+1) * _width + x];
+				inFlow += bottomFlux[(y-1) * _width + x];
+				dflowTopBottom = bottomFlux[(y-1) * _width + x];
 			} else {
 				topFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from bottom
 			if (y < _height - 1) {
-				heightDiff = h1 - _grid->getHeight(x, y + 1);
-				bottomFlux[currentCell] = std::max(0.0, bottomFlux[currentCell] + (fluxFactor * heightDiff) );
+				heightDiff = (h1+d1) - (_grid->getHeight(x, y + 1) + water.at((y + 1) * _width + x));
+				l = bottomFlux[currentCell] + (fluxFactor * heightDiff);
+				bottomFlux[currentCell] = std::max(0.0, l);
 				outFlow += bottomFlux[currentCell];
-				inFlow += topFlux[(y-1) * _width + x];
-				dflowTopBottom = topFlux[(y-1) * _width + x];
+				inFlow += topFlux[(y + 1) * _width + x];
+				dflowTopBottom += topFlux[(y + 1) * _width + x];
 			} else {
 				bottomFlux[currentCell] = 0.0;
 			}
 
-			// compute scaling factor
-			double z = (water[currentCell]*lx*ly) / (outFlow * dt);
-			double K = std::min(1.0, z);
+			// // compute scaling factor
+			// double z = (water[currentCell]*lx*ly) / (outFlow * dt);
+			// double K = std::min(1.0, z);
 
-			// scale the flows
-			leftFlux[currentCell] *= K;
-			bottomFlux[currentCell] *= K;
-			topFlux[currentCell] *= K;
-			rightFlux[currentCell] *= K;
+			// // scale the flows
+			// leftFlux[currentCell] *= K;
+			// bottomFlux[currentCell] *= K;
+			// topFlux[currentCell] *= K;
+			// rightFlux[currentCell] *= K;
 
+#ifdef DEBUG
+			std::cout << "currentCell: " << currentCell << "\n"
+			          << "inFlow: "      << inFlow << "\n"
+			          << "outFlow: "     << outFlow<< "\n";
+#endif
 			// update water velocity field with net volume change for water
 			double dv = dt * (inFlow - outFlow);
 			double d2 = dv / (lx * ly);
@@ -149,6 +159,7 @@ void Simulation::updateWaterSurface(double dt)
 	} // end for loop
 #ifdef DEBUG
 	std::cout << std::endl;
+	std::cout << "Water heights at cells:" << std::endl;
 	// print out the grid values
 	for (int x = 0; x < _width; ++x) {
 		for (int y = 0; y < _height; ++y) {

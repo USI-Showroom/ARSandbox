@@ -48,7 +48,7 @@ double Grid::getHeight(int x, int y) const
 		a = samples.at(i/sw);
 		b = samples.at(i%sh);
 
-		Point2d p( a * xStep * perc * (x + 1.0), b * yStep * perc * (y + 1.0) );
+		Point2d p( a * xStep * perc * (x + 1.0), b * yStep * perc * (y + 1.0));
 		h = mapping->getHeightFromParam(p);
 
 		avg += h;
