@@ -10,7 +10,6 @@
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
 #include "Drop.hpp"
-#include "Simulation.hpp"
 
 class QTimer;
 
@@ -51,8 +50,6 @@ private:
 
     QTimer *_gameTimer;
     QImage _image;
-
-    Simulation *_simulation;
 };
 #endif
 

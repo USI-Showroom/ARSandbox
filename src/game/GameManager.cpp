@@ -27,8 +27,7 @@ static const int scaling=7;
 static int nDrops=720;
 
 GameManager::GameManager()
-: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(imgWidth, imgHeight, _mapping))
+: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32)
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
@@ -41,8 +40,6 @@ GameManager::~GameManager()
 
     for(size_t i=0;i<_drops.size();++i)
         delete _drops[i];
-
-    delete _simulation;
 }
 
 void GameManager::updateTexture()
