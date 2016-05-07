@@ -37,8 +37,6 @@ private:
 	vector<double> leftFlux, rightFlux, topFlux, bottomFlux;
 	vector<double> _u, _v;
 
-	double _temporaryWaterAmount;
-
 	const UnitSquareMapping _mapping;
 	const Grid *_grid;
 };

@@ -24,12 +24,10 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nDrops=720;
-
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(3, 3, _mapping)),
-  _grid(new Grid(3, &_mapping))
+  _simulation(new Simulation(10, 10, _mapping)),
+  _grid(new Grid(10, &_mapping))
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
@@ -148,8 +146,7 @@ void GameManager::updateGame()
     //     }
     // }
 
-    _simulation->update(0.001);
-    _grid->draw(painter);
+    _simulation->update(0.0001);
     _simulation->draw(painter, _mapping);
 
     painter.end();

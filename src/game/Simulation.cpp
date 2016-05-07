@@ -2,12 +2,6 @@
 #include <iostream>
 #include "Simulation.hpp"
 
-#ifdef NO_KINECT
-static const int scaling=3;
-#else
-static const int scaling=7;
-#endif
-
 Simulation::Simulation(int newWidth, int newHeight, const UnitSquareMapping& mapping)
 	:	_width(newWidth),
 		_height(newHeight),
@@ -48,9 +42,9 @@ void Simulation::updateWaterSurface(double dt)
 	}
 
 	// cross sectional area of the pipe
-	const double A = 0.0025;
+	const double A = 0.25;
 	// length of virtual pipe
-	const double l = 0.15;
+	const double l = 0.75;
 	// gravity
 	const double g = 9.81;
 	// flux factor
@@ -179,7 +173,7 @@ void Simulation::updateWaterSurface(double dt)
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
-	water[4] = 0.20;
+	water[4] = 20.0;
 }
 
 const double Simulation::getWaterAt(int x, int y)
@@ -207,14 +201,8 @@ void Simulation::setGrid(const Grid *newGrid)
 void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
     for ( int x = 0; x < _width; ++x ) {
         for ( int y = 0; y < _height; ++y ) {
-            QPen pen( Qt::blue, 2 );
-            painter.setPen( pen );
-
-            QBrush brush( Qt::blue );
-            painter.setBrush( brush );
-
             const double cellOpacity = water[y * _width + x];
-            _grid->drawCell( painter, x, y, cellOpacity * 10.0 );
+            _grid->drawCell( painter, x, y, cellOpacity );
         }
     }
 }

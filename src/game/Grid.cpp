@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cassert>
 
+#include "util.hpp"
+
 #ifdef NO_KINECT
 static const int scaling=3;
 #else
@@ -92,16 +94,39 @@ void Grid::draw(QPainter &painter)
     }
 }
 
-void Grid::drawCell( QPainter& painter, const int x, const int y,
-                     const double opacity ) const {
-    Point2d p_( x * xStep, y * yStep );
-    Point2d p = mapping->fromParameterization( p_ );
-    p.y() = imgHeight - p.y();
+void Grid::drawCell( QPainter& painter, const int x, const int y, const double opacity ) const {
 
-    if ( p.y() == imgHeight ) --p.y();
-    assert( p.y() >= 0 );
-    assert( p.y() < imgHeight );
-    p *= scaling;
+    Point2d p1( x * xStep, y * yStep );
 
-    painter.drawEllipse( QPointF( p.x(), p.y() ), 10, 10 );
+    double rescaleOpacity = ( opacity + 0.0 ) / 20.0;
+
+    int r = std::min( 255.0, 255 * rescaleOpacity );
+    int b = r;
+    int g = r;
+    if ( rescaleOpacity < 0.0 || rescaleOpacity > 1.0 ) {
+        r = 0.0;
+    } else if ( rescaleOpacity > 1.0 ) {
+        g = 0.0;
+    }
+
+    QColor color( r, g, b );
+
+#ifdef DEBUG
+    std::cout << "cell color: " << r << ", " << g << ", " << b << std::endl;
+#endif
+
+    for ( int nx = 1; nx < 50; ++nx ) {
+        for ( int ny = 1; ny < 50; ++ny ) {
+            Point2d p_ = p1 + Point2d( nx / 50.0 * xStep, ny / 50.0 * yStep );
+            Point2d p = util::scale( p_, imgHeight, scaling, *mapping );
+
+            QPen pen( color, 1 );
+            painter.setPen( pen );
+
+            QBrush brush( color );
+            painter.setBrush( brush );
+
+            painter.drawEllipse( QPointF( p.x(), p.y() ), 1, 1 );
+        }
+    }
 }
