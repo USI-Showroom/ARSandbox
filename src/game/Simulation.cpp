@@ -155,6 +155,29 @@ void Simulation::updateWaterSurface(double dt)
             	_u[currentCell] = avgWaterX;
             	_v[currentCell] = avgWaterY;
             }
+
+            // simulate erosion
+            const double Kc = 25.0;     // sediment capacity constant
+    		const double Ks = 0.001*12; // dissolving constant
+    		const double Kd = 0.001*12; // deposition constant
+
+    		// local velocity
+            double uV = _u[currentCell];
+            double vV = _v[currentCell];
+
+            double angle = _mapping.fromParameterization(Point2d(x,y)).norm();
+            double C = Kc * angle * (uV + vV);
+
+            double st = sediment[currentCell];
+            if (C > st) {
+            	sediment[currentCell] += Ks*(C - st);
+            } else {
+            	sediment[currentCell] += Kd*(st - C);
+            }
+
+            // simulate evaporation
+            const double Ke = 0.0004;
+            water[currentCell] *= (1 - Ke * dt);
 		}
 	} // end for loop
 #ifdef DEBUG
