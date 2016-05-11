@@ -115,9 +115,10 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, const double o
     std::cout << "cell color: " << r << ", " << g << ", " << b << std::endl;
 #endif
 
-    for ( int nx = 1; nx < 50; ++nx ) {
-        for ( int ny = 1; ny < 50; ++ny ) {
-            Point2d p_ = p1 + Point2d( nx / 50.0 * xStep, ny / 50.0 * yStep );
+    int nItems = 20;
+    for ( int nx = 1; nx < nItems; ++nx ) {
+        for ( int ny = 1; ny < nItems; ++ny ) {
+            Point2d p_ = p1 + Point2d( nx / static_cast<double>(nItems) * xStep, ny / static_cast<double>(nItems) * yStep );
             Point2d p = util::scale( p_, imgHeight, scaling, *mapping );
 
             QPen pen( color, 1 );
