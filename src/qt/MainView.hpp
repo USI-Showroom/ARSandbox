@@ -51,7 +51,7 @@ signals:
 public slots:
 	void newKinectData(const UINT16 *data, int w, int h);
 	void newGameImage(const QImage &img);
-	//void rangeChanged(int min, int max, int a, int b);
+	void rangeChanged(const float h);
 
 private:
 	void checkGLError(const std::string &msg);
@@ -88,6 +88,7 @@ private:
 	bool _showSand;
 
 	float _minH, _maxH;
+	float _dispHeigh;
 	int _currentCorner;
 	int _currentGame;
 

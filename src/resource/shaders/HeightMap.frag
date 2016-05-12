@@ -21,6 +21,8 @@ uniform sampler2D height3;
 uniform float minH;
 uniform float maxH;
 
+uniform float displacementHeight;
+
 uniform sampler2D level0;
 uniform sampler2D level1;
 uniform sampler2D level2;
@@ -105,7 +107,10 @@ void main()
     heightV=(heightV-minH)/(maxH-minH);
 
     // calcolo della nuove altezza usando d
-    float opacity = gameTxt.a;
+    // r = terrain height
+    // g = sediment height
+    // b = water height
+    float newHeight = heightV + gameTxt.r + gameTxt.g + gameTxt.b;
 
     heightV=min(1.0,heightV);
     heightV=max(0.0,heightV);
@@ -131,10 +136,13 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    vec4 terrainColor = vec4(gameTxt.rg, 0.0, 1.0);
-    vec4 waterColor = vec4(0.0, 0.0, gameTxt.b, 1.0);
+    vec4 terrainColor = vec4(gameTxt.r, 0.0, 0.0, 0.25);
+    vec4 sedimentColor = vec4(0.0, gameTxt.g, 0.0, 0.25);
+    vec4 waterColor = vec4(0.0, 0.0, gameTxt.b, 0.25);
 
-    gl_FragColor = opacity * (terrainColor + waterColor) + (1.0-gameTxt.a) * bgCol;
+    vec4 gameTxtColor = gameTxt.a * (terrainColor + sedimentColor + waterColor) + (1.0-gameTxt.a);
+    
+    gl_FragColor = gameTxtColor * bgCol;
 
     // isolines
     // float isoH = 0.0025;

@@ -35,6 +35,8 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
 
     _saveNextMesh=false;
 
+    _dispHeigh = 0.0f;
+
     _currentCorner=4;
 
     _initialized=false;
@@ -66,6 +68,7 @@ void MainView::setUniforms()
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
 
+    GLuint dHeig = _shader.uniformLocation("displacementHeight");
 
     GLuint heightT[nSmoothing];
     for(int i=0; i<nSmoothing; ++i) {
@@ -95,6 +98,8 @@ void MainView::setUniforms()
 
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
+
+    _shader.setUniformValue(dHeig, _dispHeigh);
 
     checkGLError("setUniforms");
 
@@ -756,4 +761,9 @@ void MainView::loadState()
 
     file.close();
 
+}
+
+void MainView::rangeChanged(const float h)
+{
+    _dispHeigh = h;
 }

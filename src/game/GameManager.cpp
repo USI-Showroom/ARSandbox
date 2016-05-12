@@ -149,7 +149,7 @@ void GameManager::updateGame()
     // }
 
     _simulation->update(0.01);
-    // emit rangeChanged(_simulation->min/max bla);
+    emit rangeChanged(4.0f);
     _simulation->draw(painter, _mapping);
 
     painter.end();

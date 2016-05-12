@@ -23,6 +23,8 @@ public:
 	void setGrid(const Grid *);
 	
 	const double getWaterAt(int x, int y);
+	const double getTerrainAt(int x, int y);
+	const double getSedimentAt(int x, int y);
 
 	void draw(QPainter &, const UnitSquareMapping &);
 

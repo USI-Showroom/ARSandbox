@@ -33,13 +33,6 @@ inline void clamp(Point3d& p, const double minValue, const double maxValue)
     if (p.z() > maxValue) p.z() = maxValue;
 }
 
-template <typename T>
-inline void clamp(T& val, const T& a, const T& b)
-{
-    if (val < a) val = a;
-    if (val > b) val = b;
-}
-
 inline void clamp(double& value, const double minValue, const double maxValue)
 {
     if (value < minValue) value = minValue;

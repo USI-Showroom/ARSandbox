@@ -207,6 +207,16 @@ const double Simulation::getWaterAt(int x, int y)
 	return water.at(y * _height + x);
 }
 
+const double Simulation::getTerrainAt(int x, int y)
+{
+	return terrain.at(y * _height + x);
+}
+
+const double Simulation::getSedimentAt(int x, int y)
+{
+	return sediment.at(y * _height + x);
+}
+
 // http://stackoverflow.com/a/26843664
 //
 QByteArray Simulation::getWaterField()
