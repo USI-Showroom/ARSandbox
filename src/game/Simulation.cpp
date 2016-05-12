@@ -42,9 +42,9 @@ void Simulation::updateWaterSurface(double dt)
 	}
 
 	// cross sectional area of the pipe
-	const double A = 0.25;
+	const double A = 0.95;
 	// length of virtual pipe
-	const double l = 0.75;
+	const double l = 0.45;
 	// gravity
 	const double g = 9.81;
 	// flux factor
@@ -165,7 +165,7 @@ void Simulation::updateWaterSurface(double dt)
             double uV = _u[currentCell];
             double vV = _v[currentCell];
 
-            double angle = _mapping.fromParameterization(Point2d(x,y)).norm();
+            double angle = 0.5;
             double C = Kc * angle * (uV + vV);
 
             double st = sediment[currentCell];
@@ -196,7 +196,7 @@ void Simulation::updateWaterSurface(double dt)
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
-	water[4] = 20.0;
+	water[4] = 5.0;
 }
 
 const double Simulation::getWaterAt(int x, int y)

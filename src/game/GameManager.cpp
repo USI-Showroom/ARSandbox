@@ -26,8 +26,8 @@ static const int scaling=7;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(10, 10, _mapping)),
-  _grid(new Grid(10, &_mapping))
+  _simulation(new Simulation(40, 40, _mapping)),
+  _grid(new Grid(40, &_mapping))
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
@@ -75,7 +75,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
     {
         _drops.clear();
         _gameTimer->stop();
-        //_image.fill(QColor(0, 0, 0, 0));
+        _image.fill(QColor(0, 0, 0, 0));
     }
 }
 
@@ -113,6 +113,8 @@ void GameManager::initialize()
 
 void GameManager::updateGame()
 {
+    _image.fill(QColor(0, 0, 0, 0));
+
     QPainter painter;
     painter.begin(&_image);
 
@@ -146,7 +148,8 @@ void GameManager::updateGame()
     //     }
     // }
 
-    _simulation->update(0.0001);
+    _simulation->update(0.01);
+    // emit rangeChanged(_simulation->min/max bla);
     _simulation->draw(painter, _mapping);
 
     painter.end();

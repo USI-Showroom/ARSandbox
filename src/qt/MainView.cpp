@@ -57,7 +57,8 @@ MainView::~MainView()
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 }
-
+// n field (pari)
+// 
 void MainView::setUniforms()
 {
     GLuint gameT = _shader.uniformLocation("gameTexture");
@@ -96,6 +97,8 @@ void MainView::setUniforms()
     _shader.setUniformValue(maxHT,_maxH);
 
     checkGLError("setUniforms");
+
+    //_shader.setUniformValue(<nome field>)
 }
 
 void MainView::initializeGL() {

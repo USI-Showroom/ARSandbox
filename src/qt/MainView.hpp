@@ -51,6 +51,7 @@ signals:
 public slots:
 	void newKinectData(const UINT16 *data, int w, int h);
 	void newGameImage(const QImage &img);
+	//void rangeChanged(int min, int max, int a, int b);
 
 private:
 	void checkGLError(const std::string &msg);

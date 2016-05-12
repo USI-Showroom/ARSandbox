@@ -98,28 +98,35 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, const double o
 
     Point2d p1( x * xStep, y * yStep );
 
-    double rescaleOpacity = ( opacity + 0.0 ) / 20.0;
+    double rescaleOpacity = ( opacity + 0.0 ) / 10.0;
 
-    int r = std::min( 255.0, 255 * rescaleOpacity );
-    int b = r;
-    int g = r;
-    if ( rescaleOpacity < 0.0 || rescaleOpacity > 1.0 ) {
-        r = 0.0;
-    } else if ( rescaleOpacity > 1.0 ) {
-        g = 0.0;
-    }
+    int r = 0.0;
+    int g = 0.0;
+    int b = std::min( 255.0, 255 * rescaleOpacity );
 
-    QColor color( r, g, b );
+    // clamping to avoid RGB QColor error for out of range values
+    util::clamp(b, 0, 255);
+
+    // Canali: 1 per d e 1 per s
+    // Shader: usando d modifico h nello shader
+#ifdef DEBUG
+    std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
+#endif
+    
+    QColor color( r, g, b , 255 );
 
 #ifdef DEBUG
     std::cout << "cell color: " << r << ", " << g << ", " << b << std::endl;
 #endif
 
     int nItems = 20;
+    double nPoints = static_cast<double>(nItems);
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {
-            Point2d p_ = p1 + Point2d( nx / static_cast<double>(nItems) * xStep, ny / static_cast<double>(nItems) * yStep );
+            Point2d p_ = p1 + Point2d( nx / nPoints * xStep, ny / nPoints * yStep );
             Point2d p = util::scale( p_, imgHeight, scaling, *mapping );
+
+            // painter.setRenderHint(QPainter::Antialiasing, true);
 
             QPen pen( color, 1 );
             painter.setPen( pen );
@@ -127,7 +134,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, const double o
             QBrush brush( color );
             painter.setBrush( brush );
 
-            painter.drawEllipse( QPointF( p.x(), p.y() ), 1, 1 );
+            painter.drawRect( p.x()-3, p.y()-3, 6, 6);
         }
     }
 }

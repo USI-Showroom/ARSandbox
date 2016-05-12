@@ -103,6 +103,10 @@ void main()
 #endif
 
     heightV=(heightV-minH)/(maxH-minH);
+
+    // calcolo della nuove altezza usando d
+    float opacity = gameTxt.a;
+
     heightV=min(1.0,heightV);
     heightV=max(0.0,heightV);
 
@@ -127,7 +131,10 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    gl_FragColor = gameTxt.a*vec4(gameTxt.rgb, 1.0)+(1.0-gameTxt.a)*bgCol;
+    vec4 terrainColor = gameTxt.rgba;
+    vec4 waterColor = vec4(0.0, 0.0, gameTxt.b, 1.0);
+
+    gl_FragColor = opacity * (terrainColor + waterColor) + (1.0-gameTxt.a) * bgCol;
 
     // isolines
     // float isoH = 0.0025;
