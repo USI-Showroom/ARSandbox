@@ -94,30 +94,16 @@ void Grid::draw(QPainter &painter)
     }
 }
 
-void Grid::drawCell( QPainter& painter, const int x, const int y, const double opacity ) const {
+void Grid::drawCell( QPainter& painter, const int x, const int y, double t, double w, double s ) const {
 
     Point2d p1( x * xStep, y * yStep );
 
-    double rescaleOpacity = ( opacity + 0.0 ) / 10.0;
+    int r = static_cast<int>(std::min(255.0, std::max(0.0, t*255.0)));
+    int g = static_cast<int>(std::min(255.0, std::max(0.0, w*255.0)));
+    int b = static_cast<int>(std::min(255.0, std::max(0.0, s*255.0)));
 
-    int r = 0.0;
-    int g = 0.0;
-    int b = std::min( 255.0, 255 * rescaleOpacity );
-
-    // clamping to avoid RGB QColor error for out of range values
-    util::clamp(b, 0, 255);
-
-    // Canali: 1 per d e 1 per s
-    // Shader: usando d modifico h nello shader
-#ifdef DEBUG
     std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
-#endif
-    
-    QColor color( r, g, b , 255 );
-
-#ifdef DEBUG
-    std::cout << "cell color: " << r << ", " << g << ", " << b << std::endl;
-#endif
+    QColor color(r,g,b,255);
 
     int nItems = 20;
     double nPoints = static_cast<double>(nItems);

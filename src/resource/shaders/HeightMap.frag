@@ -131,7 +131,7 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    vec4 terrainColor = gameTxt.rgba;
+    vec4 terrainColor = vec4(gameTxt.rg, 0.0, 1.0);
     vec4 waterColor = vec4(0.0, 0.0, gameTxt.b, 1.0);
 
     gl_FragColor = opacity * (terrainColor + waterColor) + (1.0-gameTxt.a) * bgCol;

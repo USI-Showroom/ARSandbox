@@ -157,9 +157,12 @@ void Simulation::updateWaterSurface(double dt)
             }
 
             // simulate erosion
-            const double Kc = 25.0;     // sediment capacity constant
-    		const double Ks = 0.001*12; // dissolving constant
-    		const double Kd = 0.001*12; // deposition constant
+            // sediment capacity constant
+            const double Kc = 25.0;
+            // dissolving constant
+    		const double Ks = 0.001;
+    		// deposition constant
+    		const double Kd = 0.001;
 
     		// local velocity
             double uV = _u[currentCell];
@@ -222,10 +225,19 @@ void Simulation::setGrid(const Grid *newGrid)
 }
 
 void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
+	int currentCell = 0;
+	double waterHeight, terrainHeight, sedimentHeight;
+	waterHeight = terrainHeight = sedimentHeight = 0.0;
+    
     for ( int x = 0; x < _width; ++x ) {
         for ( int y = 0; y < _height; ++y ) {
-            const double cellOpacity = water[y * _width + x];
-            _grid->drawCell( painter, x, y, cellOpacity );
+        	currentCell = y * _width + x;
+            
+            terrainHeight = terrain[currentCell];
+            waterHeight = water[currentCell];
+            sedimentHeight = sediment[currentCell];
+            
+            _grid->drawCell( painter, x, y, terrainHeight, waterHeight, sedimentHeight );
         }
     }
 }

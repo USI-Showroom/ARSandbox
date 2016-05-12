@@ -1,9 +1,11 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include <iostream>
 #include "Point2.hpp"
 #include "Point3.hpp"
 #include "UnitSquareMapping.hpp"
+#include <QColor>
 
 // Some utility functions
 // @author matteo.muscella@usi.ch

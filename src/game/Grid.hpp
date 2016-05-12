@@ -19,7 +19,7 @@ public:
 	int& size();
 	void draw(QPainter &painter);
 	double getHeight(int x, int y) const;
-	void drawCell( QPainter& painter, const int x, const int y, const double opacity ) const;
+	void drawCell( QPainter&, const int, const int, double, double, double ) const;
 
 private:
 	int _size;
