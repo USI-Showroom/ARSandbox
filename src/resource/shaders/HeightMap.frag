@@ -33,8 +33,11 @@ uniform sampler2D gameTexture;
 
 // vector of min and max values for
 // terrain (x), water(y) and sediment (z) heights
-uniform vec3 minVal;
-uniform vec3 maxVal;
+uniform float maxW;
+uniform float minW;
+uniform float maxS;
+uniform float minS;
+
 
 float weight(float heightV, int region)
 {

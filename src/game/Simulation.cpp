@@ -2,8 +2,6 @@
 #include <iostream>
 #include "Simulation.hpp"
 
-double Simulation::_minT = 0.0; 
-double Simulation::_maxT = 0.0; 
 double Simulation::_minW = 0.0; 
 double Simulation::_maxW = 0.0; 
 double Simulation::_minS = 0.0;
@@ -116,6 +114,7 @@ void Simulation::updateWaterSurface(double dt)
 				if (waterRight > _maxW) {
 					_maxW = waterRight;
 				}
+
 			} else {
 				rightFlux[currentCell] = 0.0;
 			}
@@ -217,6 +216,14 @@ void Simulation::updateWaterSurface(double dt)
             	sediment[currentCell] += Kd*(st - C);
             }
 
+            // update min and max sediment for current cell
+            if (sediment[currentCell] < _minS) {
+            	_minS = sediment[currentCell];
+            }
+            if (sediment[currentCell] > _maxS) {
+            	_maxS = sediment[currentCell];
+            }
+
             // simulate evaporation
             const double Ke = 0.0004;
             water[currentCell] *= (1 - Ke * dt);
@@ -248,8 +255,6 @@ void Simulation::updateWaterSurface(double dt)
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
 	water[4] = amount;
-	_minT = amount;
-	_maxT = amount;
 	_minW = amount;
 	_maxW = amount;
 	_minS = amount;

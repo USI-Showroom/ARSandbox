@@ -51,7 +51,7 @@ signals:
 public slots:
 	void newKinectData(const UINT16 *data, int w, int h);
 	void newGameImage(const QImage &img);
-	void rangeChanged(const float minW, const float maxW);
+	void rangeChanged(const float, const float, const float, const float);
 
 private:
 	void checkGLError(const std::string &msg);
@@ -103,4 +103,6 @@ private:
 	Point2d txt0, txt1, txt2, txt3;
 
 	QImage _zoom, _move, _corner0, _corner1, _corner2, _corner3;
+
+	float _minW, _maxW, _minS, _maxS;
 };

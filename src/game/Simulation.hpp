@@ -26,10 +26,8 @@ public:
 
 	void draw(QPainter &, const UnitSquareMapping &);
 
-	void updateValues(double& minValue, double& maxValue, double a, double b, double c, double d, double e);
-
 	// ranges for shader
-	static double _minT, _maxT, _minW, _maxW, _minS, _maxS;
+	static double _minW, _maxW, _minS, _maxS;
 
 private:
 	int _width, _height;

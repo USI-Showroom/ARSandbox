@@ -149,7 +149,8 @@ void GameManager::updateGame()
     // }
 
     _simulation->update(0.01);
-    emit rangeChanged(_simulation->_minW, _simulation->_maxW);
+    emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
+                      (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping);
 
     painter.end();

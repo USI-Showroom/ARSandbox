@@ -24,7 +24,8 @@ public:
 
 signals:
     void gameTextureChanged(const QImage &img);
-    void rangeChanged(const double minW, const double maxW);
+    void rangeChanged(const float, const float,
+                      const float, const float);
 
 private slots:
     void updateGame();
