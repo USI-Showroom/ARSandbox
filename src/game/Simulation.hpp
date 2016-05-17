@@ -2,8 +2,6 @@
 #define SIMULATION_HPP_INCLUDED
 
 #include <vector>
-#include <QByteArray>
-#include <QDataStream>
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
 #include "Grid.hpp"
@@ -28,7 +26,10 @@ public:
 
 	void draw(QPainter &, const UnitSquareMapping &);
 
-	QByteArray getWaterField();
+	void updateValues(double& minValue, double& maxValue, double a, double b, double c, double d, double e);
+
+	// ranges for shader
+	static double _minT, _maxT, _minW, _maxW, _minS, _maxS;
 
 private:
 	int _width, _height;

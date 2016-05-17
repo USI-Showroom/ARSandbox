@@ -68,7 +68,7 @@ void MainView::setUniforms()
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
 
-    GLuint dHeig = _shader.uniformLocation("displacementHeight");
+    GLuint maxW = _shader.uniformLocation("maxW");
 
     GLuint heightT[nSmoothing];
     for(int i=0; i<nSmoothing; ++i) {
@@ -99,7 +99,7 @@ void MainView::setUniforms()
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
 
-    _shader.setUniformValue(dHeig, _dispHeigh);
+    _shader.setUniformValue(maxW, _maxW);
 
     checkGLError("setUniforms");
 
@@ -763,7 +763,8 @@ void MainView::loadState()
 
 }
 
-void MainView::rangeChanged(const float h)
+void MainView::rangeChanged(const float minWater, const float maxWater)
 {
-    _dispHeigh = h;
+    _minW = minWater;
+    _maxW = maxWater;
 }

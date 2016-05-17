@@ -2,6 +2,13 @@
 #include <iostream>
 #include "Simulation.hpp"
 
+double Simulation::_minT = 0.0; 
+double Simulation::_maxT = 0.0; 
+double Simulation::_minW = 0.0; 
+double Simulation::_maxW = 0.0; 
+double Simulation::_minS = 0.0;
+double Simulation::_maxS = 0.0;
+
 Simulation::Simulation(int newWidth, int newHeight, const UnitSquareMapping& mapping)
 	:	_width(newWidth),
 		_height(newHeight),
@@ -75,48 +82,80 @@ void Simulation::updateWaterSurface(double dt)
 			// there is flow from left
 			if (x > 0) {
 				// height diff between current cell and left cell
-				heightDiff = (h1+d1) - (_grid->getHeight(x - 1, y) + water.at(y * _width + x - 1));
+				double waterLeft = water.at(y * _width + x - 1);
+				heightDiff = (h1+d1) - (_grid->getHeight(x - 1, y) + waterLeft);
 				l = leftFlux[currentCell] + (fluxFactor * heightDiff);
 				leftFlux[currentCell] = std::max(0.0, l);
 				outFlow += leftFlux[currentCell];
 				inFlow += rightFlux[y * _width + x - 1];
 				dflowRightLeft = rightFlux[y * _width + x - 1];
+
+				if (waterLeft < _minW) {
+					_minW = waterLeft;
+				}
+				if (waterLeft > _maxW) {
+					_maxW = waterLeft;
+				}
 			} else {
 				leftFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from right
 			if (x < _width - 1) {
-				heightDiff = (h1+d1) - (_grid->getHeight(x + 1, y) + water.at(y * _width + x + 1));
+				double waterRight = water.at(y * _width + x + 1);
+				heightDiff = (h1+d1) - (_grid->getHeight(x + 1, y) + waterRight);
 				l = rightFlux[currentCell] + (fluxFactor * heightDiff);
 				rightFlux[currentCell] = std::max(0.0, l);
 				outFlow += rightFlux[currentCell];
 				inFlow += leftFlux[y * _width + x + 1];
 				dflowRightLeft -= leftFlux[y * _width + x + 1];
+
+				if (waterRight < _minW) {
+					_minW = waterRight;
+				}
+				if (waterRight > _maxW) {
+					_maxW = waterRight;
+				}
 			} else {
 				rightFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from above
 			if (y > 0) {
-				heightDiff = (h1+d1) - (_grid->getHeight(x, y - 1) + water.at((y - 1) * _width + x));
+				double waterUp = water.at((y - 1) * _width + x);
+				heightDiff = (h1+d1) - (_grid->getHeight(x, y - 1) + waterUp);
 				l = topFlux[currentCell] + (fluxFactor * heightDiff);
 				topFlux[currentCell] = std::max(0.0, l);
 				outFlow += topFlux[currentCell];
 				inFlow += bottomFlux[(y-1) * _width + x];
 				dflowTopBottom = bottomFlux[(y-1) * _width + x];
+
+				if (waterUp < _minW) {
+					_minW = waterUp;
+				}
+				if (waterUp > _maxW) {
+					_maxW = waterUp;
+				}
 			} else {
 				topFlux[currentCell] = 0.0;
 			}
 
 			// there is flow from bottom
 			if (y < _height - 1) {
-				heightDiff = (h1+d1) - (_grid->getHeight(x, y + 1) + water.at((y + 1) * _width + x));
+				double waterBottom = water.at((y + 1) * _width + x);
+				heightDiff = (h1+d1) - (_grid->getHeight(x, y + 1) + waterBottom);
 				l = bottomFlux[currentCell] + (fluxFactor * heightDiff);
 				bottomFlux[currentCell] = std::max(0.0, l);
 				outFlow += bottomFlux[currentCell];
 				inFlow += topFlux[(y + 1) * _width + x];
 				dflowTopBottom += topFlux[(y + 1) * _width + x];
+
+				if (waterBottom < _minW) {
+					_minW = waterBottom;
+				}
+				if (waterBottom > _maxW) {
+					_maxW = waterBottom;
+				}
 			} else {
 				bottomFlux[currentCell] = 0.0;
 			}
@@ -181,6 +220,15 @@ void Simulation::updateWaterSurface(double dt)
             // simulate evaporation
             const double Ke = 0.0004;
             water[currentCell] *= (1 - Ke * dt);
+
+            // update min and max for water
+            double waterCurrent = water[currentCell];
+            if (waterCurrent < _minW) {
+				_minW = waterCurrent;
+			}
+			if (waterCurrent > _maxW) {
+				_maxW = waterCurrent;
+			}
 		}
 	} // end for loop
 #ifdef DEBUG
@@ -199,7 +247,13 @@ void Simulation::updateWaterSurface(double dt)
 
 void Simulation::addWaterSource(const Point2d &center, const int radius, const double amount)
 {
-	water[4] = 5.0;
+	water[4] = amount;
+	_minT = amount;
+	_maxT = amount;
+	_minW = amount;
+	_maxW = amount;
+	_minS = amount;
+	_maxS = amount;
 }
 
 const double Simulation::getWaterAt(int x, int y)
@@ -215,18 +269,6 @@ const double Simulation::getTerrainAt(int x, int y)
 const double Simulation::getSedimentAt(int x, int y)
 {
 	return sediment.at(y * _height + x);
-}
-
-// http://stackoverflow.com/a/26843664
-//
-QByteArray Simulation::getWaterField()
-{
-	QByteArray data;
-	QDataStream stream(&data, QIODevice::WriteOnly);
-	for (size_t i = 0; i < water.size(); ++i) {
-		stream << water.at(i);
-	}
-	return data;
 }
 
 void Simulation::setGrid(const Grid *newGrid)
