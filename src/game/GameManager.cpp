@@ -24,10 +24,12 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
+static const int simulationSize = 3;
+
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(40, 40, _mapping)),
-  _grid(new Grid(40, &_mapping))
+  _simulation(new Simulation(simulationSize, simulationSize, _mapping)),
+  _grid(new Grid(simulationSize, &_mapping))
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
@@ -94,6 +96,8 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
 #endif
 
+    // convert to grid cell
+    std::cout << "grid index: " << _grid->getCellIndex(normalisedX, normalisedY) << std::endl;
 
 }
 

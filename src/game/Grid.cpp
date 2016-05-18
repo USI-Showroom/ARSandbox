@@ -61,6 +61,11 @@ double Grid::getHeight(int x, int y) const
     return avg;
 }
 
+int Grid::getCellIndex(const double x, const double y)
+{
+    return static_cast<int>(y * _size + x);
+}
+
 void Grid::draw(QPainter &painter)
 {
     for (int i = 0; i < _size; ++i) {

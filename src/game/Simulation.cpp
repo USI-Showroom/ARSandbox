@@ -34,7 +34,6 @@ void Simulation::update(double dt)
 
 void Simulation::incrementWater(double dt)
 {
-	addWaterSource(Point2d(0.5, 0.5), 10, 0.20);
 }
 
 void Simulation::updateWaterSurface(double dt)
@@ -49,7 +48,7 @@ void Simulation::updateWaterSurface(double dt)
 	// cross sectional area of the pipe
 	const double A = 0.95;
 	// length of virtual pipe
-	const double l = 0.45;
+	const double l = 0.15;
 	// gravity
 	const double g = 9.81;
 	// flux factor
@@ -126,8 +125,8 @@ void Simulation::updateWaterSurface(double dt)
 				l = topFlux[currentCell] + (fluxFactor * heightDiff);
 				topFlux[currentCell] = std::max(0.0, l);
 				outFlow += topFlux[currentCell];
-				inFlow += bottomFlux[(y-1) * _width + x];
-				dflowTopBottom = bottomFlux[(y-1) * _width + x];
+				inFlow += bottomFlux[(y - 1) * _width + x];
+				dflowTopBottom = bottomFlux[(y - 1) * _width + x];
 
 				if (waterUp < _minW) {
 					_minW = waterUp;

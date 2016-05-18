@@ -20,6 +20,7 @@ public:
 	void draw(QPainter &painter);
 	double getHeight(int x, int y) const;
 	void drawCell( QPainter&, const int, const int, double, double, double ) const;
+	int getCellIndex(const double, const double);
 
 private:
 	int _size;
