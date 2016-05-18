@@ -125,7 +125,11 @@ void main()
 #ifndef NO_KINECT
     heightV=1-heightV;
 #endif
+    vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
 
+    // green channel holds sediment amount
+    // TODO: rescale back
+    heightV += gameTxt.g;
 
     vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
@@ -143,13 +147,12 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    vec4 terrainColor = vec4(gameTxt.r, 0.0, 0.0, 0.25);
-    vec4 sedimentColor = vec4(0.0, gameTxt.g, 0.0, 0.25);
-    vec4 waterColor = vec4(0.0, 0.0, gameTxt.b, 0.25);
-
-    vec4 gameTxtColor = gameTxt.a * (terrainColor + sedimentColor + waterColor) + (1.0-gameTxt.a);
+    // TODO: rescale back
+    float waterHeight = gameTxt.b;
+    waterHeight = min(waterHeight, 1.0);
+    waterHeight = max(waterHeight, 0.0);
     
-    gl_FragColor = gameTxtColor * bgCol;
+    gl_FragColor = bgCol * (1.0 - waterHeight) + waterColor * waterHeight;
 
     // isolines
     // float isoH = 0.0025;

@@ -118,36 +118,6 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    // for(size_t i = 0; i <_drops.size(); ++i)
-    // {
-    //     Drop& d = *_drops[i];
-
-    //     if(d.alive())
-    //     {
-    //         d.update(_mapping);
-
-    //         Point2d p=_mapping.fromParameterization(d.position());
-    //         p.y() = imgHeight - p.y();
-
-    //         if (p.y() == imgHeight)
-    //             --p.y();
-    //         assert(p.y() >= 0);
-    //         assert(p.y() < imgHeight);
-
-    //         p*=scaling;
-
-    //         painter.setRenderHint(QPainter::Antialiasing, true);
-
-    //         QPen pen(Qt::blue, 2);
-    //         painter.setPen(pen);
-
-    //         QBrush brush(Qt::blue);
-    //         painter.setBrush(brush);
-
-    //         painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
-    //     }
-    // }
-
     _simulation->update(0.01);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
