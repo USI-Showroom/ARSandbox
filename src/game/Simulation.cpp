@@ -68,7 +68,7 @@ void Simulation::updateWaterSurface( double dt ) {
             if ( x > 0 ) {
                 // height diff between current cell and left cell
                 double waterLeft = water.at( y * _width + x - 1 );
-                heightDiff =  d1 - waterLeft;
+                heightDiff = d1 - waterLeft;
                 l = leftFlux[currentCell] + ( fluxFactor * heightDiff );
                 leftFlux[currentCell] = std::max( 0.0, l );
                 outFlow += leftFlux[currentCell];
