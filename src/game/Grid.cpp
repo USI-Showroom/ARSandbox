@@ -63,7 +63,12 @@ double Grid::getHeight(int x, int y) const
 
 int Grid::getCellIndex(const double x, const double y)
 {
-    return static_cast<int>(y * _size + x);
+    const int xx = floor(x / xStep);
+    const int yy = floor(y / yStep);
+#ifdef DEBUG
+    std::cout << "xx: " << xx << ", " << "yy: " << yy << std::endl;
+#endif
+    return yy * _size + xx;
 }
 
 void Grid::draw(QPainter &painter)
