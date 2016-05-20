@@ -17,7 +17,7 @@ public:
 	void update(double dt);
 	void incrementWater(double dt);
 	void updateWaterSurface(double dt);
-	void addWaterSource(const Point2d &center, const int radius, const double amount);
+	void addWaterSource(const int cellIndex, const double amount);
 	void setGrid(const Grid *);
 	
 	const double getWaterAt(int x, int y);

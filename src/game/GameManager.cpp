@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 3;
+static const int simulationSize = 20;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -97,8 +97,12 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 #endif
 
     // convert to grid cell
-    std::cout << "grid index: " << _grid->getCellIndex(normalisedX, normalisedY) << std::endl;
-
+    int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
+#ifdef DEBUG
+    std::cout << "grid index: " << gridIndex << std::endl;
+#endif
+    _simulation->addWaterSource( gridIndex, 0.10 );
+    std::cout << "Water added at cell " << gridIndex << std::endl;
 }
 
 void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
@@ -122,7 +126,7 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.01);
+    _simulation->update(0.0075);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping);

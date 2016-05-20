@@ -34,9 +34,9 @@ void Simulation::updateWaterSurface( double dt ) {
     }
 
     // cross sectional area of the pipe
-    const double A = 0.95;
+    const double A = 0.85;
     // length of virtual pipe
-    const double l = 0.15;
+    const double l = 0.45;
     // gravity
     const double g = 9.81;
     // flux factor
@@ -241,9 +241,8 @@ void Simulation::updateWaterSurface( double dt ) {
 #endif
 }
 
-void Simulation::addWaterSource( const Point2d& center, const int radius,
-                                 const double amount ) {
-    water[4] = amount;
+void Simulation::addWaterSource( const int cellIndex, const double amount ) {
+    water[cellIndex] = amount;
     _minW = amount;
     _maxW = amount;
     _minS = amount;
