@@ -170,10 +170,11 @@ void Simulation::updateWaterSurface( double dt ) {
         for ( int y = 0; y < _height; ++y ) {
 
         	inFlow = 0.0; outFlow = 0.0;
-        	inFlow += rightFlux(x-1, y);
-        	inFlow += topFlux(x, y-1);
-        	inFlow += leftFlux(x+1, y);
-        	inFlow += bottomFlux(x, y+1);
+        	
+        	inFlow += x == 0          ? 0.0 : rightFlux (x-1, y);
+        	inFlow += y == 0          ? 0.0 : topFlux   (x, y-1);
+        	inFlow += x == _width - 1 ? 0.0 : leftFlux  (x+1, y);
+        	inFlow += y == _width - 1 ? 0.0 : bottomFlux(x, y+1);
 
         	outFlow += rightFlux(x,y);
         	outFlow += topFlux(x,y);
