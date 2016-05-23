@@ -14,7 +14,8 @@ Simulation::Simulation( int newWidth, int newHeight,
       sediment( _width * _height, 0.0 ), leftFlux( _width * _height ),
       rightFlux( _width * _height ), topFlux( _width * _height ),
       bottomFlux( _width * _height ), _u( _width * _height ),
-      _v( _width * _height ), _mapping( mapping ), _grid( nullptr ) {}
+      _v( _width * _height ), _s1( _width * _height, 0.0),
+      _mapping( mapping ), _grid( nullptr ) {}
 
 Simulation::~Simulation() {}
 
@@ -40,15 +41,15 @@ void Simulation::updateWaterSurface( double dt ) {
     // gravity
     const double g = 9.81;
     // flux factor
-    double fluxFactor = g * A / l;
+    double fluxFactor = g * A / l * dt;
     // cell size
     double lx, ly;
-    lx = ly = 1.0;
+    lx = ly = 1.0 / (_grid->size());
 
     for ( int x = 0; x < _width; ++x ) {
         for ( int y = 0; y < _height; ++y ) {
 
-            double inFlow = 0.0;
+          
             double outFlow = 0.0;
             double l = 0.0;
             int currentCell = y * _width + x;
@@ -68,11 +69,16 @@ void Simulation::updateWaterSurface( double dt ) {
             if ( x > 0 ) {
                 // height diff between current cell and left cell
                 double waterLeft = water.at( y * _width + x - 1 );
-                heightDiff = d1 - waterLeft;
+                double heightLeft = _grid->getHeight( x - 1, y);
+                heightDiff = h1 + d1 - waterLeft - heightLeft;
+                
                 l = leftFlux[currentCell] + ( fluxFactor * heightDiff );
+                
                 leftFlux[currentCell] = std::max( 0.0, l );
+                
                 outFlow += leftFlux[currentCell];
                 inFlow += rightFlux[y * _width + x - 1];
+                
                 dflowRightLeft = rightFlux[y * _width + x - 1];
 
                 if ( waterLeft < _minW ) {
@@ -146,46 +152,55 @@ void Simulation::updateWaterSurface( double dt ) {
                 bottomFlux[currentCell] = 0.0;
             }
 
-// // compute scaling factor
-// double z = (water[currentCell]*lx*ly) / (outFlow * dt);
-// double K = std::min(1.0, z);
+			// compute scaling factor
+			double z = std::fabs(outFlow) < 1e-8 ? 0 : t(water[currentCell]*lx*ly) / (outFlow * dt);
+			double K = std::min(1.0, z);
 
-// // scale the flows
-// leftFlux[currentCell] *= K;
-// bottomFlux[currentCell] *= K;
-// topFlux[currentCell] *= K;
-// rightFlux[currentCell] *= K;
+			// scale the flows
+			leftFlux[currentCell] *= K;
+			bottomFlux[currentCell] *= K;
+			topFlux[currentCell] *= K;
+			rightFlux[currentCell] *= K;
+		}
+	}
 
-#ifdef DEBUG
-            std::cout << "currentCell: " << currentCell << "\n"
-                      << "inFlow: " << inFlow << "\n"
-                      << "outFlow: " << outFlow << "\n";
-#endif
-            // update water velocity field with net volume change for water
-            double dv = dt * ( inFlow - outFlow );
+	double inFlow, outFlow;
+	for ( int x = 0; x < _width; ++x ) {
+        for ( int y = 0; y < _height; ++y ) {
+
+        	inFlow = 0.0; outFlow = 0.0;
+        	inFlow += rightFlux(x-1, y);
+        	inFlow += topFlux(x, y-1);
+        	inFlow += leftFlux(x+1, y);
+        	inFlow += bottomFlux(x, y+1);
+
+        	outFlow += rightFlux(x,y);
+        	outFlow += topFlux(x,y);
+        	outFlow += leftFlux(x,y);
+        	outFlow += bottomFlux(x,y);
+
+        	double dv = dt * ( inFlow - outFlow );
             double d2 = dv / ( lx * ly );
-            water[currentCell] = d1 + d2;
+
+            d1 = water[currentCell];
+            d2 += d1;
 
             // calculate average amount of water that passes through cell
-            double dwx =
-                dflowRightLeft - leftFlux[currentCell] + rightFlux[currentCell];
-            double dwy =
-                dflowTopBottom - topFlux[currentCell] + bottomFlux[currentCell];
+            double dwx = rightFlux(x - 1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x + 1, y);
+            // TODO: possible bug
+            double dwy = topFlux(x, y - 1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y + 1);
             double avgWaterX = 0.5 * dwx;
             double avgWaterY = 0.5 * dwy;
 
-            double avgWater = avgWaterX + avgWaterY;
-            // update velocity fields
-            if ( avgWater == 0.0 ) {
-                _u[currentCell] = _v.at( currentCell ) = 0.0;
-            } else {
-                _u[currentCell] = avgWaterX;
-                _v[currentCell] = avgWaterY;
-            }
+            double dbar = 0.5 * (d1 + d2);
+
+            double u = dwx / (dbar * lx);
+            double v = dwy / (dbar * ly);
+
 
             // simulate erosion
             // sediment capacity constant
-            const double Kc = 25.0;
+            const double Kc = 15.0;
             // dissolving constant
             const double Ks = 0.001;
             // deposition constant
@@ -195,15 +210,19 @@ void Simulation::updateWaterSurface( double dt ) {
             double uV = _u[currentCell];
             double vV = _v[currentCell];
 
-            double angle = 0.5;
-            double C = Kc * angle * ( uV + vV );
 
+            double angle = fabs(1 - _grid->getNormal(x, y).z());
+            double C = Kc * angle * ( sqrt(uV*uV + vV*vV)  );
+
+            double s1;
             double st = sediment[currentCell];
             if ( C > st ) {
-                sediment[currentCell] += Ks * ( C - st );
+                s1 += Ks * ( C - st );
             } else {
-                sediment[currentCell] += Kd * ( st - C );
+                s1 -= Kd * ( st - C );
             }
+
+            sediment[currentCell] = 
 
             // update min and max sediment for current cell
             if ( sediment[currentCell] < _minS ) {
@@ -215,7 +234,9 @@ void Simulation::updateWaterSurface( double dt ) {
 
             // simulate evaporation
             const double Ke = 0.0004;
-            water[currentCell] *= ( 1 - Ke * dt );
+            d2 *= ( 1 - Ke * dt );
+
+            water[currentCell] = d2;
 
             // update min and max for water
             double waterCurrent = water[currentCell];
@@ -226,7 +247,14 @@ void Simulation::updateWaterSurface( double dt ) {
                 _maxW = waterCurrent;
             }
         }
-    } // end for loop
+    }
+
+#ifdef DEBUG
+            std::cout << "currentCell: " << currentCell << "\n"
+                      << "outFlow: " << outFlow << "\n";
+#endif
+
+// end for loop
 #ifdef DEBUG
     std::cout << std::endl;
     std::cout << "Water heights at cells:" << std::endl;

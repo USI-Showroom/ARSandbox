@@ -61,6 +61,31 @@ double Grid::getHeight(int x, int y) const
     return avg;
 }
 
+// center, boundaries
+// z -> getHeightFromParam
+Point3d Grid::getCellNormal( int x, int y ) const
+{
+    double xx = static_cast<double>(x) / _size;
+    double yy = static_cast<double>(y) / _size;
+
+    const Point2d a1 = mapping->getHeightFromParam(xx, yy);
+    const Point2d a2 = a1 + Point2d(1.0, 0.0);
+    const Point2d a3 = a2 + Point2d(0.0,-1.0);
+
+    const double h1 = mapping->getHeightFromParam(a1);
+    const double h2 = mapping->getHeightFromParam(a2);
+    const double h3 = mapping->getHeightFromParam(a3);
+
+    const Point3d p1 = Point3d(a1.x(), a1.y(), h1);
+    const Point3d p2 = Point3d(a2.x(), a2.y(), h2);
+    const Point3d p3 = Point3d(a3.x(), a3.y(), h3);
+
+    Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
+    n.normalize();
+
+    return n;
+}
+
 int Grid::getCellIndex(const double x, const double y)
 {
     const int xx = floor(x / xStep);

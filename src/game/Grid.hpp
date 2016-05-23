@@ -2,13 +2,9 @@
 #define GRID_HPP
 
 #include "Point2.hpp"
+#include "Point3.hpp"
 #include <QPainter>
 #include "UnitSquareMapping.hpp"
-
-class Cell
-{
-	void draw(QPainter &painter);
-};
 
 class Grid
 {

@@ -101,7 +101,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 #ifdef DEBUG
     std::cout << "grid index: " << gridIndex << std::endl;
 #endif
-    _simulation->addWaterSource( gridIndex, 0.10 );
+    _simulation->addWaterSource( gridIndex, 0.30 );
     std::cout << "Water added at cell " << gridIndex << std::endl;
 }
 
@@ -126,7 +126,7 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.0075);
+    _simulation->update(0.01);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping);
