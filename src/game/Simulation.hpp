@@ -18,7 +18,7 @@ public:
 	void incrementWater(double dt);
 	void updateWaterSurface(double dt);
 	void addWaterSource(const int cellIndex, const double amount);
-	void setGrid(const Grid *);
+	void setGrid(Grid *);
 	
 	const double getWaterAt(int x, int y);
 	const double getTerrainAt(int x, int y);
@@ -60,9 +60,6 @@ private:
     constexpr static double g = 9.81;
     // cell size
     double lx, ly;
-
-    // temporary water amount
-    double d1, d2;
 };
 
 #endif // SIMULATION_HPP_INCLUDED
