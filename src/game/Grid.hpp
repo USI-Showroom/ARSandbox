@@ -12,11 +12,12 @@ public:
 	Grid(int newSize, const UnitSquareMapping *newMapping);
 	~Grid();
 
-	int& size();
+	const int& size();
 	void draw(QPainter &painter);
 	double getHeight(int x, int y) const;
 	void drawCell( QPainter&, const int, const int, double, double, double ) const;
 	int getCellIndex(const double, const double);
+	Point3d getCellNormal( int x, int y ) const;
 
 private:
 	int _size;

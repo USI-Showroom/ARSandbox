@@ -29,17 +29,40 @@ public:
 	// ranges for shader
 	static double _minW, _maxW, _minS, _maxS;
 
+	const double water(int x, int y);
+	const double sediment(int x, int y);
+	const double terrain(int x, int y);
+	const double rightFlux(int x, int y);
+	const double bottomFlux(int x, int y);
+	const double topFlux(int x, int y);
+	const double leftFlux(int x, int y);
+	const double u(int x, int y);
+	const double v(int x, int y);
+
 private:
 	int _width, _height;
 
-	vector<double> terrain;
-	vector<double> water;
-	vector<double> sediment;
-	vector<double> leftFlux, rightFlux, topFlux, bottomFlux;
+	vector<double> _terrain;
+	vector<double> _water;
+	vector<double> _sediment;
+	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
 	vector<double> _u, _v;
 
 	const UnitSquareMapping _mapping;
-	const Grid *_grid;
+	Grid *_grid;
+
+	// simulation constants
+	// cross sectional area of the pipe
+    constexpr static double A = 0.85;
+    // length of virtual pipe
+    constexpr static double l = 0.45;
+    // gravity
+    constexpr static double g = 9.81;
+    // cell size
+    double lx, ly;
+
+    // temporary water amount
+    double d1, d2;
 };
 
 #endif // SIMULATION_HPP_INCLUDED

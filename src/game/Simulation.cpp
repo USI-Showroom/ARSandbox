@@ -10,161 +10,232 @@ double Simulation::_maxS = 0.0;
 Simulation::Simulation( int newWidth, int newHeight,
                         const UnitSquareMapping& mapping )
     : _width( newWidth ), _height( newHeight ),
-      terrain( _width * _height, 0.0 ), water( _width * _height, 0.0 ),
-      sediment( _width * _height, 0.0 ), leftFlux( _width * _height ),
-      rightFlux( _width * _height ), topFlux( _width * _height ),
-      bottomFlux( _width * _height ), _u( _width * _height ),
-      _v( _width * _height ), _s1( _width * _height, 0.0),
+      _terrain( _width * _height, 0.0 ), _water( _width * _height, 0.0 ),
+      _sediment( _width * _height, 0.0 ), _leftFlux( _width * _height ),
+      _rightFlux( _width * _height ), _topFlux( _width * _height ),
+      _bottomFlux( _width * _height ), _u( _width * _height ),
+      _v( _width * _height ),
       _mapping( mapping ), _grid( nullptr ) {}
 
 Simulation::~Simulation() {}
 
-void Simulation::update( double dt ) {
-    incrementWater( dt );
-    updateWaterSurface( dt );
+const double Simulation::water(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _water.size()) {
+		return _water.at(idx);
+	} else {
+		return 0.0;
+	}
 }
 
-void Simulation::incrementWater( double dt ) {}
+const double Simulation::sediment(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _sediment.size()) {
+		return _sediment[idx];
+	} else {
+		return 0.0;
+	}
+}
 
-void Simulation::updateWaterSurface( double dt ) {
-    if ( _grid == nullptr ) {
+const double Simulation::terrain(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _terrain.size()) {
+		return _terrain[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::rightFlux(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _rightFlux.size()) {
+		return _rightFlux[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::bottomFlux(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _bottomFlux.size()) {
+		return _bottomFlux[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::topFlux(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _topFlux.size()) {
+		return _topFlux[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::leftFlux(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _leftFlux.size()) {
+		return _leftFlux[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::u(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _u.size()) {
+		return _u[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+const double Simulation::v(int x, int y) {
+	int idx = y * _width + x;
+	if (idx > 0 && idx < _v.size()) {
+		return _v[idx];
+	} else {
+		return 0.0;
+	}
+}
+
+void Simulation::update( double dt ) {
+	if ( _grid == nullptr ) {
 #ifdef DEBUG
         std::cout << "ERROR: no grid found for simulation" << std::endl;
 #endif
         return;
     }
+    
+    updateWaterSurface( dt );
+}
 
-    // cross sectional area of the pipe
-    const double A = 0.85;
-    // length of virtual pipe
-    const double l = 0.45;
-    // gravity
-    const double g = 9.81;
+void Simulation::updateWaterSurface( double dt ) {
     // flux factor
     double fluxFactor = g * A / l * dt;
     // cell size
-    double lx, ly;
     lx = ly = 1.0 / (_grid->size());
 
-    for ( int x = 0; x < _width; ++x ) {
-        for ( int y = 0; y < _height; ++y ) {
+    double outFlow, inFlow, tempFlow;
 
-          
-            double outFlow = 0.0;
-            double l = 0.0;
-            int currentCell = y * _width + x;
+ //    for ( int x = 0; x < _width; ++x ) {
+ //        for ( int y = 0; y < _height; ++y ) {
 
-            // current water height
-            const double d1 = water.at( currentCell );
-            // current terrain height
-            const double h1 = _grid->getHeight( x, y );
-            double heightDiff = 0.0;
+ //            double outFlow = 0.0;
+ //            double l = 0.0;
+ //            int currentCell = y * _width + x;
 
-            // flow difference between left and right flux
-            double dflowRightLeft = 0.0;
-            // flow difference between top and bottom flux
-            double dflowTopBottom = 0.0;
+ //            // current water height
+ //            d1 = water.at( currentCell );
+ //            // current terrain height
+ //            const double h1 = _grid->getHeight( x, y );
+ //            double heightDiff = 0.0;
 
-            // there is flow from left
-            if ( x > 0 ) {
-                // height diff between current cell and left cell
-                double waterLeft = water.at( y * _width + x - 1 );
-                double heightLeft = _grid->getHeight( x - 1, y);
-                heightDiff = h1 + d1 - waterLeft - heightLeft;
+ //            // flow difference between left and right flux
+ //            double dflowRightLeft = 0.0;
+ //            // flow difference between top and bottom flux
+ //            double dflowTopBottom = 0.0;
+
+ //            // there is flow from left
+ //            if ( x > 0 ) {
+ //                // height diff between current cell and left cell
+ //                double waterLeft = water.at( y * _width + x - 1 );
+ //                double heightLeft = _grid->getHeight( x - 1, y);
+ //                heightDiff = h1 + d1 - waterLeft - heightLeft;
                 
-                l = leftFlux[currentCell] + ( fluxFactor * heightDiff );
+ //                l = leftFlux[currentCell] + ( fluxFactor * heightDiff );
                 
-                leftFlux[currentCell] = std::max( 0.0, l );
+ //                leftFlux[currentCell] = std::max( 0.0, l );
                 
-                outFlow += leftFlux[currentCell];
-                inFlow += rightFlux[y * _width + x - 1];
+ //                outFlow += leftFlux[currentCell];
+ //                inFlow += rightFlux[y * _width + x - 1];
                 
-                dflowRightLeft = rightFlux[y * _width + x - 1];
+ //                dflowRightLeft = rightFlux[y * _width + x - 1];
 
-                if ( waterLeft < _minW ) {
-                    _minW = waterLeft;
-                }
-                if ( waterLeft > _maxW ) {
-                    _maxW = waterLeft;
-                }
-            } else {
-                leftFlux[currentCell] = 0.0;
-            }
+ //                if ( waterLeft < _minW ) {
+ //                    _minW = waterLeft;
+ //                }
+ //                if ( waterLeft > _maxW ) {
+ //                    _maxW = waterLeft;
+ //                }
+ //            } else {
+ //                leftFlux[currentCell] = 0.0;
+ //            }
 
-            // there is flow from right
-            if ( x < _width - 1 ) {
-                double waterRight = water.at( y * _width + x + 1 );
-                heightDiff = d1 - waterRight;
-                l = rightFlux[currentCell] + ( fluxFactor * heightDiff );
-                rightFlux[currentCell] = std::max( 0.0, l );
-                outFlow += rightFlux[currentCell];
-                inFlow += leftFlux[y * _width + x + 1];
-                dflowRightLeft -= leftFlux[y * _width + x + 1];
+ //            // there is flow from right
+ //            if ( x < _width - 1 ) {
+ //                double waterRight = water.at( y * _width + x + 1 );
+ //                heightDiff = d1 - waterRight;
+ //                l = rightFlux[currentCell] + ( fluxFactor * heightDiff );
+ //                rightFlux[currentCell] = std::max( 0.0, l );
+ //                outFlow += rightFlux[currentCell];
+ //                inFlow += leftFlux[y * _width + x + 1];
+ //                dflowRightLeft -= leftFlux[y * _width + x + 1];
 
-                if ( waterRight < _minW ) {
-                    _minW = waterRight;
-                }
-                if ( waterRight > _maxW ) {
-                    _maxW = waterRight;
-                }
+ //                if ( waterRight < _minW ) {
+ //                    _minW = waterRight;
+ //                }
+ //                if ( waterRight > _maxW ) {
+ //                    _maxW = waterRight;
+ //                }
 
-            } else {
-                rightFlux[currentCell] = 0.0;
-            }
+ //            } else {
+ //                rightFlux[currentCell] = 0.0;
+ //            }
 
-            // there is flow from above
-            if ( y > 0 ) {
-                double waterUp = water.at( ( y - 1 ) * _width + x );
-                heightDiff = d1 - waterUp;
-                l = topFlux[currentCell] + ( fluxFactor * heightDiff );
-                topFlux[currentCell] = std::max( 0.0, l );
-                outFlow += topFlux[currentCell];
-                inFlow += bottomFlux[( y - 1 ) * _width + x];
-                dflowTopBottom = bottomFlux[( y - 1 ) * _width + x];
+ //            // there is flow from above
+ //            if ( y > 0 ) {
+ //                double waterUp = water.at( ( y - 1 ) * _width + x );
+ //                heightDiff = d1 - waterUp;
+ //                l = topFlux[currentCell] + ( fluxFactor * heightDiff );
+ //                topFlux[currentCell] = std::max( 0.0, l );
+ //                outFlow += topFlux[currentCell];
+ //                inFlow += bottomFlux[( y - 1 ) * _width + x];
+ //                dflowTopBottom = bottomFlux[( y - 1 ) * _width + x];
 
-                if ( waterUp < _minW ) {
-                    _minW = waterUp;
-                }
-                if ( waterUp > _maxW ) {
-                    _maxW = waterUp;
-                }
-            } else {
-                topFlux[currentCell] = 0.0;
-            }
+ //                if ( waterUp < _minW ) {
+ //                    _minW = waterUp;
+ //                }
+ //                if ( waterUp > _maxW ) {
+ //                    _maxW = waterUp;
+ //                }
+ //            } else {
+ //                topFlux[currentCell] = 0.0;
+ //            }
 
-            // there is flow from bottom
-            if ( y < _height - 1 ) {
-                double waterBottom = water.at( ( y + 1 ) * _width + x );
-                heightDiff = d1 - waterBottom;
-                l = bottomFlux[currentCell] + ( fluxFactor * heightDiff );
-                bottomFlux[currentCell] = std::max( 0.0, l );
-                outFlow += bottomFlux[currentCell];
-                inFlow += topFlux[( y + 1 ) * _width + x];
-                dflowTopBottom += topFlux[( y + 1 ) * _width + x];
+ //            // there is flow from bottom
+ //            if ( y < _height - 1 ) {
+ //                double waterBottom = water.at( ( y + 1 ) * _width + x );
+ //                heightDiff = d1 - waterBottom;
+ //                l = bottomFlux[currentCell] + ( fluxFactor * heightDiff );
+ //                bottomFlux[currentCell] = std::max( 0.0, l );
+ //                outFlow += bottomFlux[currentCell];
+ //                inFlow += topFlux[( y + 1 ) * _width + x];
+ //                dflowTopBottom += topFlux[( y + 1 ) * _width + x];
 
-                if ( waterBottom < _minW ) {
-                    _minW = waterBottom;
-                }
-                if ( waterBottom > _maxW ) {
-                    _maxW = waterBottom;
-                }
-            } else {
-                bottomFlux[currentCell] = 0.0;
-            }
+ //                if ( waterBottom < _minW ) {
+ //                    _minW = waterBottom;
+ //                }
+ //                if ( waterBottom > _maxW ) {
+ //                    _maxW = waterBottom;
+ //                }
+ //            } else {
+ //                bottomFlux[currentCell] = 0.0;
+ //            }
 
-			// compute scaling factor
-			double z = std::fabs(outFlow) < 1e-8 ? 0 : t(water[currentCell]*lx*ly) / (outFlow * dt);
-			double K = std::min(1.0, z);
+	// 		// compute scaling factor
+	// 		double z = std::fabs(outFlow) < 1e-8 ? 0 : t(water[currentCell]*lx*ly) / (outFlow * dt);
+	// 		double K = std::min(1.0, z);
 
-			// scale the flows
-			leftFlux[currentCell] *= K;
-			bottomFlux[currentCell] *= K;
-			topFlux[currentCell] *= K;
-			rightFlux[currentCell] *= K;
-		}
-	}
+	// 		// scale the flows
+	// 		leftFlux[currentCell] *= K;
+	// 		bottomFlux[currentCell] *= K;
+	// 		topFlux[currentCell] *= K;
+	// 		rightFlux[currentCell] *= K;
+	// 	}
+	// }
 
-	double inFlow, outFlow;
 	for ( int x = 0; x < _width; ++x ) {
         for ( int y = 0; y < _height; ++y ) {
 
@@ -180,9 +251,9 @@ void Simulation::updateWaterSurface( double dt ) {
         	outFlow += bottomFlux(x,y);
 
         	double dv = dt * ( inFlow - outFlow );
-            double d2 = dv / ( lx * ly );
+            d2 = dv / ( lx * ly );
 
-            d1 = water[currentCell];
+            d1 = water(x,y);
             d2 += d1;
 
             // calculate average amount of water that passes through cell
@@ -194,8 +265,8 @@ void Simulation::updateWaterSurface( double dt ) {
 
             double dbar = 0.5 * (d1 + d2);
 
-            double u = dwx / (dbar * lx);
-            double v = dwy / (dbar * ly);
+            double uu = dwx / (dbar * lx);
+            double vv = dwy / (dbar * ly);
 
 
             // simulate erosion
@@ -205,17 +276,19 @@ void Simulation::updateWaterSurface( double dt ) {
             const double Ks = 0.001;
             // deposition constant
             const double Kd = 0.001;
+            // evaporation constant
+            const double Ke = 0.0004;
 
             // local velocity
-            double uV = _u[currentCell];
-            double vV = _v[currentCell];
+            double uV = u(x,y);
+            double vV = v(x,y);
 
 
-            double angle = fabs(1 - _grid->getNormal(x, y).z());
+            double angle = fabs(1.0 - _grid->getCellNormal(x, y).z());
             double C = Kc * angle * ( sqrt(uV*uV + vV*vV)  );
 
             double s1;
-            double st = sediment[currentCell];
+            double st = sediment(x,y);
             if ( C > st ) {
                 s1 += Ks * ( C - st );
             } else {
@@ -225,21 +298,20 @@ void Simulation::updateWaterSurface( double dt ) {
             sediment[currentCell] = 
 
             // update min and max sediment for current cell
-            if ( sediment[currentCell] < _minS ) {
-                _minS = sediment[currentCell];
+            if ( sediment(x,y) < _minS ) {
+                _minS = sediment(x,y);
             }
-            if ( sediment[currentCell] > _maxS ) {
-                _maxS = sediment[currentCell];
+            if ( sediment(x,y) > _maxS ) {
+                _maxS = sediment(x,y);
             }
 
             // simulate evaporation
-            const double Ke = 0.0004;
             d2 *= ( 1 - Ke * dt );
 
             water[currentCell] = d2;
 
             // update min and max for water
-            double waterCurrent = water[currentCell];
+            double waterCurrent = water(x,y);
             if ( waterCurrent < _minW ) {
                 _minW = waterCurrent;
             }
@@ -248,33 +320,14 @@ void Simulation::updateWaterSurface( double dt ) {
             }
         }
     }
-
-#ifdef DEBUG
-            std::cout << "currentCell: " << currentCell << "\n"
-                      << "outFlow: " << outFlow << "\n";
-#endif
-
-// end for loop
-#ifdef DEBUG
-    std::cout << std::endl;
-    std::cout << "Water heights at cells:" << std::endl;
-    // print out the grid values
-    for ( int x = 0; x < _width; ++x ) {
-        for ( int y = 0; y < _height; ++y ) {
-            std::cout << water[y * _width + x] << ",  ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-#endif
 }
 
 void Simulation::addWaterSource( const int cellIndex, const double amount ) {
-    water[cellIndex] = amount;
-    _minW = amount;
-    _maxW = amount;
-    _minS = amount;
-    _maxS = amount;
+    // water[cellIndex] = amount;
+    // _minW = amount;
+    // _maxW = amount;
+    // _minS = amount;
+    // _maxS = amount;
 }
 
 const double Simulation::getWaterAt( int x, int y ) {
