@@ -139,7 +139,7 @@ void Simulation::updateWaterSurface( double dt ) {
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = water(x, y-1);
+        	d1r = water(x+1, y);
         	h1r = _grid->getHeight(x+1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
@@ -154,7 +154,13 @@ void Simulation::updateWaterSurface( double dt ) {
         	_rightFlux [y * _width + x] = std::max(0.0, fluxFactor * dhr);
         	_bottomFlux[y * _width + x] = std::max(0.0, fluxFactor * dhb);
 
-    		// compute scaling factor
+        	// outFlow
+        	outFlow += _leftFlux  [y * _width + x];
+        	outFlow += _topFlux   [y * _width + x];
+        	outFlow += _rightFlux [y * _width + x];
+        	outFlow += _bottomFlux[y * _width + x];
+
+			// compute scaling factor
 			double z = std::fabs(outFlow) < 1e-8 ? 0 : (d1*lx*ly) / (outFlow * dt);
 			double K = std::min(1.0, z);
 
@@ -166,82 +172,55 @@ void Simulation::updateWaterSurface( double dt ) {
         }
     }
 
-    // top left corner
-    // 
-    d1 = water(0,0);
-    h1 = _grid->getHeight(0,0);
-    // right neighbor
-	d1r = water(1, 0);
-	h1r = _grid->getHeight(1, 0);
-	dhr = h1 + d1 - h1r - d1r;
-	// bottom neighbor
-	d1b = water(0, 1);
-	h1b = _grid->getHeight(0, 1);
-	dhb = h1 + d1 - h1b - d1b;
+	for ( int x = 0; x < _width; x+=(_width-1) ) {
+		for ( int y = 0 y < _width; y+=(_width-1) ) {
 
-	// update fluxes
-	_leftFlux  [0] = 0.0;
-	_topFlux   [0] = 0.0;
-	_rightFlux [0] = std::max(0.0, fluxFactor * dhr);
-	_bottomFlux[0] = std::max(0.0, fluxFactor * dhb);
+		    d1 = water(x,y);
+		    h1 = _grid->getHeight(x,y);
+		    
+		    // left neighbor
+        	d1l = x == 0 ? 0.0 : water(x-1, y);
+        	h1l = x == 0 ? 0.0 : _grid->getHeight(x-1, y);
+        	dhl = h1 + d1 - h1l - d1l;
 
-	// top right corner
-	// 
-	d1 = water(_width-1, 0);
-    h1 = _grid->getHeight(_width, 0);
-    // left neighbor
-	d1l = water(_width-1, 0);
-	h1l = _grid->getHeight(_width-1, 0);
-	dhl = h1 + d1 - h1l - d1l;
-	// bottom neighbor
-	d1b = water(0, 1);
-	h1b = _grid->getHeight(0, 1);
-	dhb = h1 + d1 - h1b - d1b;
+        	// top neighbor
+        	d1t = y == 0 ? 0.0 : water(x, y-1);
+        	h1t = y == 0 ? 0.0 : _grid->getHeight(x, y-1);
+        	dht = h1 + d1 - h1t - d1t;
 
-	// update fluxes
-	_leftFlux  [_width-1] = std::max(0.0, fluxFactor * dhl);
-	_topFlux   [_width-1] = 0.0;
-	_rightFlux [_width-1] = 0.0;
-	_bottomFlux[_width-1] = std::max(0.0, fluxFactor * dhb);
+        	// right neighbor
+        	d1r = x == _width-1 ? 0.0 : _water(x+1, y);
+        	h1r = x == _width-1 ? 0.0 : _grid->getHeight(x+1, y);
+        	dhr = h1 + d1 - h1r - d1r;
 
-	// bottom left corner
-	// 
-	d1 = water(0,_width-1);
-    h1 = _grid->getHeight(0,_width-1);
-    // right neighbor
-	d1r = water(1, _width-1);
-	h1r = _grid->getHeight(1, _width-1);
-	dhr = h1 + d1 - h1r - d1r;
-	// top neighbor
-	d1b = water(0, _width-2);
-	h1b = _grid->getHeight(0, _width-2);
-	dhb = h1 + d1 - h1b - d1b;
+        	// bottom neighbor
+        	d1b = y == _width-1 ? 0.0 : water(x, y-1);
+        	h1b = y == _width-1 ? 0.0 : _grid->getHeight(x, y+1);
+        	dhb = h1 + d1 - h1b - d1b;
 
-	// update fluxes
-	_leftFlux  [y * _width + x] = 0.0;
-	_topFlux   [y * _width + x] = 0.0;
-	_rightFlux [y * _width + x] = std::max(0.0, fluxFactor * dhr);
-	_bottomFlux[y * _width + x] = std::max(0.0, fluxFactor * dhb);
+			// update fluxes
+			_leftFlux  [y * _width + x] = std::max(0.0, fluxFactor * dhl);
+			_topFlux   [y * _width + x] = std::max(0.0, fluxFactor * dht);
+			_rightFlux [y * _width + x] = std::max(0.0, fluxFactor * dhr);
+			_bottomFlux[y * _width + x] = std::max(0.0, fluxFactor * dhb);
 
-	// bottom right corner
-	// 
-	d1 = water(_width-1, 0);
-    h1 = _grid->getHeight(_width, 0);
-    // left neighbor
-	d1l = water(_width-1, 0);
-	h1l = _grid->getHeight(_width-1, 0);
-	dhl = h1 + d1 - h1l - d1l;
-	// top neighbor
-	d1b = water(_width-1, _width-2);
-	h1b = _grid->getHeight(_width-1, _width-2);
-	dhb = h1 + d1 - h1b - d1b;
+			// outFlow
+        	outFlow += _leftFlux  [y * _width + x];
+        	outFlow += _topFlux   [y * _width + x];
+        	outFlow += _rightFlux [y * _width + x];
+        	outFlow += _bottomFlux[y * _width + x];
 
-	// update fluxes
-	_leftFlux  [y * _width + x] = std::max(0.0, fluxFactor * dhl);
-	_topFlux   [y * _width + x] = 0.0;
-	_rightFlux [y * _width + x] = 0.0;
-	_bottomFlux[y * _width + x] = (0.0, fluxFactor * dhb);
+			// compute scaling factor
+			double z = std::fabs(outFlow) < 1e-8 ? 0 : (d1*lx*ly) / (outFlow * dt);
+			double K = std::min(1.0, z);
 
+			// scale the outflows
+			_leftFlux  [y * _width + x] *= K;
+			_topFlux   [y * _width + x] *= K;
+			_rightFlux [y * _width + x] *= K;
+			_bottomFlux[y * _width + x] *= K;
+		}
+	}
 
 	// compute volume of water passing through cell(x,y)
 	for ( int x = 0; x < _width; ++x ) {
