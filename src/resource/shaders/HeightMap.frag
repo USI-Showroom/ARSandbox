@@ -21,8 +21,6 @@ uniform sampler2D height3;
 uniform float minH;
 uniform float maxH;
 
-uniform float displacementHeight;
-
 uniform sampler2D level0;
 uniform sampler2D level1;
 uniform sampler2D level2;
@@ -113,11 +111,7 @@ void main()
 
     heightV=(heightV-minH)/(maxH-minH);
 
-    // calcolo della nuove altezza usando d
-    // r = terrain height
-    // g = sediment height
-    // b = water height
-    float newHeight = heightV + gameTxt.r + gameTxt.g + gameTxt.b;
+    
 
     heightV=min(1.0,heightV);
     heightV=max(0.0,heightV);
@@ -127,9 +121,9 @@ void main()
 #endif
     vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
 
-    // green channel holds sediment amount
+    // red channel holds sediment amount
     // TODO: rescale back
-    heightV += gameTxt.g;
+    heightV += gameTxt.r * (maxS - minS) + minS;
 
     vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
@@ -148,7 +142,7 @@ void main()
     weight(heightV,4)*level4Txt;
 
     // TODO: rescale back
-    float waterHeight = gameTxt.b;
+    float waterHeight = gameTxt.b * (maxW - minW) + minW;
     waterHeight = min(waterHeight, 1.0);
     waterHeight = max(waterHeight, 0.0);
     

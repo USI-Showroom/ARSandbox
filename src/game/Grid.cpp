@@ -1,6 +1,8 @@
 #include "Grid.hpp"
 #include <iostream>
 #include <cassert>
+#include <string>
+#include <QString>
 
 #include "util.hpp"
 
@@ -144,6 +146,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     double nPoints = static_cast<double>(nItems);
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {
+            
             Point2d p_ = p1 + Point2d( nx / nPoints * xStep, ny / nPoints * yStep );
             Point2d p = util::scale( p_, imgHeight, scaling, *mapping );
 
@@ -156,6 +159,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
             painter.setBrush( brush );
 
             painter.drawRect( p.x()-3, p.y()-3, 6, 6);
+
         }
     }
 }

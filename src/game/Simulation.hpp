@@ -51,15 +51,25 @@ private:
 	const UnitSquareMapping _mapping;
 	Grid *_grid;
 
+	bool newWater;
+
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 0.85;
+    constexpr static double A = 0.5;
     // length of virtual pipe
-    constexpr static double l = 0.45;
+    constexpr static double l = 2.15;
     // gravity
-    constexpr static double g = 9.81;
+    constexpr static double g = 6.81;
     // cell size
     double lx, ly;
+    // sediment capacity constant
+    constexpr static double Kc = 15.0;
+    // dissolving constant
+    constexpr static double Ks = 0.004;
+    // deposition constant
+    constexpr static double Kd = 0.03;
+    // evaporation constant
+    constexpr static double Ke = 0;
 };
 
 #endif // SIMULATION_HPP_INCLUDED

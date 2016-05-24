@@ -11,15 +11,26 @@ double Simulation::_maxS = 0.0;
 Simulation::Simulation( int newWidth, int newHeight,
                         const UnitSquareMapping& mapping )
     : _width( newWidth ), _height( newHeight ),
-      _terrain( _width * _height, 0.0 ), _water( _width * _height, 0.0 ),
-      _sediment( _width * _height, 0.0 ), _leftFlux( _width * _height ),
-      _rightFlux( _width * _height ), _topFlux( _width * _height ),
-      _bottomFlux( _width * _height ), _u( _width * _height ),
-      _v( _width * _height ), _s1( _width * _height, 0.0 ),
-      _mapping( mapping ), _grid( nullptr ) {}
+      
+      _terrain ( _width * _height, 0.0 ),
+      _water   ( _width * _height, 0.0 ),
+      _sediment( _width * _height, 0.0 ),
+      
+      _leftFlux  ( _width * _height, 0.0 ),
+      _rightFlux ( _width * _height, 0.0 ), 
+      _topFlux   ( _width * _height, 0.0 ),
+      _bottomFlux( _width * _height, 0.0 ),
+      
+      _u ( _width * _height, 0.0 ),
+      _v ( _width * _height, 0.0 ),
+      _s1( _width * _height, 0.0 ),
+      
+      _mapping( mapping ), _grid( nullptr ), newWater(false) {}
 
 Simulation::~Simulation() {}
 
+// Accessor methods for arrays
+//
 const double Simulation::water(int x, int y) {
 	int idx = y * _width + x;
 	if (idx > 0 && idx < _water.size()) {
@@ -123,30 +134,30 @@ void Simulation::updateWaterSurface( double dt ) {
 
     // compute outFlows for inner cells
     // inner cells have all four neighbors defined
-    for ( int x = 1; x < _width-1; ++x ) {
-        for ( int y = 1; y < _height-1; ++y ) {
+    for ( int y = 1; y < _height-1; ++y ) {
+    	for ( int x = 1; x < _width-1; ++x ) {
         	
         	d1 = water(x,y);
         	h1 = _grid->getHeight(x,y);
         	
         	// left neighbor
-        	d1l = water(x+1, y);
-        	h1l = _grid->getHeight(x+1, y);
+        	d1l = water(x-1, y);
+        	h1l = _grid->getHeight(x-1, y);
         	dhl = h1 + d1 - h1l - d1l;
 
         	// top neighbor
-        	d1t = water(x, y+1);
-        	h1t = _grid->getHeight(x, y+1);
+        	d1t = water(x, y-1);
+        	h1t = _grid->getHeight(x, y-1);
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = water(x-1, y);
-        	h1r = _grid->getHeight(x-1, y);
+        	d1r = water(x+1, y);
+        	h1r = _grid->getHeight(x+1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
         	// bottom neighbor
-        	d1b = water(x, y-1);
-        	h1b = _grid->getHeight(x, y-1);
+        	d1b = water(x, y+1);
+        	h1b = _grid->getHeight(x, y+1);
         	dhb = h1 + d1 - h1b - d1b;
 
         	// update fluxes
@@ -173,30 +184,31 @@ void Simulation::updateWaterSurface( double dt ) {
         }
     }
 
-	for ( int x = 0; x < _width; x+=(_width-1) ) {
-		for ( int y = 0; y < _width; y+=(_width-1) ) {
+
+	for ( int y = 0; y < _width; y+=(_width-1) ) {
+		for ( int x = 0; x < _width; x+=(_width-1) ) {
 
 		    d1 = water(x,y);
 		    h1 = _grid->getHeight(x,y);
 		    
 		    // left neighbor
-        	d1l = x == _width-1 ? 0.0 : water(x+1, y);
-        	h1l = x == _width-1 ? 0.0 : _grid->getHeight(x+1, y);
+        	d1l = x == 0 ? 0.0 : water(x-1, y);
+        	h1l = x == 0 ? 0.0 : _grid->getHeight(x-1, y);
         	dhl = h1 + d1 - h1l - d1l;
 
         	// top neighbor
-        	d1t = y == _width-1 ? 0.0 : water(x, y+1);
-        	h1t = y == _width-1 ? 0.0 : _grid->getHeight(x, y+1);
+        	d1t = y == 0 ? 0.0 : water(x, y-1);
+        	h1t = y == 0 ? 0.0 : _grid->getHeight(x, y-1);
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = x == 0 ? 0.0 : water(x-1, y);
-        	h1r = x == 0 ? 0.0 : _grid->getHeight(x-1, y);
+        	d1r = x == _width - 1 ? 0.0 : water(x+1, y);
+        	h1r = x == _width - 1 ? 0.0 : _grid->getHeight(x+1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
         	// bottom neighbor
-        	d1b = y == 0 ? 0.0 : water(x, y-1);
-        	h1b = y == 0 ? 0.0 : _grid->getHeight(x, y-1);
+        	d1b = y == _width - 1 ? 0.0 : water(x, y+1);
+        	h1b = y == _width - 1 ? 0.0 : _grid->getHeight(x, y+1);
         	dhb = h1 + d1 - h1b - d1b;
 
 			// update fluxes
@@ -224,15 +236,15 @@ void Simulation::updateWaterSurface( double dt ) {
 	}
 
 	// compute volume of water passing through cell(x,y)
-	for ( int x = 0; x < _width; ++x ) {
-        for ( int y = 0; y < _height; ++y ) {
+    for ( int y = 0; y < _height; ++y ) {
+		for ( int x = 0; x < _width; ++x ) {
 
         	inFlow = 0.0; outFlow = 0.0;
         	
-        	inFlow += x == _width - 1 ? 0.0 : rightFlux (x+1, y);
-        	inFlow += y == _width - 1 ? 0.0 : topFlux   (x, y+1);
-        	inFlow += x == 0          ? 0.0 : leftFlux  (x-1, y);
-        	inFlow += y == 0          ? 0.0 : bottomFlux(x, y-1);
+        	inFlow += x == 0          ? 0.0 : rightFlux (x-1, y);
+        	inFlow += y == 0          ? 0.0 : topFlux   (x, y-1);
+        	inFlow += x == _width - 1 ? 0.0 : leftFlux  (x+1, y);
+        	inFlow += y == _width - 1 ? 0.0 : bottomFlux(x, y+1);
 
         	outFlow += rightFlux(x,y);
         	outFlow += topFlux(x,y);
@@ -240,15 +252,20 @@ void Simulation::updateWaterSurface( double dt ) {
         	outFlow += bottomFlux(x,y);
 
         	double dv = dt * ( inFlow - outFlow );
+        	
+        	if (fabs(dv) < 1e-8) {
+        		continue;
+        	}
+            
             d2 = dv / ( lx * ly );
 
             d1 = water(x,y);
             d2 += d1;
 
             // calculate average amount of water that passes through cell
-            double dwx = (rightFlux(x+1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
+            double dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x-1, y)) * 0.5;
             // TODO: possible bug
-            double dwy = (topFlux(x, y-1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y-1)) * 0.5;
+            double dwy = (topFlux(x, y+1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y+1)) * 0.5;
 
             double dbar = 0.5 * (d1 + d2);
 
@@ -261,15 +278,7 @@ void Simulation::updateWaterSurface( double dt ) {
 
     		
     		// simulate erosion
-            // sediment capacity constant
-            const double Kc = 15.0;
-            // dissolving constant
-            const double Ks = 0.001;
-            // deposition constant
-            const double Kd = 0.003;
-            // evaporation constant
-            const double Ke = 0.004;
-
+            
             // local velocity
             double uV = u(x,y);
             double vV = v(x,y);
@@ -280,10 +289,26 @@ void Simulation::updateWaterSurface( double dt ) {
 
             double st = sediment(x,y);
             if ( C > st ) {
+            	_terrain[y * _width + x] -= Ks * ( C - st );
                 _s1[y * _width + x] += Ks * ( C - st );
             } else {
+            	_terrain[y * _width + x] += Ks * ( C - st );
                 _s1[y * _width + x] -= Kd * ( st - C );
             }
+
+            // simulate evaporation
+            d2 *= ( 1 - Ke * dt );
+
+            _water[y * _width + x] = d2;
+        }
+    }
+
+    for ( int y = 0; y < _height; ++y ) {
+		for ( int x = 0; x < _width; ++x ) {
+
+			// local velocity
+            double uV = u(x,y);
+            double vV = v(x,y);
 
             // where the flow comes from
             double sedimentFromX = static_cast<double>(x) * uV * dt;
@@ -297,37 +322,50 @@ void Simulation::updateWaterSurface( double dt ) {
 
             _sediment[sy * _width + sx] = _s1[x * _width + x];
 
-            // update min and max sediment for current cell
-            if ( sediment(x,y) < _minS ) {
-                _minS = sediment(x,y);
+            // update min and max terrain for current cell
+            if ( terrain(x,y) < _minS ) {
+                _minS = terrain(x,y);
             }
-            if ( sediment(x,y) > _maxS ) {
-                _maxS = sediment(x,y);
+            if ( terrain(x,y) > _maxS ) {
+                _maxS = terrain(x,y);
             }
 
-            // simulate evaporation
-            d2 *= ( 1 - Ke * dt );
 
-            _water[y * _width + x] = d2;
-
+            double waterCurrent = _water[y * _width +x];
             // update min and max for water
-            double waterCurrent = water(x,y);
             if ( waterCurrent < _minW ) {
-                _minW = water(x,y);
+                _minW = waterCurrent;
             }
             if ( waterCurrent > _maxW ) {
-                _maxW = water(x,y);
+                _maxW = waterCurrent;
             }
-        }
-    }
+
+            if (newWater) {
+	        	std::cout << "water heights:";
+		        for ( int y = 0; y < _height; ++y ) {
+					for ( int x = 0; x < _width; ++x ) {
+						std::cout << water(x,y) << ", ";
+					}
+					std::cout << std::endl;
+				}
+
+				std::cout << "terrain heights:";
+		        for ( int y = 0; y < _height; ++y ) {
+					for ( int x = 0; x < _width; ++x ) {
+						std::cout << terrain(x,y) << ", ";
+					}
+					std::cout << std::endl;
+				}
+			}
+	        
+        } // end x for loop
+    } // end y for loop
+    assert(true==false);
 }
 
 void Simulation::addWaterSource( const int cellIndex, const double amount ) {
-    _water[cellIndex] = amount;
-    _minW = amount;
-    _maxW = amount;
-    _minS = amount;
-    _maxS = amount;
+    _water[cellIndex] += amount;
+    newWater = true;
 }
 
 const double Simulation::getWaterAt( int x, int y ) {
@@ -345,17 +383,18 @@ const double Simulation::getSedimentAt( int x, int y ) {
 void Simulation::setGrid( Grid* newGrid ) {
 	_grid = newGrid;
 	// set cell size
-    lx = ly = 1.0 / (_grid->size());
+    lx = ly = 0.25;
 }
 
 void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
     double waterHeight, terrainHeight, sedimentHeight;
     waterHeight = terrainHeight = sedimentHeight = 0.0;
 
-    for ( int x = 0; x < _width; ++x ) {
-        for ( int y = 0; y < _height; ++y ) {
-            terrainHeight = terrain(x,y);
-            waterHeight = water(x,y);
+    for ( int y = 0; y < _height; ++y ) {
+    	for ( int x = 0; x < _width; ++x ) {
+            
+            terrainHeight = (terrain(x,y) - _minS) / (_maxS - _minS);
+            waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
             sedimentHeight = sediment(x,y);
 
             _grid->drawCell( painter, x, y, terrainHeight, waterHeight,
