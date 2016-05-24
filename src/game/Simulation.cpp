@@ -166,6 +166,84 @@ void Simulation::updateWaterSurface( double dt ) {
         }
     }
 
+    // top left corner
+    // 
+    d1 = water(0,0);
+    h1 = _grid->getHeight(0,0);
+    // right neighbor
+	d1r = water(1, 0);
+	h1r = _grid->getHeight(1, 0);
+	dhr = h1 + d1 - h1r - d1r;
+	// bottom neighbor
+	d1b = water(0, 1);
+	h1b = _grid->getHeight(0, 1);
+	dhb = h1 + d1 - h1b - d1b;
+
+	// update fluxes
+	_leftFlux  [0] = 0.0;
+	_topFlux   [0] = 0.0;
+	_rightFlux [0] = std::max(0.0, fluxFactor * dhr);
+	_bottomFlux[0] = std::max(0.0, fluxFactor * dhb);
+
+	// top right corner
+	// 
+	d1 = water(_width-1, 0);
+    h1 = _grid->getHeight(_width, 0);
+    // left neighbor
+	d1l = water(_width-1, 0);
+	h1l = _grid->getHeight(_width-1, 0);
+	dhl = h1 + d1 - h1l - d1l;
+	// bottom neighbor
+	d1b = water(0, 1);
+	h1b = _grid->getHeight(0, 1);
+	dhb = h1 + d1 - h1b - d1b;
+
+	// update fluxes
+	_leftFlux  [_width-1] = std::max(0.0, fluxFactor * dhl);
+	_topFlux   [_width-1] = 0.0;
+	_rightFlux [_width-1] = 0.0;
+	_bottomFlux[_width-1] = std::max(0.0, fluxFactor * dhb);
+
+	// bottom left corner
+	// 
+	d1 = water(0,_width-1);
+    h1 = _grid->getHeight(0,_width-1);
+    // right neighbor
+	d1r = water(1, _width-1);
+	h1r = _grid->getHeight(1, _width-1);
+	dhr = h1 + d1 - h1r - d1r;
+	// top neighbor
+	d1b = water(0, _width-2);
+	h1b = _grid->getHeight(0, _width-2);
+	dhb = h1 + d1 - h1b - d1b;
+
+	// update fluxes
+	_leftFlux  [y * _width + x] = 0.0;
+	_topFlux   [y * _width + x] = 0.0;
+	_rightFlux [y * _width + x] = std::max(0.0, fluxFactor * dhr);
+	_bottomFlux[y * _width + x] = std::max(0.0, fluxFactor * dhb);
+
+	// bottom right corner
+	// 
+	d1 = water(_width-1, 0);
+    h1 = _grid->getHeight(_width, 0);
+    // left neighbor
+	d1l = water(_width-1, 0);
+	h1l = _grid->getHeight(_width-1, 0);
+	dhl = h1 + d1 - h1l - d1l;
+	// top neighbor
+	d1b = water(_width-1, _width-2);
+	h1b = _grid->getHeight(_width-1, _width-2);
+	dhb = h1 + d1 - h1b - d1b;
+
+	// update fluxes
+	_leftFlux  [y * _width + x] = std::max(0.0, fluxFactor * dhl);
+	_topFlux   [y * _width + x] = 0.0;
+	_rightFlux [y * _width + x] = 0.0;
+	_bottomFlux[y * _width + x] = (0.0, fluxFactor * dhb);
+
+
+	// compute volume of water passing through cell(x,y)
 	for ( int x = 0; x < _width; ++x ) {
         for ( int y = 0; y < _height; ++y ) {
 
@@ -224,7 +302,7 @@ void Simulation::updateWaterSurface( double dt ) {
                 s1 -= Kd * ( st - C );
             }
 
-            // sediment[currentCell] = s1;
+            sediment[currentCell] = s1;
 
             // update min and max sediment for current cell
             if ( sediment(x,y) < _minS ) {
@@ -237,7 +315,7 @@ void Simulation::updateWaterSurface( double dt ) {
             // simulate evaporation
             d2 *= ( 1 - Ke * dt );
 
-            // water[currentCell] = d2;
+            water[currentCell] = d2;
 
             // update min and max for water
             double waterCurrent = water(x,y);
