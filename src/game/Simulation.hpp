@@ -46,7 +46,7 @@ private:
 	vector<double> _water;
 	vector<double> _sediment;
 	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
-	vector<double> _u, _v;
+	vector<double> _u, _v, _s1;
 
 	const UnitSquareMapping _mapping;
 	Grid *_grid;

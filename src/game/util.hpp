@@ -39,6 +39,12 @@ inline void clamp(double& value, const double minValue, const double maxValue)
     if (value > maxValue) value = maxValue;
 }
 
+inline void clamp(int& value, const int minValue, const int maxValue)
+{
+    if (value < minValue) value = minValue;
+    if (value > maxValue) value = maxValue;
+}
+
 inline Point2d scale(Point2d& point, const int imgHeight, const int scaling, const UnitSquareMapping& mapping)
 {
     Point2d p = mapping.fromParameterization(point);

@@ -1,6 +1,7 @@
 #include "Simulation.hpp"
 #include <cmath>
 #include <iostream>
+#include "util.hpp"
 
 double Simulation::_minW = 0.0;
 double Simulation::_maxW = 0.0;
@@ -14,7 +15,7 @@ Simulation::Simulation( int newWidth, int newHeight,
       _sediment( _width * _height, 0.0 ), _leftFlux( _width * _height ),
       _rightFlux( _width * _height ), _topFlux( _width * _height ),
       _bottomFlux( _width * _height ), _u( _width * _height ),
-      _v( _width * _height ),
+      _v( _width * _height ), _s1( _width * _height, 0.0 ),
       _mapping( mapping ), _grid( nullptr ) {}
 
 Simulation::~Simulation() {}
@@ -254,16 +255,20 @@ void Simulation::updateWaterSurface( double dt ) {
             double uu = dwx / (dbar * lx);
             double vv = dwy / (dbar * ly);
 
+            // update velocity field
+            _u[y * _width + x] = uu;
+            _v[y * _width + x] = vv;
 
-            // simulate erosion
+    		
+    		// simulate erosion
             // sediment capacity constant
             const double Kc = 15.0;
             // dissolving constant
             const double Ks = 0.001;
             // deposition constant
-            const double Kd = 0.001;
+            const double Kd = 0.003;
             // evaporation constant
-            const double Ke = 0.0004;
+            const double Ke = 0.004;
 
             // local velocity
             double uV = u(x,y);
@@ -271,17 +276,26 @@ void Simulation::updateWaterSurface( double dt ) {
 
 
             double angle = fabs(1.0 - _grid->getCellNormal(x, y).z());
-            double C = Kc * angle * ( sqrt(uV*uV + vV*vV)  );
+            double C = Kc * sin(acos(angle)) * ( sqrt(uV*uV + vV*vV)  );
 
-            double s1 = 0.0;
             double st = sediment(x,y);
             if ( C > st ) {
-                s1 += Ks * ( C - st );
+                _s1[y * _width + x] += Ks * ( C - st );
             } else {
-                s1 -= Kd * ( st - C );
+                _s1[y * _width + x] -= Kd * ( st - C );
             }
 
-            _sediment[y * _width + x] = s1;
+            // where the flow comes from
+            double sedimentFromX = static_cast<double>(x) * uV * dt;
+            double sedimentFromY = static_cast<double>(y) * vV * dt;
+
+           	int sx = floor(sedimentFromX);
+           	int sy = floor(sedimentFromY);
+
+            util::clamp(sx, 0, _sediment.size());
+            util::clamp(sy, 0, _sediment.size());
+
+            _sediment[sy * _width + sx] = _s1[x * _width + x];
 
             // update min and max sediment for current cell
             if ( sediment(x,y) < _minS ) {
