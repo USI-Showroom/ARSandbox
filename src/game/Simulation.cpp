@@ -173,7 +173,7 @@ void Simulation::updateWaterSurface( double dt ) {
     }
 
 	for ( int x = 0; x < _width; x+=(_width-1) ) {
-		for ( int y = 0 y < _width; y+=(_width-1) ) {
+		for ( int y = 0; y < _width; y+=(_width-1) ) {
 
 		    d1 = water(x,y);
 		    h1 = _grid->getHeight(x,y);
@@ -189,7 +189,7 @@ void Simulation::updateWaterSurface( double dt ) {
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = x == _width-1 ? 0.0 : _water(x+1, y);
+        	d1r = x == _width-1 ? 0.0 : water(x+1, y);
         	h1r = x == _width-1 ? 0.0 : _grid->getHeight(x+1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
@@ -281,7 +281,7 @@ void Simulation::updateWaterSurface( double dt ) {
                 s1 -= Kd * ( st - C );
             }
 
-            sediment[currentCell] = s1;
+            _sediment[y * _width + x] = s1;
 
             // update min and max sediment for current cell
             if ( sediment(x,y) < _minS ) {
@@ -294,7 +294,7 @@ void Simulation::updateWaterSurface( double dt ) {
             // simulate evaporation
             d2 *= ( 1 - Ke * dt );
 
-            water[currentCell] = d2;
+            _water[y * _width + x] = d2;
 
             // update min and max for water
             double waterCurrent = water(x,y);
