@@ -130,23 +130,23 @@ void Simulation::updateWaterSurface( double dt ) {
         	h1 = _grid->getHeight(x,y);
         	
         	// left neighbor
-        	d1l = water(x-1, y);
-        	h1l = _grid->getHeight(x-1, y);
+        	d1l = water(x+1, y);
+        	h1l = _grid->getHeight(x+1, y);
         	dhl = h1 + d1 - h1l - d1l;
 
         	// top neighbor
-        	d1t = water(x, y-1);
-        	h1t = _grid->getHeight(x, y-1);
+        	d1t = water(x, y+1);
+        	h1t = _grid->getHeight(x, y+1);
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = water(x+1, y);
-        	h1r = _grid->getHeight(x+1, y);
+        	d1r = water(x-1, y);
+        	h1r = _grid->getHeight(x-1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
         	// bottom neighbor
         	d1b = water(x, y-1);
-        	h1b = _grid->getHeight(x, y+1);
+        	h1b = _grid->getHeight(x, y-1);
         	dhb = h1 + d1 - h1b - d1b;
 
         	// update fluxes
@@ -180,23 +180,23 @@ void Simulation::updateWaterSurface( double dt ) {
 		    h1 = _grid->getHeight(x,y);
 		    
 		    // left neighbor
-        	d1l = x == 0 ? 0.0 : water(x-1, y);
-        	h1l = x == 0 ? 0.0 : _grid->getHeight(x-1, y);
+        	d1l = x == _width-1 ? 0.0 : water(x+1, y);
+        	h1l = x == _width-1 ? 0.0 : _grid->getHeight(x+1, y);
         	dhl = h1 + d1 - h1l - d1l;
 
         	// top neighbor
-        	d1t = y == 0 ? 0.0 : water(x, y-1);
-        	h1t = y == 0 ? 0.0 : _grid->getHeight(x, y-1);
+        	d1t = y == _width-1 ? 0.0 : water(x, y+1);
+        	h1t = y == _width-1 ? 0.0 : _grid->getHeight(x, y+1);
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
-        	d1r = x == _width-1 ? 0.0 : water(x+1, y);
-        	h1r = x == _width-1 ? 0.0 : _grid->getHeight(x+1, y);
+        	d1r = x == 0 ? 0.0 : water(x-1, y);
+        	h1r = x == 0 ? 0.0 : _grid->getHeight(x-1, y);
         	dhr = h1 + d1 - h1r - d1r;
 
         	// bottom neighbor
-        	d1b = y == _width-1 ? 0.0 : water(x, y-1);
-        	h1b = y == _width-1 ? 0.0 : _grid->getHeight(x, y+1);
+        	d1b = y == 0 ? 0.0 : water(x, y-1);
+        	h1b = y == 0 ? 0.0 : _grid->getHeight(x, y-1);
         	dhb = h1 + d1 - h1b - d1b;
 
 			// update fluxes
@@ -229,10 +229,10 @@ void Simulation::updateWaterSurface( double dt ) {
 
         	inFlow = 0.0; outFlow = 0.0;
         	
-        	inFlow += x == 0          ? 0.0 : rightFlux (x-1, y);
-        	inFlow += y == 0          ? 0.0 : topFlux   (x, y-1);
-        	inFlow += x == _width - 1 ? 0.0 : leftFlux  (x+1, y);
-        	inFlow += y == _width - 1 ? 0.0 : bottomFlux(x, y+1);
+        	inFlow += x == _width - 1 ? 0.0 : rightFlux (x+1, y);
+        	inFlow += y == _width - 1 ? 0.0 : topFlux   (x, y+1);
+        	inFlow += x == 0          ? 0.0 : leftFlux  (x-1, y);
+        	inFlow += y == 0          ? 0.0 : bottomFlux(x, y-1);
 
         	outFlow += rightFlux(x,y);
         	outFlow += topFlux(x,y);
@@ -246,9 +246,9 @@ void Simulation::updateWaterSurface( double dt ) {
             d2 += d1;
 
             // calculate average amount of water that passes through cell
-            double dwx = (rightFlux(x - 1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x + 1, y)) * 0.5;
+            double dwx = (rightFlux(x+1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
             // TODO: possible bug
-            double dwy = (topFlux(x, y - 1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y + 1)) * 0.5;
+            double dwy = (topFlux(x, y-1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y-1)) * 0.5;
 
             double dbar = 0.5 * (d1 + d2);
 
