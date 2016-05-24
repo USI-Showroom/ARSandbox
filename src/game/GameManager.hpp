@@ -9,7 +9,6 @@
 
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
-#include "Drop.hpp"
 #include "Simulation.hpp"
 #include "Grid.hpp"
 
@@ -46,7 +45,6 @@ public:
     void updateTexture();
 
 private:
-    std::vector<Drop *> _drops;
     int _minH, _maxH;
     
     bool _playing;

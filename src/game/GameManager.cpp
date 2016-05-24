@@ -75,7 +75,6 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
 	}
     else
     {
-        _drops.clear();
         _gameTimer->stop();
         _image.fill(QColor(0, 0, 0, 0));
     }
