@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 20;
+static const int simulationSize = 60;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -101,7 +101,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 #ifdef DEBUG
     std::cout << "grid index: " << gridIndex << std::endl;
 #endif
-    _simulation->addWaterSource( gridIndex, 0.30 );
+    _simulation->addWaterSource( gridIndex, 3.00 );
     std::cout << "Water added at cell " << gridIndex << std::endl;
 }
 
