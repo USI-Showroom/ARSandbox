@@ -33,9 +33,14 @@ const int& Grid::size()
 
 double Grid::getHeight(int x, int y) const
 {
+#ifdef DEBUG
     assert(x < _size);
     assert(y < _size);
-
+#endif
+    
+    if (x < _size || y < _size)
+        return 0;
+    
     const int sw = 3;
     const int sh = 3;
     const int npoints = sw*sh;
@@ -142,7 +147,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     // std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
     QColor color(r,g,b,255);
 
-    int nItems = 10;
+    int nItems = 12;
     double nPoints = static_cast<double>(nItems);
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {

@@ -55,15 +55,15 @@ private:
 
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 8.0;
+    constexpr static double A = 15.0;
     // length of virtual pipe
     constexpr static double l = 5.05;
     // gravity
-    constexpr static double g = 12.81;
+    constexpr static double g = 9.8;
     // cell size
     double lx, ly;
     // sediment capacity constant
-    constexpr static double Kc = 0.0075;
+    constexpr static double Kc = 0.295;
     // dissolving constant
     constexpr static double Ks = 0.002;
     // deposition constant
