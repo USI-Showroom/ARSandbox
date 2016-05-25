@@ -141,8 +141,8 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     Point2d p1( x * xStep, y * yStep );
 
     int r = static_cast<int>(std::min(255.0, std::max(0.0, terrain*255.0)));
-    int g = static_cast<int>(std::min(255.0, std::max(0.0, water*255.0)));
-    int b = static_cast<int>(std::min(255.0, std::max(0.0, sediment*255.0)));
+    int g = static_cast<int>(std::min(255.0, std::max(0.0, sediment*255.0)));
+    int b = static_cast<int>(std::min(255.0, std::max(0.0, water*255.0)));
 
     // std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
     QColor color(r,g,b,255);

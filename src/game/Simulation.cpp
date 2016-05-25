@@ -140,26 +140,26 @@ void Simulation::updateWaterSurface( double dt ) {
     	for ( int x = 0; x < _width; ++x ) {
         	
         	d1 = water(x,y);
-        	h1 = _grid->getHeight(x,y);
+        	h1 = _grid->getHeight(x,y) + _terrain[y * _width + x];
         	
         	// left neighbor
         	d1l = water(x+1, y);
-        	h1l = _grid->getHeight(x+1, y);
+        	h1l = _grid->getHeight(x+1, y) + _terrain[y * _width + x];
         	dhl = h1 + d1 - h1l - d1l;
 
         	// top neighbor
         	d1t = water(x, y+1);
-        	h1t = _grid->getHeight(x, y+1);
+        	h1t = _grid->getHeight(x, y+1) + _terrain[y * _width + x];
         	dht = h1 + d1 - h1t - d1t;
 
         	// right neighbor
         	d1r = water(x-1, y);
-        	h1r = _grid->getHeight(x-1, y);
+        	h1r = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
         	dhr = h1 + d1 - h1r - d1r;
 
         	// bottom neighbor
         	d1b = water(x, y-1);
-        	h1b = _grid->getHeight(x, y-1);
+        	h1b = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
         	dhb = h1 + d1 - h1b - d1b;
 
         	// update fluxes
