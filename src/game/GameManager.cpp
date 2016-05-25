@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 38;
+static const int simulationSize = 50;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -35,8 +35,8 @@ GameManager::GameManager()
     _image.fill(QColor(0,0,0,0));
     _simulation->setGrid(_grid);
 
-    int gridIndex = _grid->getCellIndex( 0.56, 0.67 );
-    _simulation->addWaterSource( gridIndex, 10.0 );
+    // int gridIndex = _grid->getCellIndex( 0.56, 0.67 );
+    // _simulation->addWaterSource( gridIndex, 10.0 );
 }
 
 GameManager::~GameManager()
