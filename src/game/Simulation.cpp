@@ -25,7 +25,8 @@ Simulation::Simulation( int newWidth, int newHeight,
       _v ( _width * _height, 0.0 ),
       _s1( _width * _height, 0.0 ),
       
-      _mapping( mapping ), _grid( nullptr ), newWater(false) {}
+      _mapping( mapping ), _grid( nullptr ), newWater(false)
+      {}
 
 Simulation::~Simulation() {}
 
@@ -253,11 +254,17 @@ void Simulation::updateWaterSurface( double dt ) {
 
         	double dv = dt * ( inFlow - outFlow );
         	
-        	if (fabs(dv) < 1e-8) {
+        	if (fabs(dv) < 1e-12) {
         		continue;
         	}
             
             d2 = dv / ( lx * ly );
+
+            double dbar = 0.5 * (d1 + d2);
+
+            if (fabs(lx + ly) < 1e-8) {
+            	dbar = 1.0;
+            }
 
             d1 = water(x,y);
             d2 += d1;
@@ -265,9 +272,9 @@ void Simulation::updateWaterSurface( double dt ) {
             // calculate average amount of water that passes through cell
             double dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x-1, y)) * 0.5;
             // TODO: possible bug
-            double dwy = (topFlux(x, y+1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y+1)) * 0.5;
+            double dwy = (topFlux(x, y+1) - bottomFlux(x, y) + bottomFlux(x, y) - topFlux(x, y-1)) * 0.5;
 
-            double dbar = 0.5 * (d1 + d2);
+            // std::cout << "\ndwx: " << dwx << ", dwy: " << dwy << std::endl;
 
             double uu = dwx / (dbar * lx);
             double vv = dwy / (dbar * ly);
@@ -285,7 +292,9 @@ void Simulation::updateWaterSurface( double dt ) {
 
 
             double angle = fabs(1.0 - _grid->getCellNormal(x, y).z());
-            double C = Kc * sin(acos(angle)) * ( sqrt(uV*uV + vV*vV)  );
+            double sq = sqrt(uV*uV + vV*vV);
+            double C = Kc * angle * sq;
+
 
             double st = sediment(x,y);
             if ( C > st ) {
@@ -295,6 +304,14 @@ void Simulation::updateWaterSurface( double dt ) {
             	_terrain[y * _width + x] += Ks * ( C - st );
                 _s1[y * _width + x] -= Kd * ( st - C );
             }
+
+            // if (_terrain[y * _width + x] != _terrain[y * _width + x]) {
+            // 		std::cout << "A: "<< angle << ", " << _terrain[y * _width + x] << ", " << st
+            // 		 << std::endl;
+
+            // 		 std::cout << "C: " << C << std::endl;
+            // 		 std::cout << "uv: " << uV << ", vV:" << vV << ", sqrt: " << sq << std::endl;
+            // }
 
             // simulate evaporation
             d2 *= ( 1 - Ke * dt );
@@ -340,8 +357,9 @@ void Simulation::updateWaterSurface( double dt ) {
                 _maxW = waterCurrent;
             }
 
+#ifdef DEBUG
             if (newWater) {
-	        	std::cout << "water heights:";
+	        	std::cout << "\nwater heights:" << std::endl;
 		        for ( int y = 0; y < _height; ++y ) {
 					for ( int x = 0; x < _width; ++x ) {
 						std::cout << water(x,y) << ", ";
@@ -349,7 +367,7 @@ void Simulation::updateWaterSurface( double dt ) {
 					std::cout << std::endl;
 				}
 
-				std::cout << "terrain heights:";
+				std::cout << "\nterrain heights:" << std::endl;
 		        for ( int y = 0; y < _height; ++y ) {
 					for ( int x = 0; x < _width; ++x ) {
 						std::cout << terrain(x,y) << ", ";
@@ -357,10 +375,9 @@ void Simulation::updateWaterSurface( double dt ) {
 					std::cout << std::endl;
 				}
 			}
-	        
+#endif        
         } // end x for loop
     } // end y for loop
-    assert(true==false);
 }
 
 void Simulation::addWaterSource( const int cellIndex, const double amount ) {

@@ -63,13 +63,13 @@ private:
     // cell size
     double lx, ly;
     // sediment capacity constant
-    constexpr static double Kc = 15.0;
+    constexpr static double Kc = 0.0005;
     // dissolving constant
-    constexpr static double Ks = 0.004;
+    constexpr static double Ks = 0.0004;
     // deposition constant
-    constexpr static double Kd = 0.03;
+    constexpr static double Kd = 0.0003;
     // evaporation constant
-    constexpr static double Ke = 0;
+    constexpr static double Ke = 0.005;
 };
 
 #endif // SIMULATION_HPP_INCLUDED

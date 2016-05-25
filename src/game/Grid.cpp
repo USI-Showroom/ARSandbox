@@ -71,8 +71,8 @@ Point3d Grid::getCellNormal( int x, int y ) const
     double yy = static_cast<double>(y) / _size;
 
     const Point2d a1 = Point2d(xx, yy);
-    const Point2d a2 = a1 + Point2d(1.0, 0.0);
-    const Point2d a3 = a2 + Point2d(0.0,-1.0);
+    const Point2d a2 = a1 + Point2d(0.05, 0.0);
+    const Point2d a3 = a2 + Point2d(0.0,-0.05);
 
     const double h1 = mapping->getHeightFromParam(a1);
     const double h2 = mapping->getHeightFromParam(a2);
