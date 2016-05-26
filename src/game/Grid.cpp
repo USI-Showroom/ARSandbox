@@ -32,13 +32,8 @@ const int& Grid::size()
 }
 
 double Grid::getHeight(int x, int y) const
-{
-#ifdef DEBUG
-    assert(x < _size);
-    assert(y < _size);
-#endif
-    
-    if (x < _size || y < _size)
+{    
+    if ( x < 0 || y < 0 || x >= _size || y >= _size )
         return 0;
     
     const int sw = 3;
@@ -75,9 +70,13 @@ Point3d Grid::getCellNormal( int x, int y ) const
     double xx = static_cast<double>(x) / _size;
     double yy = static_cast<double>(y) / _size;
 
-    const Point2d a1 = Point2d(xx, yy);
-    const Point2d a2 = a1 + Point2d(0.05, 0.0);
-    const Point2d a3 = a2 + Point2d(0.0,-0.05);
+    Point2d a1 = Point2d(xx, yy);
+    Point2d a2 = a1 + Point2d(0.05, 0.0);
+    Point2d a3 = a2 + Point2d(0.0,-0.05);
+
+    util::clamp(a1, 0.0, _size);
+    util::clamp(a2, 0.0, _size);
+    util::clamp(a3, 0.0, _size);
 
     const double h1 = mapping->getHeightFromParam(a1);
     const double h2 = mapping->getHeightFromParam(a2);
@@ -147,7 +146,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     // std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
     QColor color(r,g,b,255);
 
-    int nItems = 12;
+    int nItems = 10;
     double nPoints = static_cast<double>(nItems);
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {

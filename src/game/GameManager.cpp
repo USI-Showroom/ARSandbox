@@ -35,8 +35,10 @@ GameManager::GameManager()
     _image.fill(QColor(0,0,0,0));
     _simulation->setGrid(_grid);
 
-    // int gridIndex = _grid->getCellIndex( 0.56, 0.67 );
-    // _simulation->addWaterSource( gridIndex, 10.0 );
+#ifdef DEBUG
+    assert(simulationSize == 3);
+    _simulation->addWaterSource( 4, 0.5 );
+#endif
 }
 
 GameManager::~GameManager()
@@ -98,14 +100,18 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
 #endif
 
+#ifndef DEBUG
     // convert to grid cell
     int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
-#ifdef DEBUG
-    std::cout << "grid index: " << gridIndex << std::endl;
-#endif
-    double amount = 50.0;
+    
+    double amount = 3.0;
     _simulation->addWaterSource( gridIndex, amount );
+
+#ifdef DEBUG
+    std::cout << "Computed grid index: " << gridIndex << std::endl;
     std::cout << " Water amount " << amount << " added at cell " << gridIndex << std::endl;
+#endif
+#endif
 }
 
 void GameManager::mouseMove(const int x, const int y,  const int w, const int h)

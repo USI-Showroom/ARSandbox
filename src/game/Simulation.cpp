@@ -34,7 +34,7 @@ Simulation::~Simulation() {}
 //
 const double Simulation::water(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _water.size()) {
+	if (idx >= 0 && idx < _water.size()) {
 		return _water.at(idx);
 	} else {
 		return 0.0;
@@ -43,7 +43,7 @@ const double Simulation::water(int x, int y) {
 
 const double Simulation::sediment(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _sediment.size()) {
+	if (idx >= 0 && idx < _sediment.size()) {
 		return _sediment[idx];
 	} else {
 		return 0.0;
@@ -52,7 +52,7 @@ const double Simulation::sediment(int x, int y) {
 
 const double Simulation::terrain(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _terrain.size()) {
+	if (idx >= 0 && idx < _terrain.size()) {
 		return _terrain[idx];
 	} else {
 		return 0.0;
@@ -61,7 +61,7 @@ const double Simulation::terrain(int x, int y) {
 
 const double Simulation::rightFlux(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _rightFlux.size()) {
+	if (idx >= 0 && idx < _rightFlux.size()) {
 		return _rightFlux[idx];
 	} else {
 		return 0.0;
@@ -70,7 +70,7 @@ const double Simulation::rightFlux(int x, int y) {
 
 const double Simulation::bottomFlux(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _bottomFlux.size()) {
+	if (idx >= 0 && idx < _bottomFlux.size()) {
 		return _bottomFlux[idx];
 	} else {
 		return 0.0;
@@ -79,7 +79,7 @@ const double Simulation::bottomFlux(int x, int y) {
 
 const double Simulation::topFlux(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _topFlux.size()) {
+	if (idx >= 0 && idx < _topFlux.size()) {
 		return _topFlux[idx];
 	} else {
 		return 0.0;
@@ -88,7 +88,7 @@ const double Simulation::topFlux(int x, int y) {
 
 const double Simulation::leftFlux(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _leftFlux.size()) {
+	if (idx >= 0 && idx < _leftFlux.size()) {
 		return _leftFlux[idx];
 	} else {
 		return 0.0;
@@ -97,7 +97,7 @@ const double Simulation::leftFlux(int x, int y) {
 
 const double Simulation::u(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _u.size()) {
+	if (idx >= 0 && idx < _u.size()) {
 		return _u[idx];
 	} else {
 		return 0.0;
@@ -106,7 +106,7 @@ const double Simulation::u(int x, int y) {
 
 const double Simulation::v(int x, int y) {
 	int idx = y * _width + x;
-	if (idx > 0 && idx < _v.size()) {
+	if (idx >= 0 && idx < _v.size()) {
 		return _v[idx];
 	} else {
 		return 0.0;
@@ -128,10 +128,13 @@ void Simulation::updateWaterSurface( double dt ) {
     // flux factor
     double fluxFactor = g * A / l * dt;
 
-    double outFlow, inFlow, tempFlow, dh, d1, d2, h1;
-    outFlow = inFlow = tempFlow = dh = d1 = d2 = h1 = 0.0;
-
-    double d1l, h1l, dhl, d1t, h1t, dht, d1r, h1r, dhr, d1b, h1b, dhb;
+    outFlow = inFlow = 0.0;
+    
+    d1  = d2  = b1  = 0.0;
+    d1l = b1l = dhl = 0.0;
+    d1t = b1t = dht = 0.0;
+    d1r = b1r = dhr = 0.0;
+    d1b = b1b = dhb = 0.0;
 
     // compute outFlows for cells
     // boundaries are taken into consideration
@@ -140,28 +143,38 @@ void Simulation::updateWaterSurface( double dt ) {
     	for ( int x = 0; x < _width; ++x ) {
         	
         	d1 = water(x,y);
-        	h1 = _grid->getHeight(x,y) + _terrain[y * _width + x];
+        	b1 = _grid->getHeight(x,y) + _terrain[y * _width + x];
         	
         	// left neighbor
-        	d1l = water(x+1, y);
-        	h1l = _grid->getHeight(x+1, y) + _terrain[y * _width + x];
-        	dhl = h1 + d1 - h1l - d1l;
+        	d1l = water(x-1, y);
+        	b1l = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
+        	dhl = b1 + d1 - b1l - d1l;
 
-        	// top neighbor
-        	d1t = water(x, y+1);
-        	h1t = _grid->getHeight(x, y+1) + _terrain[y * _width + x];
-        	dht = h1 + d1 - h1t - d1t;
+        	// // top neighbor
+        	// d1t = water(x, y-1);
+        	// b1t = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
+        	// dht = b1 + d1 - b1t - d1t;
 
-        	// right neighbor
-        	d1r = water(x-1, y);
-        	h1r = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
-        	dhr = h1 + d1 - h1r - d1r;
+        	// // right neighbor
+        	// d1r = water(x-1, y);
+        	// b1r = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
+        	// dhr = b1 + d1 - b1r - d1r;
 
-        	// bottom neighbor
-        	d1b = water(x, y-1);
-        	h1b = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
-        	dhb = h1 + d1 - h1b - d1b;
+        	// // bottom neighbor
+        	// d1b = water(x, y-1);
+        	// b1b = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
+        	// dhb = b1 + d1 - b1b - d1b;
 
+#ifdef DEBUG
+        	if ( dhl != dhl || dht != dht || dhr != dhr || dhb != dhb ) {
+	        	std::cout << "\ndh: " <<
+				        	 "\ndhl: " << dhl <<
+				        	 "\ndht: " << dht <<
+				        	 "\ndhr: " << dhr <<
+				        	 "\ndhb: " << dhb <<
+				std::endl;
+			}
+#endif
         	// update fluxes
         	_leftFlux  [y * _width + x] = std::max(0.0, fluxFactor * dhl);
         	_topFlux   [y * _width + x] = std::max(0.0, fluxFactor * dht);
@@ -192,10 +205,10 @@ void Simulation::updateWaterSurface( double dt ) {
 
         	inFlow = 0.0; outFlow = 0.0;
         	
-        	inFlow += x == _width - 1 ? 0.0 : rightFlux(x+1, y);
-        	inFlow += y == 0 ? 0.0 : topFlux(x, y-1);
-        	inFlow += x == 0 ? 0.0 : leftFlux(x-1, y);
-        	inFlow += y == _width - 1 ? 0.0 : bottomFlux(x, y+1);
+        	inFlow += leftFlux(x+1, y);
+        	inFlow += bottomFlux(x, y+1);
+        	inFlow += rightFlux(x-1, y);
+        	inFlow += topFlux(x, y-1);
 
         	outFlow += rightFlux(x,y);
         	outFlow += topFlux(x,y);
@@ -222,7 +235,7 @@ void Simulation::updateWaterSurface( double dt ) {
             // calculate average amount of water that passes through cell
             double dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
             // TODO: possible bug
-            double dwy = (bottomFlux(x, y-1) - topFlux(x, y) + topFlux(x, y) - bottomFlux(x, y-1)) * 0.5;
+            double dwy = (topFlux(x, y-1) - bottomFlux(x, y) + topFlux(x, y) - bottomFlux(x, y+1)) * 0.5;
 
             // std::cout << "\ndwx: " << dwx << ", dwy: " << dwy << std::endl;
 
@@ -255,14 +268,19 @@ void Simulation::updateWaterSurface( double dt ) {
                 _s1[y * _width + x] -= Kd * ( st - C );
             }
 
-            // if (_terrain[y * _width + x] != _terrain[y * _width + x]) {
-            // 		std::cout << "A: "<< angle << ", " << _terrain[y * _width + x] << ", " << st
-            // 		 << std::endl;
-
-            // 		 std::cout << "C: " << C << std::endl;
-            // 		 std::cout << "uv: " << uV << ", vV:" << vV << ", sqrt: " << sq << std::endl;
-            // }
-
+#ifdef DEBUG
+            if (_terrain[y * _width + x] != _terrain[y * _width + x]) {
+            		std::cout
+	            		<< "\nA: "<< angle << ", "
+	            		<< "\nterrain: " << _terrain[y * _width + x] << ", "
+	            		<< "\nst: " << st << ", "
+	            		<< "\nC: " << C << ", "
+	            		<< "\nuv: " << uV << ", "
+	            		<< "\nvV: " << vV << ", "
+	            		<< "\nsqrt: " << sq << 
+	            	std::endl;
+            }
+#endif
             // simulate evaporation
             d2 *= ( 1 - Ke * dt );
 
@@ -322,8 +340,9 @@ void Simulation::updateWaterSurface( double dt ) {
 					for ( int x = 0; x < _width; ++x ) {
 						std::cout << terrain(x,y) << ", ";
 					}
-					std::cout << std::endl;
+					std::cout << "\n";
 				}
+				std::cout << "\n";
 			}
 #endif        
         } // end x for loop

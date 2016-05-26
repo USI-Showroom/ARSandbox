@@ -55,21 +55,29 @@ private:
 
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 15.0;
+    constexpr static double A = 2;
     // length of virtual pipe
-    constexpr static double l = 5.05;
+    constexpr static double l = 4;
     // gravity
-    constexpr static double g = 9.8;
+    constexpr static double g = 8;
     // cell size
     double lx, ly;
     // sediment capacity constant
-    constexpr static double Kc = 0.295;
+    constexpr static double Kc = 0.5;
     // dissolving constant
-    constexpr static double Ks = 0.002;
+    constexpr static double Ks = 0.5;
     // deposition constant
-    constexpr static double Kd = 0.0025;
+    constexpr static double Kd = 0.5;
     // evaporation constant
-    constexpr static double Ke = 0.00005;
+    constexpr static double Ke = 0.5;
+
+    double outFlow, inFlow;
+    
+    double d1, d2, b1;
+    double d1l, b1l, dhl;
+    double d1t, b1t, dht;
+    double d1r, b1r, dhr;
+    double d1b, b1b, dhb;
 };
 
 #endif // SIMULATION_HPP_INCLUDED
