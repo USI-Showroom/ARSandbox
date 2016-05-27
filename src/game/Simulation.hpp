@@ -48,28 +48,28 @@ private:
 	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
 	vector<double> _u, _v, _s1;
 
-	const UnitSquareMapping _mapping;
+	const UnitSquareMapping &_mapping;
 	Grid *_grid;
 
 	bool newWater;
 
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 2;
+    constexpr static double A = 0.00005;
     // length of virtual pipe
-    constexpr static double l = 4;
+    constexpr static double l = 1.0;
     // gravity
-    constexpr static double g = 8;
+    constexpr static double g = 9.81;
     // cell size
     double lx, ly;
     // sediment capacity constant
-    constexpr static double Kc = 0.5;
+    constexpr static double Kc = 25.0;
     // dissolving constant
-    constexpr static double Ks = 0.5;
+    constexpr static double Ks = 0.0001*12*10;
     // deposition constant
-    constexpr static double Kd = 0.5;
+    constexpr static double Kd = 0.0001*12*10;
     // evaporation constant
-    constexpr static double Ke = 0.5;
+    constexpr static double Ke = 0.00011*0.5;
 
     double outFlow, inFlow;
     

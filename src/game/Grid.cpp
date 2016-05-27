@@ -43,7 +43,7 @@ double Grid::getHeight(int x, int y) const
 
     std::vector<double> samples;
     samples.push_back(10.0);
-    samples.push_back(40.0);
+    samples.push_back(50.0);
     samples.push_back(90.0);
 
     double avg = 0;
@@ -53,7 +53,7 @@ double Grid::getHeight(int x, int y) const
         a = samples.at(i/sw);
         b = samples.at(i%sh);
 
-        Point2d p( a * xStep * perc * (x + 1.0), b * yStep * perc * (y + 1.0));
+        Point2d p( (x + a * perc ) * xStep, (y + b * perc ) * yStep );
         h = mapping->getHeightFromParam(p);
 
         avg += h;

@@ -37,7 +37,7 @@ GameManager::GameManager()
 
 #ifdef DEBUG
     assert(simulationSize == 3);
-    _simulation->addWaterSource( 4, 0.5 );
+    _simulation->addWaterSource( 4, 0.3 );
 #endif
 }
 
@@ -135,7 +135,7 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.01);
+    _simulation->update(0.001);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping);
