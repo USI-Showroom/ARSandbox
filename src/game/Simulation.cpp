@@ -150,20 +150,20 @@ void Simulation::updateWaterSurface( double dt ) {
         	b1l = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
         	dhl = b1 + d1 - b1l - d1l;
 
-        	// // top neighbor
-        	// d1t = water(x, y-1);
-        	// b1t = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
-        	// dht = b1 + d1 - b1t - d1t;
+        	// top neighbor
+        	d1t = water(x, y-1);
+        	b1t = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
+        	dht = b1 + d1 - b1t - d1t;
 
-        	// // right neighbor
-        	// d1r = water(x-1, y);
-        	// b1r = _grid->getHeight(x-1, y) + _terrain[y * _width + x];
-        	// dhr = b1 + d1 - b1r - d1r;
+        	// right neighbor
+        	d1r = water(x+1, y);
+        	b1r = _grid->getHeight(x+1, y) + _terrain[y * _width + x];
+        	dhr = b1 + d1 - b1r - d1r;
 
-        	// // bottom neighbor
-        	// d1b = water(x, y-1);
-        	// b1b = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
-        	// dhb = b1 + d1 - b1b - d1b;
+        	// bottom neighbor
+        	d1b = water(x, y-1);
+        	b1b = _grid->getHeight(x, y-1) + _terrain[y * _width + x];
+        	dhb = b1 + d1 - b1b - d1b;
 
 #ifdef DEBUG
         	if ( dhl != dhl || dht != dht || dhr != dhr || dhb != dhb ) {
@@ -205,9 +205,9 @@ void Simulation::updateWaterSurface( double dt ) {
 
         	inFlow = 0.0; outFlow = 0.0;
         	
-        	inFlow += leftFlux(x+1, y);
+        	inFlow += leftFlux(x-1, y);
         	inFlow += bottomFlux(x, y+1);
-        	inFlow += rightFlux(x-1, y);
+        	inFlow += rightFlux(x+1, y);
         	inFlow += topFlux(x, y-1);
 
         	outFlow += rightFlux(x,y);
@@ -254,7 +254,8 @@ void Simulation::updateWaterSurface( double dt ) {
             double vV = v(x,y);
 
 
-            double angle = fabs(1.0 - _grid->getCellNormal(x, y).z());
+            double nh = _grid->getCellNormal(x, y).z();
+            double angle = fabs(1.0 - nh);
             double sq = sqrt(uV*uV + vV*vV);
             double C = Kc * angle * sq;
 
@@ -269,6 +270,7 @@ void Simulation::updateWaterSurface( double dt ) {
             }
 
 #ifdef DEBUG
+            assert(_terrain[y * _width + x] == _terrain[y * _width + x]);
             if (_terrain[y * _width + x] != _terrain[y * _width + x]) {
             		std::cout
 	            		<< "\nA: "<< angle << ", "

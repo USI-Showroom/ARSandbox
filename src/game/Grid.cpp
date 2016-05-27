@@ -67,12 +67,12 @@ double Grid::getHeight(int x, int y) const
 // z -> getHeightFromParam
 Point3d Grid::getCellNormal( int x, int y ) const
 {
-    double xx = static_cast<double>(x) / _size;
+    double xx = static_cast<double>(    x) / _size;
     double yy = static_cast<double>(y) / _size;
 
     Point2d a1 = Point2d(xx, yy);
-    Point2d a2 = a1 + Point2d(0.05, 0.0);
-    Point2d a3 = a2 + Point2d(0.0,-0.05);
+    Point2d a2 = a1 + Point2d(0.2, 0.0);
+    Point2d a3 = a2 + Point2d(0.0, 0.2);
 
     util::clamp(a1, 0.0, _size);
     util::clamp(a2, 0.0, _size);
@@ -89,6 +89,9 @@ Point3d Grid::getCellNormal( int x, int y ) const
     Point3d n = ( p2 - p1 ) ^ ( p3 - p1 );
     n.normalize();
 
+#ifdef DEBUG
+    assert(n == n);
+#endif
     return n;
 }
 
