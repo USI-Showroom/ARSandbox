@@ -36,7 +36,6 @@ GameManager::GameManager()
     _simulation->setGrid(_grid);
 
 #ifdef DEBUG
-    assert(simulationSize == 3);
     _simulation->addWaterSource( 4, 0.3 );
 #endif
 }

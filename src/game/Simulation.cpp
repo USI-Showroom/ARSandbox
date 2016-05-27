@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include "util.hpp"
+#include <glm/glm.hpp>
 
 double Simulation::_minW = 0.0;
 double Simulation::_maxW = 0.0;
@@ -202,7 +203,7 @@ void Simulation::updateWaterSurface( double dt ) {
 			_rightFlux [y * _width + x] *= K;
 			_bottomFlux[y * _width + x] *= K;
 
-            #ifdef DEBUG
+#ifdef DEBUG
             // if ( dhl != dhl || dht != dht || dhr != dhr || dhb != dhb ) {
                 std::cout << "\ndh: " << x<<" "<<y<<
                              "\ndhl: " << _leftFlux  [y * _width + x] <<
@@ -375,7 +376,7 @@ void Simulation::updateWaterSurface( double dt ) {
                     std::cout << "\n";
                 }
                 std::cout << "\n";
-
+                exit(0);
 #endif        
 }
 
