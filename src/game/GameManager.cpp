@@ -35,7 +35,7 @@ GameManager::GameManager()
     _image.fill(QColor(0,0,0,0));
 
 #ifdef DEBUG
-    _simulation->addWaterSource( 4, 0.3 );
+    _simulation->addWaterSource( 4, 0.8 );
 #endif
 }
 

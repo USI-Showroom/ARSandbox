@@ -23,19 +23,9 @@ public:
 	static double _minW, _maxW, _minS, _maxS;
 
 private:
-	int _width, _height;
-
-	vector<double> _terrain;
-	vector<double> _water;
-	vector<double> _sediment;
-	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
-	vector<double> _u, _v, _s1;
-
-	bool newWater;
-
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 0.00005;
+    constexpr static double A = 0.0005;
     // length of virtual pipe
     constexpr static double l = 1.0;
     // gravity
@@ -45,11 +35,20 @@ private:
     // sediment capacity constant
     constexpr static double Kc = 25.0;
     // dissolving constant
-    constexpr static double Ks = 0.0001*12*10;
+    constexpr static double Ks = 0.001*12;
     // deposition constant
-    constexpr static double Kd = 0.0001*12*10;
+    constexpr static double Kd = 0.001*12;
     // evaporation constant
-    constexpr static double Ke = 0.00011*0.5;
+    constexpr static double Ke = 0.00015*0.5*0.2;
+
+
+	int _width, _height;
+
+	vector<double> _terrain;
+	vector<double> _water;
+	vector<double> _sediment;
+	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
+	vector<double> _u, _v, _s1;
 
     double outFlow, inFlow;
     
@@ -70,11 +69,11 @@ private:
 	const double u(int x, int y);
 	const double v(int x, int y);
 
+	// simulation steps
 	void updateWaterSurface(double dt, const Grid &);
     void flowSimulation(const double dt, const Grid &);
-    void erosionDeposition(const double dt);
+    void erosionDeposition(const double dt, const Grid &);
     void sedimentTransport(const double dt);
-    void evaporation(const double dt);
 };
 
 #endif // SIMULATION_HPP_INCLUDED

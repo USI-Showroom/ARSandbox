@@ -122,7 +122,6 @@ void main()
     vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
 
     // red channel holds sediment amount
-    // TODO: rescale back
     heightV += gameTxt.r * (maxS - minS) + minS;
 
     vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;

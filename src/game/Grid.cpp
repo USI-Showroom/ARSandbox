@@ -166,4 +166,5 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
 
         }
     }
+
 }
