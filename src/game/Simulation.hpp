@@ -25,7 +25,7 @@ public:
 private:
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 0.0005;
+    constexpr static double A = 0.00005;
     // length of virtual pipe
     constexpr static double l = 1.0;
     // gravity
@@ -35,11 +35,11 @@ private:
     // sediment capacity constant
     constexpr static double Kc = 25.0;
     // dissolving constant
-    constexpr static double Ks = 0.001*12;
+    constexpr static double Ks = 0.000001*12;
     // deposition constant
-    constexpr static double Kd = 0.001*12;
+    constexpr static double Kd = 0.000001*12;
     // evaporation constant
-    constexpr static double Ke = 0.00015*0.5*0.2;
+    constexpr static double Ke = 0.0000011*0.5*0.2;
 
 
 	int _width, _height;
@@ -74,6 +74,7 @@ private:
     void flowSimulation(const double dt, const Grid &);
     void erosionDeposition(const double dt, const Grid &);
     void sedimentTransport(const double dt);
+    void evaporation(const double dt);
 };
 
 #endif // SIMULATION_HPP_INCLUDED

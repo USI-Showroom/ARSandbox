@@ -14,8 +14,6 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define RADIUS 0.0045
-
 static const int imgWidth=512;
 static const int imgHeight=424;
 #ifdef NO_KINECT
@@ -24,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 3;
+static const int simulationSize = 20;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -33,10 +31,6 @@ GameManager::GameManager()
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
-
-#ifdef DEBUG
-    _simulation->addWaterSource( 4, 0.8 );
-#endif
 }
 
 GameManager::~GameManager()
@@ -74,6 +68,11 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
 	if (_playing)
     {
         _gameTimer->start(100);
+        
+        double amount = 2.0;
+        int idx = 40;
+        _simulation->addWaterSource(idx, amount);
+        std::cout << " Water amount " << amount << " added at cell " << idx << std::endl;
 	}
     else
     {
@@ -99,15 +98,16 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 
 #ifndef DEBUG
     // convert to grid cell
-    int gridIndex = _grid.getCellIndex(normalisedX, normalisedY);
-    
-    double amount = 3.0;
-    _simulation->addWaterSource( gridIndex, amount );
+    int index = _grid.getCellIndex(normalisedX, normalisedY);
+
+    double amount = 0.3 * 0.0001;
+    _simulation->addWaterSource(index, amount);
 
 #ifdef DEBUG
-    std::cout << "Computed grid index: " << gridIndex << std::endl;
-    std::cout << " Water amount " << amount << " added at cell " << gridIndex << std::endl;
+    std::cout << "Computed grid index: " << index << std::endl;
+    std::cout << " Water amount " << amount << " added at cell " << index << std::endl;
 #endif
+
 #endif
 }
 
@@ -132,7 +132,7 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.001, _mapping, _grid);
+    _simulation->update(0.0001, _mapping, _grid);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping, _grid);

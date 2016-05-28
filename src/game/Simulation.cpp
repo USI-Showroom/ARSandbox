@@ -40,6 +40,7 @@ void Simulation::update( double dt, const UnitSquareMapping &mapping, const Grid
     updateWaterSurface(dt, grid);
     erosionDeposition(dt, grid);
     sedimentTransport(dt);
+    //evaporation(dt);
 }
 
 // Simulation steps
@@ -133,6 +134,9 @@ void Simulation::flowSimulation(const double dt, const Grid &_grid)
 
 void Simulation::updateWaterSurface( double dt, const Grid &_grid )
 {
+    double dbar, dv, dwx, dwy, uu, vv;
+    dbar = dv = dwx = dwy = uu = vv = 0.0;
+    
     // compute volume of water passing through cell(x,y)
     for ( int y = 0; y < _height; ++y ) {
         for ( int x = 0; x < _width; ++x ) {
@@ -149,7 +153,7 @@ void Simulation::updateWaterSurface( double dt, const Grid &_grid )
             outFlow += leftFlux(x,y);
             outFlow += bottomFlux(x,y);
 
-            double dv = dt * ( inFlow - outFlow );
+            dv = dt * ( inFlow - outFlow );
             
             if (fabs(dv) < 1e-12) {
                 continue;
@@ -160,7 +164,7 @@ void Simulation::updateWaterSurface( double dt, const Grid &_grid )
             d1 = water(x,y);
             d2 += d1;
 
-            double dbar = 0.5 * (d1 + d2);
+            dbar = 0.5 * (d1 + d2);
 
             // to avoid velocity get to 0
             if (fabs(dbar) < 1e-8) {
@@ -168,14 +172,14 @@ void Simulation::updateWaterSurface( double dt, const Grid &_grid )
             }
 
             // calculate average amount of water that passes through cell
-            double dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
+            dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
             // TODO: possible bug
-            double dwy = (topFlux(x, y-1) - bottomFlux(x, y) + topFlux(x, y) - bottomFlux(x, y+1)) * 0.5;
+            dwy = (topFlux(x, y-1) - bottomFlux(x, y) + topFlux(x, y) - bottomFlux(x, y+1)) * 0.5;
 
             // std::cout << "\ndwx: " << dwx << ", dwy: " << dwy << std::endl;
 
-            double uu = dwx / (dbar * lx);
-            double vv = dwy / (dbar * ly);
+            uu = dwx / (dbar * lx);
+            vv = dwy / (dbar * ly);
 
             if (fabs(dbar) < 1e-8) {
                 uu = 0.0;
@@ -185,11 +189,6 @@ void Simulation::updateWaterSurface( double dt, const Grid &_grid )
             // update velocity field
             _u[y * _width + x] = uu;
             _v[y * _width + x] = vv;
-
-            // simulate evaporation
-            d2 *= ( 1 - Ke * dt );
-
-            _water[y * _width + x] = d2;
 
 #ifdef DEBUG
             std::cout
@@ -224,7 +223,7 @@ void Simulation::updateWaterSurface( double dt, const Grid &_grid )
     }
     std::cout << "\n";
     
-    exit(0);
+    // exit(0);
 #endif        
 }
 
@@ -289,13 +288,26 @@ void Simulation::sedimentTransport(const double dt)
             double sedimentFromX = static_cast<double>(x) - uV * dt;
             double sedimentFromY = static_cast<double>(y) - vV * dt;
 
-            int sx = floor(sedimentFromX);
-            int sy = floor(sedimentFromY);
+            int x0 = floor(sedimentFromX);
+            int y0 = floor(sedimentFromY);
+            int x1 = x0+1;
+            int y1 = y0+1;
 
-            util::clamp(sx, 0, _sediment.size());
-            util::clamp(sy, 0, _sediment.size());
+            float fX = sedimentFromX - x0;
+            float fY = sedimentFromY - y0;
 
-            _sediment[y * _width + x] = _s1[sy * _width + sx];
+            x0 = glm::clamp(x0,0,int(_width - 1));
+            x1 = glm::clamp(x1,0,int(_width - 1));
+            y0 = glm::clamp(y0,0,int(_height- 1));
+            y1 = glm::clamp(y1,0,int(_height- 1));
+
+            float newVal =
+            glm::mix(
+                glm::mix(sediment(y0,x0),sediment(y0,x1),fX),
+                glm::mix(sediment(y1,x0),sediment(y1,x1),fX),
+                fY);
+
+            _s1[y * _width + x] = newVal;
 
             // update min and max terrain for current cell
             if ( terrain(x,y) < _minS ) {
@@ -316,89 +328,109 @@ void Simulation::sedimentTransport(const double dt)
             }
         } // end x for loop
     } // end y for loop
+
+    // update sediment
+    for ( int y = 0; y < _height; ++y ) {
+        for ( int x = 0; x < _width; ++x ) {
+            _sediment[y * _width + x] = _s1[y * _width + x];
+        }
+    }
+}
+
+void Simulation::evaporation( double dt ) {
+    for ( int y = 0; y < _height; ++y ) {
+        for ( int x = 0; x < _width; ++x ) {
+            // simulate evaporation
+            d2 *= ( 1 - Ke * dt );
+            _water[y * _width + x] = std::max(d2, 0.0);
+            if (water(x,y) < 1e-2) {
+                _water[y * _width + x] = 0.0;
+            }
+        }
+    }
 }
 
 // Accessor methods for arrays
 //
 const double Simulation::water(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _water.size()) {
-		return _water.at(idx);
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _water.size()) {
+        return _water.at(idx);
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::sediment(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _sediment.size()) {
-		return _sediment[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _sediment.size()) {
+        return _sediment[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::terrain(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _terrain.size()) {
-		return _terrain[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _terrain.size()) {
+        return _terrain[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::rightFlux(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _rightFlux.size()) {
-		return _rightFlux[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _rightFlux.size()) {
+        return _rightFlux[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::bottomFlux(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _bottomFlux.size()) {
-		return _bottomFlux[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _bottomFlux.size()) {
+        return _bottomFlux[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::topFlux(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _topFlux.size()) {
-		return _topFlux[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _topFlux.size()) {
+        return _topFlux[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::leftFlux(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _leftFlux.size()) {
-		return _leftFlux[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _leftFlux.size()) {
+        return _leftFlux[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::u(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _u.size()) {
-		return _u[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _u.size()) {
+        return _u[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 const double Simulation::v(int x, int y) {
-	int idx = y * _width + x;
-	if (idx >= 0 && idx < _v.size()) {
-		return _v[idx];
-	} else {
-		return 0.0;
-	}
+    int idx = y * _width + x;
+    if (idx >= 0 && idx < _v.size()) {
+        return _v[idx];
+    } else {
+        return 0.0;
+    }
 }
 
 void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping, const Grid &grid ) {
@@ -406,7 +438,7 @@ void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping, cons
     waterHeight = terrainHeight = sedimentHeight = 0.0;
 
     for ( int y = 0; y < _height; ++y ) {
-    	for ( int x = 0; x < _width; ++x ) {
+        for ( int x = 0; x < _width; ++x ) {
             
             terrainHeight = (terrain(x,y) - _minS) / (_maxS - _minS);
             waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
