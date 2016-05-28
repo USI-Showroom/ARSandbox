@@ -17,13 +17,7 @@ public:
 	void update(double, const UnitSquareMapping &, const Grid &);
 	void draw(QPainter &, const UnitSquareMapping &, const Grid &);
 
-	// simulation steps
-	void updateWaterSurface(double dt, const Grid &);
 	void addWaterSource(const int cellIndex, const double amount);
-    void flowSimulation(const double dt);
-    void erosionDeposition(const double dt);
-    void sedimentTransport(const double dt);
-    void evaporation(const double dt);
 
 	// ranges for shader
 	static double _minW, _maxW, _minS, _maxS;
@@ -59,6 +53,7 @@ private:
 
     double outFlow, inFlow;
     
+    // temporary variables
     double d1, d2, b1;
     double d1l, b1l, dhl;
     double d1t, b1t, dht;
@@ -74,6 +69,12 @@ private:
 	const double leftFlux(int x, int y);
 	const double u(int x, int y);
 	const double v(int x, int y);
+
+	void updateWaterSurface(double dt, const Grid &);
+    void flowSimulation(const double dt, const Grid &);
+    void erosionDeposition(const double dt);
+    void sedimentTransport(const double dt);
+    void evaporation(const double dt);
 };
 
 #endif // SIMULATION_HPP_INCLUDED
