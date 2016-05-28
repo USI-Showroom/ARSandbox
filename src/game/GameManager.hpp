@@ -54,7 +54,7 @@ private:
     QImage _image;
 
     Simulation *_simulation;
-    Grid *_grid;
+    const Grid _grid;
 };
 #endif
 

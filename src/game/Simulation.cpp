@@ -25,22 +25,15 @@ Simulation::Simulation( int newWidth, int newHeight )
       _v ( _width * _height, 0.0 ),
       _s1( _width * _height, 0.0 ),
       
-      _grid( nullptr ), newWater(false)
+      newWater(false)
       {}
 
 Simulation::~Simulation() {}
 
-void Simulation::update( double dt, const UnitSquareMapping &mapping ) {
-    if ( _grid == nullptr ) {
-#ifdef DEBUG
-        std::cout << "ERROR: no grid found for simulation" << std::endl;
-#endif
-        return;
-    }
-
+void Simulation::update( double dt, const UnitSquareMapping &mapping, const Grid &grid ) {
     if(!mapping.initialized()) return;
     
-    updateWaterSurface(dt);
+    updateWaterSurface(dt, grid);
     flowSimulation(dt);
     erosionDeposition(dt);
     sedimentTransport(dt);
@@ -130,7 +123,7 @@ const double Simulation::v(int x, int y) {
 	}
 }
 
-void Simulation::updateWaterSurface( double dt )
+void Simulation::updateWaterSurface( double dt, const Grid &_grid )
 {    
     double fluxFactor = g * A / l * dt;
 
@@ -149,26 +142,26 @@ void Simulation::updateWaterSurface( double dt )
             outFlow = inFlow = 0.0;        	
 
         	d1 = water(x,y);
-        	b1 = _grid->getHeight(x,y) + terrain(x,y); //_terrain[y * _width + x];
+        	b1 = _grid.getHeight(x,y) + terrain(x,y); //_terrain[y * _width + x];
         	
         	// left neighbor
         	d1l = water(x-1, y);
-        	b1l = _grid->getHeight(x-1, y) + terrain(x-1,y); //_terrain[y * _width + x -1];
+        	b1l = _grid.getHeight(x-1, y) + terrain(x-1,y); //_terrain[y * _width + x -1];
         	dhl = b1 + d1 - b1l - d1l;
 
         	// top neighbor
         	d1t = water(x, y-1);
-        	b1t = _grid->getHeight(x, y-1) + terrain(x,y-1); //_terrain[(y - 1) * _width + x];
+        	b1t = _grid.getHeight(x, y-1) + terrain(x,y-1); //_terrain[(y - 1) * _width + x];
         	dht = b1 + d1 - b1t - d1t;
 
         	// right neighbor
         	d1r = water(x+1, y);
-        	b1r = _grid->getHeight(x+1, y) + terrain(x+1,y); //_terrain[y * _width + x + 1];
+        	b1r = _grid.getHeight(x+1, y) + terrain(x+1,y); //_terrain[y * _width + x + 1];
         	dhr = b1 + d1 - b1r - d1r;
 
         	// bottom neighbor
         	d1b = water(x, y+1);
-        	b1b = _grid->getHeight(x, y+1) + terrain(x,y+1); //_terrain[(y+1) * _width + x];
+        	b1b = _grid.getHeight(x, y+1) + terrain(x,y+1); //_terrain[(y+1) * _width + x];
         	dhb = b1 + d1 - b1b - d1b;
 
             if (x == 0)
@@ -274,7 +267,7 @@ void Simulation::updateWaterSurface( double dt )
 
     		
     		// simulate erosion
-            double nh = _grid->getCellNormal(x, y).z();
+            double nh = _grid.getCellNormal(x, y).z();
             double angle = max(0.01, fabs(1.0 - nh));
             double sq = sqrt(uu*uu + vv*vv);
             double C = Kc * angle * sq;
@@ -405,13 +398,7 @@ void Simulation::evaporation(const double dt)
 
 }
 
-void Simulation::setGrid( Grid* newGrid ) {
-	_grid = newGrid;
-	// set cell size
-    lx = ly = 1.0 / _grid->size();
-}
-
-void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
+void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping, const Grid &grid ) {
     double waterHeight, terrainHeight, sedimentHeight;
     waterHeight = terrainHeight = sedimentHeight = 0.0;
 
@@ -422,8 +409,7 @@ void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
             waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
             sedimentHeight = sediment(x,y);
 
-            _grid->drawCell( painter, x, y, terrainHeight, waterHeight,
-                             sedimentHeight );
+            grid.drawCell( painter, x, y, terrainHeight, waterHeight, sedimentHeight );
         }
     }
 }

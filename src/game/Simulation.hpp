@@ -14,17 +14,16 @@ public:
 	Simulation(int newWidth, int newHeight);
 	~Simulation();
 
-	void update(double dt, const UnitSquareMapping &mapping);
-	void updateWaterSurface(double dt);
+	void update(double, const UnitSquareMapping &, const Grid &);
+	void draw(QPainter &, const UnitSquareMapping &, const Grid &);
+
+	// simulation steps
+	void updateWaterSurface(double dt, const Grid &);
 	void addWaterSource(const int cellIndex, const double amount);
     void flowSimulation(const double dt);
     void erosionDeposition(const double dt);
     void sedimentTransport(const double dt);
     void evaporation(const double dt);
-	
-	void setGrid(Grid *);
-	
-	void draw(QPainter &, const UnitSquareMapping &);
 
 	// ranges for shader
 	static double _minW, _maxW, _minS, _maxS;
@@ -37,8 +36,6 @@ private:
 	vector<double> _sediment;
 	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
 	vector<double> _u, _v, _s1;
-
-	Grid *_grid;
 
 	bool newWater;
 

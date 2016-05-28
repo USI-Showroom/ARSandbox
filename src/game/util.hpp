@@ -45,9 +45,9 @@ inline void clamp(int& value, const int minValue, const int maxValue)
     if (value > maxValue) value = maxValue;
 }
 
-inline Point2d scale(Point2d& point, const int imgHeight, const int scaling, const UnitSquareMapping& mapping)
+inline Point2d scale(Point2d& point, const int imgHeight, const int scaling, const UnitSquareMapping *mapping)
 {
-    Point2d p = mapping.fromParameterization(point);
+    Point2d p = mapping->fromParameterization(point);
     p.y() = imgHeight - p.y();
 
     if (p.y() == imgHeight) {

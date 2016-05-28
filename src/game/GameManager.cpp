@@ -29,11 +29,10 @@ static const int simulationSize = 3;
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
   _simulation(new Simulation(simulationSize, simulationSize)),
-  _grid(new Grid(simulationSize, &_mapping))
+  _grid(simulationSize, &_mapping)
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
-    _simulation->setGrid(_grid);
 
 #ifdef DEBUG
     _simulation->addWaterSource( 4, 0.3 );
@@ -46,7 +45,6 @@ GameManager::~GameManager()
         _gameTimer->stop();
 
     delete _simulation;
-    delete _grid;
 }
 
 void GameManager::updateTexture()
@@ -101,7 +99,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
 
 #ifndef DEBUG
     // convert to grid cell
-    int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
+    int gridIndex = _grid.getCellIndex(normalisedX, normalisedY);
     
     double amount = 3.0;
     _simulation->addWaterSource( gridIndex, amount );
@@ -134,10 +132,10 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.001, _mapping);
+    _simulation->update(0.001, _mapping, _grid);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
-    _simulation->draw(painter, _mapping);
+    _simulation->draw(painter, _mapping, _grid);
 
     painter.end();
     updateTexture();

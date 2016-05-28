@@ -14,22 +14,15 @@ static const int scaling=7;
 
 Grid::Grid(int newSize, const UnitSquareMapping *newMapping)
     :   _size(newSize),
-        xStep(1.0 / _size), yStep(1.0 / _size),
-        imgHeight(424),
-        mapping(newMapping)
-{
-
-}
+        _xStep(1.0 / _size), _yStep(1.0 / _size),
+        _imgHeight(424),
+        _mapping(newMapping)
+{}
 
 Grid::~Grid()
-{
+{}
 
-}
-
-const int& Grid::size()
-{
-    return _size;
-}
+const int& Grid::size() { return _size; }
 
 double Grid::getHeight(int x, int y) const
 {    
@@ -53,8 +46,8 @@ double Grid::getHeight(int x, int y) const
         a = samples.at(i/sw);
         b = samples.at(i%sh);
 
-        Point2d p( (x + a * perc ) * xStep, (y + b * perc ) * yStep );
-        h = mapping->getHeightFromParam(p);
+        Point2d p( (x + a * perc ) * _xStep, (y + b * perc ) * _yStep );
+        h = _mapping->getHeightFromParam(p);
 
         avg += h;
     }
@@ -78,9 +71,9 @@ Point3d Grid::getCellNormal( int x, int y ) const
     util::clamp(a2, 0.0, _size);
     util::clamp(a3, 0.0, _size);
 
-    const double h1 = mapping->getHeightFromParam(a1);
-    const double h2 = mapping->getHeightFromParam(a2);
-    const double h3 = mapping->getHeightFromParam(a3);
+    const double h1 = _mapping->getHeightFromParam(a1);
+    const double h2 = _mapping->getHeightFromParam(a2);
+    const double h3 = _mapping->getHeightFromParam(a3);
 
     const Point3d p1 = Point3d(a1.x(), a1.y(), h1);
     const Point3d p2 = Point3d(a2.x(), a2.y(), h2);
@@ -95,10 +88,10 @@ Point3d Grid::getCellNormal( int x, int y ) const
     return n;
 }
 
-int Grid::getCellIndex(const double x, const double y)
+int Grid::getCellIndex(const double x, const double y) const
 {
-    const int xx = floor(x / xStep);
-    const int yy = floor(y / yStep);
+    const int xx = floor(x / _xStep);
+    const int yy = floor(y / _yStep);
 #ifdef DEBUG
     std::cout << "xx: " << xx << ", " << "yy: " << yy << std::endl;
 #endif
@@ -110,20 +103,20 @@ void Grid::draw(QPainter &painter)
     for (int i = 0; i < _size; ++i) {
         for (int j = 0; j < _size; ++j) {
 
-            Point2d p1(i*xStep, j*yStep);
-            Point2d p2(xStep, yStep);
+            Point2d p1(i*_xStep, j*_yStep);
+            Point2d p2(_xStep, _yStep);
 
             // draw gridlines
             for (int nx = 0; nx < 10; ++nx) {
                 for (int ny = 0; ny < 10; ++ny) {
-                    Point2d p_ = p1 + Point2d(nx / 9.0 * xStep, ny / 9.0 * yStep);
-                    Point2d p = mapping->fromParameterization(p_);
-                    p.y() = imgHeight - p.y();
+                    Point2d p_ = p1 + Point2d(nx / 9.0 * _xStep, ny / 9.0 * _yStep);
+                    Point2d p = _mapping->fromParameterization(p_);
+                    p.y() = _imgHeight - p.y();
 
-                    if (p.y() == imgHeight)
+                    if (p.y() == _imgHeight)
                         --p.y();
                     assert(p.y() >= 0);
-                    assert(p.y() < imgHeight);
+                    assert(p.y() < _imgHeight);
                     p*=scaling;
                     QPen pen(Qt::gray, 2);
                     painter.setPen(pen);
@@ -140,7 +133,9 @@ void Grid::draw(QPainter &painter)
 
 void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain, double water, double sediment ) const {
 
-    Point2d p1( x * xStep, y * yStep );
+    if (!_mapping->initialized()) return;
+
+    Point2d p1( x * _xStep, y * _yStep );
 
     int r = static_cast<int>(std::min(255.0, std::max(0.0, terrain*255.0)));
     int g = static_cast<int>(std::min(255.0, std::max(0.0, sediment*255.0)));
@@ -154,8 +149,8 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {
             
-            Point2d p_ = p1 + Point2d( nx / nPoints * xStep, ny / nPoints * yStep );
-            Point2d p = util::scale( p_, imgHeight, scaling, *mapping );
+            Point2d p_ = p1 + Point2d( nx / nPoints * _xStep, ny / nPoints * _yStep );
+            Point2d p = util::scale( p_, _imgHeight, scaling, _mapping );
 
             // painter.setRenderHint(QPainter::Antialiasing, true);
 
