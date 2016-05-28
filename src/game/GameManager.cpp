@@ -28,7 +28,7 @@ static const int simulationSize = 3;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
-  _simulation(new Simulation(simulationSize, simulationSize, _mapping)),
+  _simulation(new Simulation(simulationSize, simulationSize)),
   _grid(new Grid(simulationSize, &_mapping))
 {
     _playing=false;
@@ -134,7 +134,7 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.001);
+    _simulation->update(0.001, _mapping);
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
     _simulation->draw(painter, _mapping);

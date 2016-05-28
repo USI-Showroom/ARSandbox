@@ -11,33 +11,23 @@ using namespace std;
 class Simulation
 {
 public:
-	Simulation(int newWidth, int newHeight, const UnitSquareMapping &);
+	Simulation(int newWidth, int newHeight);
 	~Simulation();
 
-	void update(double dt);
-	void incrementWater(double dt);
+	void update(double dt, const UnitSquareMapping &mapping);
 	void updateWaterSurface(double dt);
 	void addWaterSource(const int cellIndex, const double amount);
+    void flowSimulation(const double dt);
+    void erosionDeposition(const double dt);
+    void sedimentTransport(const double dt);
+    void evaporation(const double dt);
+	
 	void setGrid(Grid *);
 	
-	const double getWaterAt(int x, int y);
-	const double getTerrainAt(int x, int y);
-	const double getSedimentAt(int x, int y);
-
 	void draw(QPainter &, const UnitSquareMapping &);
 
 	// ranges for shader
 	static double _minW, _maxW, _minS, _maxS;
-
-	const double water(int x, int y);
-	const double sediment(int x, int y);
-	const double terrain(int x, int y);
-	const double rightFlux(int x, int y);
-	const double bottomFlux(int x, int y);
-	const double topFlux(int x, int y);
-	const double leftFlux(int x, int y);
-	const double u(int x, int y);
-	const double v(int x, int y);
 
 private:
 	int _width, _height;
@@ -48,7 +38,6 @@ private:
 	vector<double> _leftFlux, _rightFlux, _topFlux, _bottomFlux;
 	vector<double> _u, _v, _s1;
 
-	const UnitSquareMapping &_mapping;
 	Grid *_grid;
 
 	bool newWater;
@@ -78,6 +67,16 @@ private:
     double d1t, b1t, dht;
     double d1r, b1r, dhr;
     double d1b, b1b, dhb;
+
+    const double water(int x, int y);
+	const double sediment(int x, int y);
+	const double terrain(int x, int y);
+	const double rightFlux(int x, int y);
+	const double bottomFlux(int x, int y);
+	const double topFlux(int x, int y);
+	const double leftFlux(int x, int y);
+	const double u(int x, int y);
+	const double v(int x, int y);
 };
 
 #endif // SIMULATION_HPP_INCLUDED

@@ -9,8 +9,7 @@ double Simulation::_maxW = 0.0;
 double Simulation::_minS = 0.0;
 double Simulation::_maxS = 0.0;
 
-Simulation::Simulation( int newWidth, int newHeight,
-                        const UnitSquareMapping& mapping )
+Simulation::Simulation( int newWidth, int newHeight )
     : _width( newWidth ), _height( newHeight ),
       
       _terrain ( _width * _height, 0.0 ),
@@ -26,10 +25,27 @@ Simulation::Simulation( int newWidth, int newHeight,
       _v ( _width * _height, 0.0 ),
       _s1( _width * _height, 0.0 ),
       
-      _mapping( mapping ), _grid( nullptr ), newWater(false)
+      _grid( nullptr ), newWater(false)
       {}
 
 Simulation::~Simulation() {}
+
+void Simulation::update( double dt, const UnitSquareMapping &mapping ) {
+    if ( _grid == nullptr ) {
+#ifdef DEBUG
+        std::cout << "ERROR: no grid found for simulation" << std::endl;
+#endif
+        return;
+    }
+
+    if(!mapping.initialized()) return;
+    
+    updateWaterSurface(dt);
+    flowSimulation(dt);
+    erosionDeposition(dt);
+    sedimentTransport(dt);
+    evaporation(dt);
+}
 
 // Accessor methods for arrays
 //
@@ -114,21 +130,8 @@ const double Simulation::v(int x, int y) {
 	}
 }
 
-void Simulation::update( double dt ) {
-	if ( _grid == nullptr ) {
-#ifdef DEBUG
-        std::cout << "ERROR: no grid found for simulation" << std::endl;
-#endif
-        return;
-    }
-    
-    updateWaterSurface( dt );
-}
-
-void Simulation::updateWaterSurface( double dt ) {
-    if(!_mapping.initialized()) return;
-
-    // flux factor
+void Simulation::updateWaterSurface( double dt )
+{    
     double fluxFactor = g * A / l * dt;
 
     
@@ -385,16 +388,21 @@ void Simulation::addWaterSource( const int cellIndex, const double amount ) {
     newWater = true;
 }
 
-const double Simulation::getWaterAt( int x, int y ) {
-    return _water.at( y * _height + x );
-}
+void Simulation::flowSimulation(const double dt)
+{
 
-const double Simulation::getTerrainAt( int x, int y ) {
-    return _terrain.at( y * _height + x );
 }
+void Simulation::erosionDeposition(const double dt)
+{
 
-const double Simulation::getSedimentAt( int x, int y ) {
-    return _sediment.at( y * _height + x );
+}
+void Simulation::sedimentTransport(const double dt)
+{
+
+}
+void Simulation::evaporation(const double dt)
+{
+
 }
 
 void Simulation::setGrid( Grid* newGrid ) {
