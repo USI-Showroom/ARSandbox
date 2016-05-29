@@ -318,6 +318,8 @@ void Simulation::updateWaterSurface( double dt ) {
     Simulation::_minS = terrain(0,0);
     Simulation::_maxS = terrain(0,0);
 
+    // transports sediment from cell x,y to target cell by
+    // computing final position as velocity * time
     for ( int y = 0; y < _height; ++y ) {
 		for ( int x = 0; x < _width; ++x ) {
 
@@ -329,13 +331,27 @@ void Simulation::updateWaterSurface( double dt ) {
             double sedimentFromX = static_cast<double>(x) - uV * dt;
             double sedimentFromY = static_cast<double>(y) - vV * dt;
 
-           	int sx = floor(sedimentFromX);
-           	int sy = floor(sedimentFromY);
+            // integer coordinates
+            int x0 = floor(sedimentFromX);
+            int y0 = floor(sedimentFromY);
+            int x1 = x0+1;
+            int y1 = y0+1;
 
-            util::clamp(sx, 0, _sediment.size());
-            util::clamp(sy, 0, _sediment.size());
+            // interpolation factors
+            float fX = sedimentFromX - x0;
+            float fY = sedimentFromY - y0;
 
-            _sediment[y * _width + x] = _s1[sy * _width + sx];
+            // clamp to grid borders
+            x0 = glm::clamp(x0,0,_width-1);
+            x1 = glm::clamp(x1,0,_width-1);
+            y0 = glm::clamp(y0,0,_height-1);
+            y1 = glm::clamp(y1,0,_height-1);
+
+            float newSediment = glm::mix( 
+                glm::mix(sediment(x0,y0),sediment(x1,y0),fX),
+                glm::mix(sediment(x0,y1),sediment(x1,y1),fX),
+                fY);
+            _s1[y * _width + x] = newSediment;
 
             // update min and max terrain for current cell
             if ( terrain(x,y) < _minS ) {
@@ -359,6 +375,13 @@ void Simulation::updateWaterSurface( double dt ) {
         } // end x for loop
     } // end y for loop
 
+    // update sediment
+    for ( int y = 0; y < _height; ++y ) {
+        for ( int x = 0; x < _width; ++x ) {
+            _sediment[y * _width + x] = _s1.at(y * _width + x);
+        }
+    }
+
 #ifdef DEBUG
                 std::cout << "\nwater heights:" << std::endl;
                 for ( int y = 0; y < _height; ++y ) {
@@ -376,7 +399,7 @@ void Simulation::updateWaterSurface( double dt ) {
                     std::cout << "\n";
                 }
                 std::cout << "\n";
-                exit(0);
+                //exit(0);
 #endif        
 }
 
