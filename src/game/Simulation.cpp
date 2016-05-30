@@ -503,13 +503,14 @@ std::vector<int> Simulation::getNeighbors(const int index) {
 
 void Simulation::addWaterSource( const int cellIndex, const double amount ) {
     std::vector<int> neighbors = getNeighbors(cellIndex);
-    std::cout << "cell: " << cellIndex << "\n";
-    for (auto n: neighbors) {
-        std::cout << n << ", ";
+    for (size_t i = 0; i < neighbors.size(); i++) {
+        if (i%2 == 0) {
+            _water[cellIndex] = amount / 1.5;
+        } else {
+            _water[cellIndex] = amount;
+        }
     }
-    std::cout << "\n";
-    _newWater = true;
-    exit(0);
+    std::cout << "added water at " << neighbors.size() << " cells"  << std::endl;
 }
 
 const double Simulation::getWaterAt( int x, int y ) {

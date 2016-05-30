@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 3;
+static const int simulationSize = 60;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -34,13 +34,6 @@ GameManager::GameManager()
     _playing=false;
     _image.fill(QColor(0,0,0,0));
     _simulation->setGrid(_grid);
-
-// #ifdef DEBUG
-//     int cellIndex = 105;
-//     double amount = 30.0;
-//     _simulation->addWaterSource( cellIndex, amount );
-//     std::cout << "added " << amount << " to cell " << cellIndex << std::endl;
-// #endif
 }
 
 GameManager::~GameManager()
@@ -111,7 +104,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     // convert to grid cell
     int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
     
-    double amount = 3.0;
+    double amount = 30.0;
     _simulation->addWaterSource( gridIndex, amount );
 
 #ifdef DEBUG
