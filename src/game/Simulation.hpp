@@ -19,15 +19,20 @@ public:
 	void updateWaterSurface(double dt);
 	void addWaterSource(const int cellIndex, const double amount);
 	void setGrid(Grid *);
+    void rain(double dt);
+
+    std::vector<int> getNeighbors(const int index);
 	
 	const double getWaterAt(int x, int y);
 	const double getTerrainAt(int x, int y);
 	const double getSedimentAt(int x, int y);
 
-	void draw(QPainter &, const UnitSquareMapping &);
+	void draw(QPainter &);
 
 	// ranges for shader
 	static double _minW, _maxW, _minS, _maxS;
+
+    void toggleRain();
 
 	const double water(int x, int y);
 	const double sediment(int x, int y);
@@ -51,25 +56,25 @@ private:
 	const UnitSquareMapping &_mapping;
 	Grid *_grid;
 
-	bool newWater;
+	bool _newWater, _isRaining;
 
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 10.0;
+    constexpr static double A = 0.00005;
     // length of virtual pipe
     constexpr static double l = 1.0;
     // gravity
-    constexpr static double g = 15.81;
+    constexpr static double g = 9.81;
     // cell size
     double lx, ly;
     // sediment capacity constant
     constexpr static double Kc = 25.0;
     // dissolving constant
-    constexpr static double Ks = 0.00001*12*10;
+    constexpr static double Ks = 0.0001*12*10;
     // deposition constant
-    constexpr static double Kd = 0.00001*12*10;
+    constexpr static double Kd = 0.0001*12*10;
     // evaporation constant
-    constexpr static double Ke = 0.00011;
+    constexpr static double Ke = 0.00011*0.5;
 
     double outFlow, inFlow;
     

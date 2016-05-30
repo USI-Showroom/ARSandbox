@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 40;
+static const int simulationSize = 3;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -35,12 +35,12 @@ GameManager::GameManager()
     _image.fill(QColor(0,0,0,0));
     _simulation->setGrid(_grid);
 
-#ifdef DEBUG
-    int cellIndex = 105;
-    double amount = 0.6;
-    _simulation->addWaterSource( cellIndex, amount );
-    std::cout << "added " << amount << " to cell " << cellIndex << std::endl;
-#endif
+// #ifdef DEBUG
+//     int cellIndex = 105;
+//     double amount = 30.0;
+//     _simulation->addWaterSource( cellIndex, amount );
+//     std::cout << "added " << amount << " to cell " << cellIndex << std::endl;
+// #endif
 }
 
 GameManager::~GameManager()
@@ -88,7 +88,12 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
 }
 
 void GameManager::keyPress(const int key)
-{ }
+{
+    switch(key) {
+        case Qt::Key_R: _simulation->toggleRain();
+        default: return;
+    }
+}
 
 void GameManager::mousePress(const int x, const int y,  const int w, const int h)
 {
@@ -137,10 +142,10 @@ void GameManager::updateGame()
     QPainter painter;
     painter.begin(&_image);
 
-    _simulation->update(0.001);
+    _simulation->update(1000.0/(60));
     emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
                       (float)_simulation->_minS, (float)_simulation->_maxS);
-    _simulation->draw(painter, _mapping);
+    _simulation->draw(painter);
 
     painter.end();
     updateTexture();

@@ -1,13 +1,17 @@
 #include "Simulation.hpp"
 #include <cmath>
-#include <iostream>
-#include "util.hpp"
 #include <glm/glm.hpp>
+#include <iostream>
+#include <random>
+#include "util.hpp"
+
 
 double Simulation::_minW = 0.0;
 double Simulation::_maxW = 0.0;
 double Simulation::_minS = 0.0;
 double Simulation::_maxS = 0.0;
+
+std::mt19937 rnd;
 
 Simulation::Simulation( int newWidth, int newHeight,
                         const UnitSquareMapping& mapping )
@@ -26,7 +30,9 @@ Simulation::Simulation( int newWidth, int newHeight,
       _v ( _width * _height, 0.0 ),
       _s1( _width * _height, 0.0 ),
       
-      _mapping( mapping ), _grid( nullptr ), newWater(false)
+      _mapping( mapping ), _grid( nullptr ),
+      _newWater(false), _isRaining(false)
+      
       {}
 
 Simulation::~Simulation() {}
@@ -114,6 +120,39 @@ const double Simulation::v(int x, int y) {
 	}
 }
 
+void Simulation::toggleRain()
+{
+    _isRaining = _isRaining ? false : true;
+    if (_isRaining) {
+        std::cout << "rain on";
+    } else {
+        std::cout << "rain off";
+    }
+}
+
+void Simulation::rain(double dt)
+{
+    int a = 1;
+    int b = _width - 2;
+    std::uniform_int_distribution<ushort> rndInt(a, b);
+
+    double amount = 1.0/16.0;
+    for ( uint i = 0; i < 100; i++ ) {
+        uint x = rndInt(rnd);
+        uint y = rndInt(rnd);
+
+        _water[ (y-1) * _width + x-1] += amount;
+        _water[ (y-1) * _width + x  ] += amount;
+        _water[ (y-1) * _width + x+1] += amount;
+        _water[  y    * _width + x-1] += amount;
+        _water[  y    * _width + x  ] += amount;
+        _water[  y    * _width + x+1] += amount;
+        _water[ (y+1) * _width + x-1] += amount;
+        _water[ (y+1) * _width + x  ] += amount;
+        _water[ (y+1) * _width + x+1] += amount;
+    }
+}
+
 void Simulation::update( double dt ) {
 	if ( _grid == nullptr ) {
 #ifdef DEBUG
@@ -122,7 +161,9 @@ void Simulation::update( double dt ) {
         return;
     }
     
-    updateWaterSurface( dt );
+    if (_isRaining) rain(dt);
+    
+    updateWaterSurface(dt);
 }
 
 void Simulation::updateWaterSurface( double dt ) {
@@ -277,34 +318,14 @@ void Simulation::updateWaterSurface( double dt ) {
             double C = Kc * angle * sq * (std::min(water(x,y),0.01)/0.01) ;
 
             double st = sediment(x,y);
-            double delta = C - st;
 
-            double d = 0.0;
-            if (delta > 0.0)
-            {
-                d = Ks*delta;
-                _terrain[y * _width + x]  -= d;
-                _water[y * _width + x]    += d;
-                _sediment[y * _width * x] += d;
+            if ( C > st ) {
+            	_terrain[y * _width + x] -= Ks * ( C - st );
+                _s1[y * _width + x] = sediment(x,y) + Ks * ( C - st );
+            } else {
+            	_terrain[y * _width + x] += Kd * ( st - C );
+                _s1[y * _width + x] = sediment(x,y) - Kd * ( st - C );
             }
-            // deposit onto ground
-            else if (delta < 0.0)
-            {
-                d = Kd*delta;
-                _terrain[y * _width + x]  -= d;
-                _water[y * _width + x]    += d;
-                _sediment[y * _width * x] += d;
-            }
-
-
-            // double st = sediment(x,y);
-            // if ( C > st ) {
-            // 	_terrain[y * _width + x] -= Ks * ( C - st );
-            //     _s1[y * _width + x] = sediment(x,y) + Ks * ( C - st );
-            // } else {
-            // 	_terrain[y * _width + x] += Kd * ( st - C );
-            //     _s1[y * _width + x] = sediment(x,y) - Kd * ( st - C );
-            // }
 
 #ifdef DEBUG
             assert(_terrain[y * _width + x] == _terrain[y * _width + x]);
@@ -423,9 +444,72 @@ void Simulation::updateWaterSurface( double dt ) {
 #endif        
 }
 
+std::vector<int> Simulation::getNeighbors(const int index) {
+    std::vector<int> indices;
+
+    if (index < 0 || index >= _width * _width) {
+        return std::vector<int> ();
+    }
+    
+    if (index == 0) {
+        indices.push_back(index + 1);
+        indices.push_back(index + _width);
+        indices.push_back(index + _width - 1);
+    
+    }  else if (index > 0 && index < _width) {
+        indices.push_back(index + 1);
+        indices.push_back(index + _width + 1);
+        indices.push_back(index + _width);
+        indices.push_back(index + _width - 1);
+        indices.push_back(index - 1);
+    
+    } else if ((index % _width) == _width - 1) {
+        indices.push_back(index - 1);
+        indices.push_back(index - _width - 1);
+        indices.push_back(index - _width);
+        indices.push_back(index + _width);
+        indices.push_back(index + _width - 1);
+    
+    } else if (index == _width * _width - 1) {
+        indices.push_back(index - 1);
+        indices.push_back(index - _width - 1);
+        indices.push_back(index - _width);
+    
+    } else if (index > _width * _width - _width) {
+        indices.push_back(index - 1);
+        indices.push_back(index - _width - 1);
+        indices.push_back(index - _width);
+        indices.push_back(index - _width + 1);
+        indices.push_back(index + 1);
+    
+    } else if ((index % _width) == 0) {
+        indices.push_back(index - _width);
+        indices.push_back(index - _width + 1);
+        indices.push_back(index + 1);
+        indices.push_back(index + _width + 1);
+        indices.push_back(index + _width);
+
+    } else if (index > _width && index < _width * (_width - 1) - 1) {
+        indices.push_back(index - 1);
+        indices.push_back(index - 1 - _width);
+        indices.push_back(index - _width);
+        indices.push_back(index - _width + 1);
+        indices.push_back(index + 1);
+        indices.push_back(index + _width + 1);
+        indices.push_back(index + _width - 1);
+    }
+    return indices;
+}
+
 void Simulation::addWaterSource( const int cellIndex, const double amount ) {
-    _water[cellIndex] += amount;
-    newWater = true;
+    std::vector<int> neighbors = getNeighbors(cellIndex);
+    std::cout << "cell: " << cellIndex << "\n";
+    for (auto n: neighbors) {
+        std::cout << n << ", ";
+    }
+    std::cout << "\n";
+    _newWater = true;
+    exit(0);
 }
 
 const double Simulation::getWaterAt( int x, int y ) {
@@ -443,10 +527,10 @@ const double Simulation::getSedimentAt( int x, int y ) {
 void Simulation::setGrid( Grid* newGrid ) {
 	_grid = newGrid;
 	// set cell size
-    lx = ly = 1.0 / _grid->size();
+    lx = ly = 1.0;
 }
 
-void Simulation::draw( QPainter& painter, const UnitSquareMapping& mapping ) {
+void Simulation::draw( QPainter& painter ) {
     double waterHeight, terrainHeight, sedimentHeight;
     waterHeight = terrainHeight = sedimentHeight = 0.0;
 

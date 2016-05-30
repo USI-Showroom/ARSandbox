@@ -149,7 +149,7 @@ void Grid::drawCell( QPainter& painter, const int x, const int y, double terrain
     // std::cout << "Color: " << r << ", " << g << ", " << b << std::endl;
     QColor color(r,g,b,255);
 
-    int nItems = 10;
+    int nItems = 20;
     double nPoints = static_cast<double>(nItems);
     for ( int nx = 1; nx < nItems; ++nx ) {
         for ( int ny = 1; ny < nItems; ++ny ) {
