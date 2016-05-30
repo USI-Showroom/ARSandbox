@@ -274,7 +274,7 @@ void Simulation::updateWaterSurface( double dt ) {
             double nh = _grid->getCellNormal(x, y).z();
             double angle = max(0.01, fabs(1.0 - nh));
             double sq = sqrt(uu*uu + vv*vv);
-            double C = Kc * angle * sq; // * (std::min(water(x,y),0.01)/0.01) ;
+            double C = Kc * angle * sq * (std::min(water(x,y),0.01)/0.01) ;
 
             double st = sediment(x,y);
             double delta = C - st;

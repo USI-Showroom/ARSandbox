@@ -29,8 +29,7 @@ uniform sampler2D level4;
 
 uniform sampler2D gameTexture;
 
-// vector of min and max values for
-// terrain (x), water(y) and sediment (z) heights
+// min and max values for Water and Terrain
 uniform float maxW;
 uniform float minW;
 uniform float maxS;
