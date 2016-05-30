@@ -274,17 +274,37 @@ void Simulation::updateWaterSurface( double dt ) {
             double nh = _grid->getCellNormal(x, y).z();
             double angle = max(0.01, fabs(1.0 - nh));
             double sq = sqrt(uu*uu + vv*vv);
-            double C = Kc * angle * sq;
-
+            double C = Kc * angle * sq; // * (std::min(water(x,y),0.01)/0.01) ;
 
             double st = sediment(x,y);
-            if ( C > st ) {
-            	_terrain[y * _width + x] -= Ks * ( C - st );
-                _s1[y * _width + x] = sediment(x,y) + Ks * ( C - st );
-            } else {
-            	_terrain[y * _width + x] += Kd * ( st - C );
-                _s1[y * _width + x] = sediment(x,y) - Kd * ( st - C );
+            double delta = C - st;
+
+            double d = 0.0;
+            if (delta > 0.0)
+            {
+                d = Ks*delta;
+                _terrain[y * _width + x]  -= d;
+                _water[y * _width + x]    += d;
+                _sediment[y * _width * x] += d;
             }
+            // deposit onto ground
+            else if (delta < 0.0)
+            {
+                d = Kd*delta;
+                _terrain[y * _width + x]  -= d;
+                _water[y * _width + x]    += d;
+                _sediment[y * _width * x] += d;
+            }
+
+
+            // double st = sediment(x,y);
+            // if ( C > st ) {
+            // 	_terrain[y * _width + x] -= Ks * ( C - st );
+            //     _s1[y * _width + x] = sediment(x,y) + Ks * ( C - st );
+            // } else {
+            // 	_terrain[y * _width + x] += Kd * ( st - C );
+            //     _s1[y * _width + x] = sediment(x,y) - Kd * ( st - C );
+            // }
 
 #ifdef DEBUG
             assert(_terrain[y * _width + x] == _terrain[y * _width + x]);
