@@ -541,18 +541,6 @@ void Simulation::addWaterSource( const int cellIndex, const double amount ) {
     std::cout << "added water at " << neighbors.size() << " cells"  << std::endl;
 }
 
-const double Simulation::getWaterAt( int x, int y ) {
-    return _water.at( y * _height + x );
-}
-
-const double Simulation::getTerrainAt( int x, int y ) {
-    return _terrain.at( y * _height + x );
-}
-
-const double Simulation::getSedimentAt( int x, int y ) {
-    return _sediment.at( y * _height + x );
-}
-
 void Simulation::setGrid( Grid* newGrid ) {
 	_grid = newGrid;
 }
@@ -561,15 +549,16 @@ void Simulation::draw( QPainter& painter ) {
     double waterHeight, terrainHeight, sedimentHeight;
     waterHeight = terrainHeight = sedimentHeight = 0.0;
 
-    for ( int y = 0; y < _height; ++y ) {
-    	for ( int x = 0; x < _width; ++x ) {
+    for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx++ )
+    {
+        int x = *idx / _height;
+        int y = *idx % _width;
 
-            terrainHeight = (terrain(x,y) - _minS) / (_maxS - _minS);
-            waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
-            sedimentHeight = sediment(x,y);
+        terrainHeight = (terrain(x,y) - _minS) / (_maxS - _minS);
+        waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
+        sedimentHeight = sediment(x,y);
 
-            _grid->drawCell( painter, x, y, terrainHeight, waterHeight,
-                             sedimentHeight );
-        }
+        _grid->drawCell( painter, x, y, terrainHeight, waterHeight,
+                         sedimentHeight );
     }
 }
