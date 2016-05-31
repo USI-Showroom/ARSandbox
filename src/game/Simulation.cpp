@@ -149,8 +149,8 @@ void Simulation::rain(double dt)
     int b = _width - 2;
     std::uniform_int_distribution<ushort> rndInt(a, b);
 
-    double amount = 1.0/16.0;
-    for ( uint i = 0; i < 100; i++ ) {
+    double amount = 0.0001;
+    for ( uint i = _width + 1; i < _width*_height - _width - 1; i++ ) {
         uint x = rndInt(rnd);
         uint y = rndInt(rnd);
 
@@ -174,7 +174,7 @@ void Simulation::update( double dt ) {
         return;
     }
 
-    // if (_isRaining) rain(dt);
+    if (_isRaining) rain(dt);
 
     updateWaterSurface(dt);
 }
@@ -197,8 +197,8 @@ void Simulation::updateWaterSurface( double dt ) {
     // because accessors return 0 if cell(x, y) are outside of grid
     for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx ++ )
     {
-        int x = *idx / _height;
-        int y = *idx % _width;
+        int x = *idx % _height;
+        int y = *idx / _width;
 
         outFlow = inFlow = 0.0;
 
@@ -261,27 +261,6 @@ void Simulation::updateWaterSurface( double dt ) {
             active_cells.insert((y+1) * _width + x);
         }
 
-        // // cells with outflow <= 0 need not to be explored
-        // if (dhl <= 0.0 && x > 0) {
-        //     int idx = y * _width + x - 1;
-        //     active_cells.erase(idx);
-        // }
-        //
-        // if (dht <= 0.0 && y > 0) {
-        //     int idx = (y - 1) * _width + x;
-        //     active_cells.erase(idx);
-        // }
-        //
-        // if (dhr <= 0.0 && x < _width - 1) {
-        //     int idx = y * _width + x + 1;
-        //     active_cells.erase(idx);
-        // }
-        //
-        // if (dhb <= 0.0 && y < _width - 1) {
-        //     int idx = (y + 1) * _width + x;
-        //     active_cells.erase(idx);
-        // }
-
     	// outFlow
     	outFlow += _leftFlux  [y * _width + x];
     	outFlow += _topFlux   [y * _width + x];
@@ -313,9 +292,10 @@ void Simulation::updateWaterSurface( double dt ) {
 	// compute volume of water passing through cell(x,y)
     for ( auto idx = active_cells.begin(); idx != active_cells.end(); ) //increment done inside
     {
-        int x = *idx / _height;
-        int y = *idx % _width;
-    	inFlow = 0.0; outFlow = 0.0;
+        int x = *idx % _height;
+        int y = *idx / _width;
+    	
+        inFlow = 0.0; outFlow = 0.0;
 
     	inFlow += rightFlux(x-1, y);
     	inFlow += topFlux(x, y-1);
@@ -419,8 +399,8 @@ void Simulation::updateWaterSurface( double dt ) {
     // computing final position as velocity * time
     for ( auto idx = active_cells.begin(); idx != active_cells.end(); ) // increment inside
     {
-        int x = *idx / _height;
-        int y = *idx % _width;
+        int x = *idx % _width;
+        int y = *idx / _height;
 
         // local velocity
         double uV = u(x,y);
@@ -499,64 +479,56 @@ void Simulation::updateWaterSurface( double dt ) {
 #endif
 
     if ( active_cells.size() > 0 ) {
-        std::cout << "\nActive cells list size: " << active_cells.size() << "\n";
+        std::cout << "\nActive cells list size: " << active_cells.size();
+    }
+
+    if (active_cells.size() > 0) {
+        std::cout << "\nPrinting active cells WATER heights:" << std::endl;
+        for (auto it = active_cells.begin(); it != active_cells.end(); ++it) {
+            std::cout << *it <<", "<< _water.at(*it) << ", ";
+        }
+        std::cout << "\n";
     }
 }
 
 std::vector<int> Simulation::getNeighbors(const int index) {
     std::vector<int> indices;
 
-    if (index < 0 || index >= _width * _width) {
+    if (index < 0 || index >= _width * _height) {
         return std::vector<int> ();
     }
 
-    if (index == 0) {
-        indices.push_back(index + 1);
-        indices.push_back(index + _width);
-        indices.push_back(index + _width - 1);
+    int x = index % _width;
+    int y = index / _height;
 
-    }  else if (index > 0 && index < _width) {
-        indices.push_back(index + 1);
-        indices.push_back(index + _width + 1);
-        indices.push_back(index + _width);
-        indices.push_back(index + _width - 1);
+    // left, top, right and bottom neighbors
+    if (x > 0) {
         indices.push_back(index - 1);
-
-    } else if ((index % _width) == _width - 1) {
-        indices.push_back(index - 1);
-        indices.push_back(index - _width - 1);
-        indices.push_back(index - _width);
-        indices.push_back(index + _width);
-        indices.push_back(index + _width - 1);
-
-    } else if (index == _width * _width - 1) {
-        indices.push_back(index - 1);
-        indices.push_back(index - _width - 1);
-        indices.push_back(index - _width);
-
-    } else if (index > _width * _width - _width) {
-        indices.push_back(index - 1);
-        indices.push_back(index - _width - 1);
-        indices.push_back(index - _width);
-        indices.push_back(index - _width + 1);
-        indices.push_back(index + 1);
-
-    } else if ((index % _width) == 0) {
-        indices.push_back(index - _width);
-        indices.push_back(index - _width + 1);
-        indices.push_back(index + 1);
-        indices.push_back(index + _width + 1);
-        indices.push_back(index + _width);
-
-    } else if (index > _width && index < _width * (_width - 1) - 1) {
-        indices.push_back(index - 1);
-        indices.push_back(index - 1 - _width);
-        indices.push_back(index - _width);
-        indices.push_back(index - _width + 1);
-        indices.push_back(index + 1);
-        indices.push_back(index + _width + 1);
-        indices.push_back(index + _width - 1);
     }
+    if (y > 0) {
+        indices.push_back(index - _height);
+    }
+    if (x < _width - 1) {
+        indices.push_back(index + 1);
+    }
+    if (y < _height - 1) {
+        indices.push_back(index + _height);
+    }
+
+    // top-left, top-right, bottom-right, bottom-left
+    if (x > 0 && y > 0) {
+        indices.push_back(index - _height - 1);
+    }
+    if (x < _width - 1 && y > 0) {
+        indices.push_back(index - _height + 1);
+    }
+    if (x < _width - 1 && y < _height - 1) {
+        indices.push_back(index + _height + 1);
+    }
+    if (x > 0 && y < _height - 1) {
+        indices.push_back(index + _height - 1);
+    }
+    
     return indices;
 }
 
@@ -564,19 +536,22 @@ void Simulation::addWaterSource( const int cellIndex, const double amount ) {
     active_cells.insert(cellIndex);
     std::vector<int> neighbors = getNeighbors(cellIndex);
     
-    std::cout << "\nneighbors size: " << neighbors.size();
+    std::cout << "\ncell " << cellIndex << " has " << neighbors.size() << " neighbors ";
     for (size_t i = 0; i < neighbors.size(); i++) {
-        
-        active_cells.insert(neighbors.at(i));
-        
-        if (i%2 == 0) {
-            _water[neighbors.at(i)] = amount / 1.5;
-        } else {
-            _water[neighbors.at(i)] = amount;
-        }
-    }
 
-    std::cout << "\nadded water cells " << cellIndex << " and ";
+#ifdef DEBUG
+        std::cout << neighbors.at(i) <<", ";
+#endif
+        
+        active_cells.insert(neighbors.at(i));        
+        _water[neighbors.at(i)] = amount;
+    }
+#ifdef DEBUG
+    std::cout << "\n";
+#endif
+
+#ifdef DEBUG
+    std::cout << "\nadded water at cell " << cellIndex << " and his neighbors ";
     for (std::vector<int>::iterator it = neighbors.begin();
          it != neighbors.end();
          it++)
@@ -584,6 +559,15 @@ void Simulation::addWaterSource( const int cellIndex, const double amount ) {
         std::cout << *it << ", ";
     }
     std::cout << "\n";
+
+    std::vector<int> v = getNeighbors(cellIndex);
+    std::cout << "\nPrinting neighbors of " << cellIndex << "\n";
+    for (auto n : v) {
+        std::cout << n << ", ";
+    }
+    std::cout << std::endl;
+    exit(0);
+#endif
 }
 
 void Simulation::setGrid( Grid* newGrid ) {
@@ -597,10 +581,9 @@ void Simulation::draw( QPainter& painter ) {
     for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx++ )
     // for(int x=0;x<_width;++x){
         // for(int y=0;y<_height;++y)
-    
     {
-        int x = *idx / _height;
-        int y = *idx % _width;
+        int x = *idx % _height;
+        int y = *idx / _width;
 
         assert(y*_width+x==*idx);
 
@@ -608,8 +591,7 @@ void Simulation::draw( QPainter& painter ) {
         waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
         sedimentHeight = sediment(x,y);
 
-        _grid->drawCell( painter, x, y, terrainHeight, waterHeight,
-                         sedimentHeight );
+        _grid->drawCell( painter, x, y, terrainHeight, waterHeight, sedimentHeight );
     // }
-}
+    }
 }

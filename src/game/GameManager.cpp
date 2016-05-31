@@ -24,7 +24,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static const int simulationSize = 300;
+static const int simulationSize = 20;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -83,7 +83,7 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
 void GameManager::keyPress(const int key)
 {
     switch(key) {
-        case Qt::Key_R: _simulation->toggleRain();
+        case Qt::Key_R: _simulation->toggleRain(); std::cout << "here" << std::endl;
         default: return;
     }
 }
@@ -103,7 +103,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     // convert to grid cell
     int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
 
-    double amount = 0.1;
+    double amount = 2.00;
     _simulation->addWaterSource( gridIndex, amount );
 
 #ifdef DEBUG
