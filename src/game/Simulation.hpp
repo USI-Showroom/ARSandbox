@@ -22,7 +22,7 @@ public:
     void rain(double dt);
 
     std::vector<int> getNeighbors(const int index);
-	
+
 	const double getWaterAt(int x, int y);
 	const double getTerrainAt(int x, int y);
 	const double getSedimentAt(int x, int y);
@@ -60,24 +60,24 @@ private:
 
 	// simulation constants
 	// cross sectional area of the pipe
-    constexpr static double A = 0.00005;
+    const double A;
     // length of virtual pipe
-    constexpr static double l = 1.0;
+    const double l;
     // gravity
-    constexpr static double g = 9.81;
+    const double g;
     // cell size
-    double lx, ly;
+    const double lx, ly;
     // sediment capacity constant
-    constexpr static double Kc = 25.0;
+    const double Kc;
     // dissolving constant
-    constexpr static double Ks = 0.0001*12*10;
+    const double Ks;
     // deposition constant
-    constexpr static double Kd = 0.0001*12*10;
+    const double Kd;
     // evaporation constant
-    constexpr static double Ke = 0.00011*0.5;
+    const double Ke;
 
     double outFlow, inFlow;
-    
+
     double d1, d2, b1;
     double d1l, b1l, dhl;
     double d1t, b1t, dht;

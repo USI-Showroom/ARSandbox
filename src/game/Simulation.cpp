@@ -16,23 +16,27 @@ std::mt19937 rnd;
 Simulation::Simulation( int newWidth, int newHeight,
                         const UnitSquareMapping& mapping )
     : _width( newWidth ), _height( newHeight ),
-      
+
       _terrain ( _width * _height, 0.0 ),
       _water   ( _width * _height, 0.0 ),
       _sediment( _width * _height, 0.0 ),
-      
+
       _leftFlux  ( _width * _height, 0.0 ),
-      _rightFlux ( _width * _height, 0.0 ), 
+      _rightFlux ( _width * _height, 0.0 ),
       _topFlux   ( _width * _height, 0.0 ),
       _bottomFlux( _width * _height, 0.0 ),
-      
+
       _u ( _width * _height, 0.0 ),
       _v ( _width * _height, 0.0 ),
       _s1( _width * _height, 0.0 ),
-      
+
       _mapping( mapping ), _grid( nullptr ),
-      _newWater(false), _isRaining(false)
-      
+      _newWater(false), _isRaining(false),
+
+      // init constants
+      A(0.00005), l(1.0), g(9.81), lx(1.0), ly(1.0),
+      Kc(25.0), Ks(0.0001*12*10), Kd(0.0001*12*10), Ke(0.00011*0.5)
+
       {}
 
 Simulation::~Simulation() {}
@@ -160,9 +164,9 @@ void Simulation::update( double dt ) {
 #endif
         return;
     }
-    
+
     if (_isRaining) rain(dt);
-    
+
     updateWaterSurface(dt);
 }
 
@@ -172,7 +176,7 @@ void Simulation::updateWaterSurface( double dt ) {
     // flux factor
     double fluxFactor = g * A / l * dt;
 
-    
+
     d1  = d2  = b1  = 0.0;
     d1l = b1l = dhl = 0.0;
     d1t = b1t = dht = 0.0;
@@ -184,11 +188,11 @@ void Simulation::updateWaterSurface( double dt ) {
     // because accessors return 0 if cell(x, y) are outside of grid
     for ( int y = 0; y < _height; ++y ) {
     	for ( int x = 0; x < _width; ++x ) {
-            outFlow = inFlow = 0.0;        	
+            outFlow = inFlow = 0.0;
 
         	d1 = water(x,y);
         	b1 = _grid->getHeight(x,y) + terrain(x,y); //_terrain[y * _width + x];
-        	
+
         	// left neighbor
         	d1l = water(x-1, y);
         	b1l = _grid->getHeight(x-1, y) + terrain(x-1,y); //_terrain[y * _width + x -1];
@@ -262,7 +266,7 @@ void Simulation::updateWaterSurface( double dt ) {
 		for ( int x = 0; x < _width; ++x ) {
 
         	inFlow = 0.0; outFlow = 0.0;
-        	
+
         	inFlow += rightFlux(x-1, y);
         	inFlow += topFlux(x, y-1);
             inFlow += leftFlux(x+1, y);
@@ -274,11 +278,11 @@ void Simulation::updateWaterSurface( double dt ) {
         	outFlow += bottomFlux(x,y);
 
         	double dv = dt * ( inFlow - outFlow );
-        	
+
         	if (fabs(dv) < 1e-12) {
         		continue;
         	}
-            
+
             d2 = dv / ( lx * ly );
 
             d1 = water(x,y);
@@ -310,7 +314,7 @@ void Simulation::updateWaterSurface( double dt ) {
             _u[y * _width + x] = uu;
             _v[y * _width + x] = vv;
 
-    		
+
     		// simulate erosion
             double nh = _grid->getCellNormal(x, y).z();
             double angle = max(0.01, fabs(1.0 - nh));
@@ -329,7 +333,7 @@ void Simulation::updateWaterSurface( double dt ) {
 
 #ifdef DEBUG
             assert(_terrain[y * _width + x] == _terrain[y * _width + x]);
-            
+
         		std::cout
                     <<"\n"<< x<<" "<<y
             		<< "\nangle: "<< angle << ", "
@@ -388,7 +392,7 @@ void Simulation::updateWaterSurface( double dt ) {
             y0 = glm::clamp(y0,0,_height-1);
             y1 = glm::clamp(y1,0,_height-1);
 
-            float newSediment = glm::mix( 
+            float newSediment = glm::mix(
                 glm::mix(sediment(x0,y0),sediment(x1,y0),fX),
                 glm::mix(sediment(x0,y1),sediment(x1,y1),fX),
                 fY);
@@ -441,7 +445,7 @@ void Simulation::updateWaterSurface( double dt ) {
                 }
                 std::cout << "\n";
                 //exit(0);
-#endif        
+#endif
 }
 
 std::vector<int> Simulation::getNeighbors(const int index) {
@@ -450,38 +454,38 @@ std::vector<int> Simulation::getNeighbors(const int index) {
     if (index < 0 || index >= _width * _width) {
         return std::vector<int> ();
     }
-    
+
     if (index == 0) {
         indices.push_back(index + 1);
         indices.push_back(index + _width);
         indices.push_back(index + _width - 1);
-    
+
     }  else if (index > 0 && index < _width) {
         indices.push_back(index + 1);
         indices.push_back(index + _width + 1);
         indices.push_back(index + _width);
         indices.push_back(index + _width - 1);
         indices.push_back(index - 1);
-    
+
     } else if ((index % _width) == _width - 1) {
         indices.push_back(index - 1);
         indices.push_back(index - _width - 1);
         indices.push_back(index - _width);
         indices.push_back(index + _width);
         indices.push_back(index + _width - 1);
-    
+
     } else if (index == _width * _width - 1) {
         indices.push_back(index - 1);
         indices.push_back(index - _width - 1);
         indices.push_back(index - _width);
-    
+
     } else if (index > _width * _width - _width) {
         indices.push_back(index - 1);
         indices.push_back(index - _width - 1);
         indices.push_back(index - _width);
         indices.push_back(index - _width + 1);
         indices.push_back(index + 1);
-    
+
     } else if ((index % _width) == 0) {
         indices.push_back(index - _width);
         indices.push_back(index - _width + 1);
@@ -527,8 +531,6 @@ const double Simulation::getSedimentAt( int x, int y ) {
 
 void Simulation::setGrid( Grid* newGrid ) {
 	_grid = newGrid;
-	// set cell size
-    lx = ly = 1.0;
 }
 
 void Simulation::draw( QPainter& painter ) {
@@ -537,7 +539,7 @@ void Simulation::draw( QPainter& painter ) {
 
     for ( int y = 0; y < _height; ++y ) {
     	for ( int x = 0; x < _width; ++x ) {
-            
+
             terrainHeight = (terrain(x,y) - _minS) / (_maxS - _minS);
             waterHeight = (water(x,y) - _minW) / (_maxW - _minW);
             sedimentHeight = sediment(x,y);
