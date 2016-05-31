@@ -78,12 +78,16 @@ ELSE()
     message(FATAL_ERROR "OpenGl not found!")
 ENDIF()
 
+IF(UNIX)
 FIND_PACKAGE(GLM REQUIRED)
 IF(GLM_FOUND)         
     SET(ARSANDBOX_LINK_LIBRARIES ${ARSANDBOX_LINK_LIBRARIES} ${GLM_LIBRARIES})   
     INCLUDE_DIRECTORIES(${QT_QTOPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIR} )
 ELSE()
     message(FATAL_ERROR "GLM not found!")
+ENDIF()
+ELSE()
+    SET(GLM_DIR "C:\\glm")
 ENDIF()
 #########################
 
