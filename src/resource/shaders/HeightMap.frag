@@ -146,7 +146,7 @@ void main()
     waterHeight = max(waterHeight, 0.0);
     
     gl_FragColor = bgCol * (1.0 - waterHeight) + waterColor * waterHeight;
-
+    // gl_FragColor = vec4(gameTxt.a,0,0,1);
     // isolines
     // float isoH = 0.0025;
     // for ( int i=0; i<10; i++) {

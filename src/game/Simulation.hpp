@@ -40,6 +40,7 @@ public:
 	const double leftFlux(int x, int y);
 	const double u(int x, int y);
 	const double v(int x, int y);
+	const double s1(int x, int y);
 
 private:
 	int _width, _height;
