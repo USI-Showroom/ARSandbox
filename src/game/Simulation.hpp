@@ -2,6 +2,7 @@
 #define SIMULATION_HPP_INCLUDED
 
 #include <vector>
+#include <set>
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
 #include "Grid.hpp"
@@ -55,6 +56,8 @@ private:
 
 	const UnitSquareMapping &_mapping;
 	Grid *_grid;
+
+	set<int> active_cells;
 
 	bool _newWater, _isRaining;
 
