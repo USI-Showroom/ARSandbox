@@ -46,6 +46,7 @@ Simulation::~Simulation() {}
 const double Simulation::water(int x, int y) {
 	int idx = y * _width + x;
 	if (idx >= 0 && idx < _water.size()) {
+        active_cells.insert(y * _width + x);
 		return _water.at(idx);
 	} else {
 		return 0.0;
@@ -73,6 +74,7 @@ const double Simulation::terrain(int x, int y) {
 const double Simulation::rightFlux(int x, int y) {
 	int idx = y * _width + x;
 	if (idx >= 0 && idx < _rightFlux.size()) {
+        active_cells.insert(y * _width + x);
 		return _rightFlux[idx];
 	} else {
 		return 0.0;
@@ -82,6 +84,7 @@ const double Simulation::rightFlux(int x, int y) {
 const double Simulation::bottomFlux(int x, int y) {
 	int idx = y * _width + x;
 	if (idx >= 0 && idx < _bottomFlux.size()) {
+        active_cells.insert(y * _width + x);
 		return _bottomFlux[idx];
 	} else {
 		return 0.0;
@@ -91,6 +94,7 @@ const double Simulation::bottomFlux(int x, int y) {
 const double Simulation::topFlux(int x, int y) {
 	int idx = y * _width + x;
 	if (idx >= 0 && idx < _topFlux.size()) {
+        active_cells.insert(y * _width + x);
 		return _topFlux[idx];
 	} else {
 		return 0.0;
@@ -100,6 +104,7 @@ const double Simulation::topFlux(int x, int y) {
 const double Simulation::leftFlux(int x, int y) {
 	int idx = y * _width + x;
 	if (idx >= 0 && idx < _leftFlux.size()) {
+        active_cells.insert(y * _width + x);
 		return _leftFlux[idx];
 	} else {
 		return 0.0;
@@ -188,9 +193,7 @@ void Simulation::updateWaterSurface( double dt ) {
     // compute outFlows for cells
     // boundaries are taken into consideration
     // because accessors return 0 if cell(x, y) are outside of grid
-    for ( std::set<int>::iterator idx = active_cells.begin();
-          idx != active_cells.end();
-          idx ++ )
+    for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx ++ )
     {
         int x = *idx / _height;
         int y = *idx % _width;
@@ -198,26 +201,26 @@ void Simulation::updateWaterSurface( double dt ) {
         outFlow = inFlow = 0.0;
 
     	d1 = water(x,y);
-    	b1 = _grid->getHeight(x,y) + terrain(x,y); //_terrain[y * _width + x];
+    	b1 = _grid->getHeight(x,y) + terrain(x,y);
 
     	// left neighbor
     	d1l = water(x-1, y);
-    	b1l = _grid->getHeight(x-1, y) + terrain(x-1,y); //_terrain[y * _width + x -1];
+    	b1l = _grid->getHeight(x-1, y) + terrain(x-1,y);
     	dhl = b1 + d1 - b1l - d1l;
 
     	// top neighbor
     	d1t = water(x, y-1);
-    	b1t = _grid->getHeight(x, y-1) + terrain(x,y-1); //_terrain[(y - 1) * _width + x];
+    	b1t = _grid->getHeight(x, y-1) + terrain(x,y-1);
     	dht = b1 + d1 - b1t - d1t;
 
     	// right neighbor
     	d1r = water(x+1, y);
-    	b1r = _grid->getHeight(x+1, y) + terrain(x+1,y); //_terrain[y * _width + x + 1];
+    	b1r = _grid->getHeight(x+1, y) + terrain(x+1,y);
     	dhr = b1 + d1 - b1r - d1r;
 
     	// bottom neighbor
     	d1b = water(x, y+1);
-    	b1b = _grid->getHeight(x, y+1) + terrain(x,y+1); //_terrain[(y+1) * _width + x];
+    	b1b = _grid->getHeight(x, y+1) + terrain(x,y+1);
     	dhb = b1 + d1 - b1b - d1b;
 
         if (x == 0)
@@ -426,7 +429,7 @@ void Simulation::updateWaterSurface( double dt ) {
     } // end idx for loop
 
     // update sediment
-    for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx ++ )
+    for ( auto idx = active_cells.begin(); idx != active_cells.end(); idx++ )
     {
         int x = *idx / _height;
         int y = *idx % _width;
@@ -452,6 +455,21 @@ void Simulation::updateWaterSurface( double dt ) {
     std::cout << "\n";
     //exit(0);
 #endif
+
+    // delete from active cells set those with value 0
+    for (std::set<int>::iterator idx = active_cells.begin();
+         idx != active_cells.end();)
+    {
+        int x = *idx / _height;
+        int y = *idx % _width;
+
+        double water_height = water(x,y);
+        if (water_height <= 0.0) {
+            idx = active_cells.erase(idx);
+        } else {
+            ++idx;
+        }
+    }
 }
 
 std::vector<int> Simulation::getNeighbors(const int index) {
