@@ -1,0 +1,84 @@
+From 8dbb6b6f77fa9f8270020ac00ee83c1f05d63fc2 Mon Sep 17 00:00:00 2001
+From: Matteo Muscella <matteo.muscella@usi.ch>
+Date: Wed, 1 Jun 2016 11:10:51 +0200
+Subject: [PATCH] Switch signs for neighbor computing
+
+---
+ src/game/GameManager.cpp |  2 +-
+ src/game/Simulation.cpp  | 18 +++++++++---------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/src/game/GameManager.cpp b/src/game/GameManager.cpp
+index 010818e..63ca8b7 100644
+--- a/src/game/GameManager.cpp
++++ b/src/game/GameManager.cpp
+@@ -103,7 +103,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
+     // convert to grid cell
+     int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
+ 
+-    double amount = 2.00;
++    double amount = 0.2;
+     _simulation->addWaterSource( gridIndex, amount );
+ 
+ #ifdef DEBUG
+diff --git a/src/game/Simulation.cpp b/src/game/Simulation.cpp
+index 6cdd2be..56ccb4e 100644
+--- a/src/game/Simulation.cpp
++++ b/src/game/Simulation.cpp
+@@ -211,8 +211,8 @@ void Simulation::updateWaterSurface( double dt ) {
+     	dhl = b1 + d1 - b1l - d1l;
+ 
+     	// top neighbor
+-    	d1t = water(x, y-1);
+-    	b1t = _grid->getHeight(x, y-1) + terrain(x,y-1);
++    	d1t = water(x, y+1);
++    	b1t = _grid->getHeight(x, y+1) + terrain(x,y+1);
+     	dht = b1 + d1 - b1t - d1t;
+ 
+     	// right neighbor
+@@ -221,8 +221,8 @@ void Simulation::updateWaterSurface( double dt ) {
+     	dhr = b1 + d1 - b1r - d1r;
+ 
+     	// bottom neighbor
+-    	d1b = water(x, y+1);
+-    	b1b = _grid->getHeight(x, y+1) + terrain(x,y+1);
++    	d1b = water(x, y-1);
++    	b1b = _grid->getHeight(x, y+1) + terrain(x,y-1);
+     	dhb = b1 + d1 - b1b - d1b;
+ 
+         if (x == 0)
+@@ -298,9 +298,9 @@ void Simulation::updateWaterSurface( double dt ) {
+         inFlow = 0.0; outFlow = 0.0;
+ 
+     	inFlow += rightFlux(x-1, y);
+-    	inFlow += topFlux(x, y-1);
++    	inFlow += topFlux(x, y+1);
+         inFlow += leftFlux(x+1, y);
+-        inFlow += bottomFlux(x, y+1);
++        inFlow += bottomFlux(x, y-1);
+ 
+     	outFlow += rightFlux(x,y);
+     	outFlow += topFlux(x,y);
+@@ -329,7 +329,7 @@ void Simulation::updateWaterSurface( double dt ) {
+         // calculate average amount of water that passes through cell
+         double dwx = (rightFlux(x-1, y) - leftFlux(x, y) + rightFlux(x, y) - leftFlux(x+1, y)) * 0.5;
+         // TODO: possible bug
+-        double dwy = (topFlux(x, y-1) - bottomFlux(x, y) + topFlux(x, y) - bottomFlux(x, y+1)) * 0.5;
++        double dwy = (topFlux(x, y+1) - bottomFlux(x, y) + topFlux(x, y) - bottomFlux(x, y-1)) * 0.5;
+ 
+         // std::cout << "\ndwx: " << dwx << ", dwy: " << dwy << std::endl;
+ 
+@@ -582,8 +582,8 @@ void Simulation::draw( QPainter& painter ) {
+     // for(int x=0;x<_width;++x){
+         // for(int y=0;y<_height;++y)
+     {
+-        int x = *idx % _height;
+-        int y = *idx / _width;
++        int x = *idx % _width;
++        int y = *idx / _height;
+ 
+         assert(y*_width+x==*idx);
+ 
+-- 
+2.8.2
+
