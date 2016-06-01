@@ -20,6 +20,7 @@ private:
     std::vector<UINT16> _data;
 
     double _minH, _maxH;
+    bool _initialized;
 
 public:
     UnitSquareMapping();
@@ -33,6 +34,8 @@ public:
 
 		for (int i = 0; i < 512 * 424; ++i)
 			_data[i] = data[i];
+
+        _initialized=true;
     }
 
     inline bool isInside(const int x, const int y)
@@ -131,6 +134,8 @@ public:
     {
         return toParameterization(Point2d(x,y));
     }
+
+    inline bool initialized() const { return _initialized; }
 
     inline Point2d paramGrad(const Point2d &p) const
     {

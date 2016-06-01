@@ -9,7 +9,8 @@
 
 #include "Point2.hpp"
 #include "UnitSquareMapping.hpp"
-#include "Drop.hpp"
+#include "Simulation.hpp"
+#include "Grid.hpp"
 
 class QTimer;
 
@@ -22,6 +23,8 @@ public:
 
 signals:
     void gameTextureChanged(const QImage &img);
+    void rangeChanged(const float, const float,
+                      const float, const float);
 
 private slots:
     void updateGame();
@@ -42,7 +45,6 @@ public:
     void updateTexture();
 
 private:
-    std::vector<Drop *> _drops;
     int _minH, _maxH;
     
     bool _playing;
@@ -50,6 +52,9 @@ private:
 
     QTimer *_gameTimer;
     QImage _image;
+
+    Simulation *_simulation;
+    Grid *_grid;
 };
 #endif
 

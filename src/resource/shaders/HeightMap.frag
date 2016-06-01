@@ -29,6 +29,12 @@ uniform sampler2D level4;
 
 uniform sampler2D gameTexture;
 
+// min and max values for Water and Terrain
+uniform float maxW;
+uniform float minW;
+uniform float maxS;
+uniform float minS;
+
 
 float weight(float heightV, int region)
 {
@@ -103,13 +109,20 @@ void main()
 #endif
 
     heightV=(heightV-minH)/(maxH-minH);
+
+    
+
     heightV=min(1.0,heightV);
     heightV=max(0.0,heightV);
 
 #ifndef NO_KINECT
     heightV=1-heightV;
 #endif
+    
 
+    // red channel holds sediment amount
+    // TODO: rescale back
+    heightV += gameTxt.r * (maxS - minS) + minS;
 
     vec2 txt=gl_TexCoord[1].xy/gl_TexCoord[1].z;
 
@@ -120,6 +133,8 @@ void main()
     vec4 level3Txt = texture2D(level3, txt);
     vec4 level4Txt = texture2D(level4, txt);
 
+    vec4 waterColor = level0Txt;
+
     vec4 bgCol=
     weight(heightV,0)*level0Txt+
     weight(heightV,1)*level1Txt+
@@ -127,8 +142,15 @@ void main()
     weight(heightV,3)*level3Txt+
     weight(heightV,4)*level4Txt;
 
-    gl_FragColor = gameTxt.a*vec4(0.0, 0.0, gameTxt.b, 1.0)+(1.0-gameTxt.a)*bgCol;
+    // TODO: rescale back
+    float waterHeight = (gameTxt.b * (maxW - minW) + minW)*1000.0;
+    waterHeight = min(waterHeight, 1.0);
+    waterHeight = max(waterHeight, 0.0);
+    
+    gl_FragColor = bgCol * (1.0 - waterHeight) + waterColor * waterHeight;
+    // gl_FragColor = vec4(0,0,1,gameTxt.a);
 
+    // gl_FragColor = vec4(gameTxt.a,0,0,1);
     // isolines
     // float isoH = 0.0025;
     // for ( int i=0; i<10; i++) {

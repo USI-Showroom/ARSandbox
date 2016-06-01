@@ -35,6 +35,8 @@ _corner0(":/interaction/0"), _corner1(":/interaction/1"), _corner2(":/interactio
 
     _saveNextMesh=false;
 
+    _dispHeigh = 0.0f;
+
     _currentCorner=4;
 
     _initialized=false;
@@ -57,7 +59,8 @@ MainView::~MainView()
     if(_gameTexture>0)
         glDeleteTextures(1, &_gameTexture);
 }
-
+// n field (pari)
+// 
 void MainView::setUniforms()
 {
     GLuint gameT = _shader.uniformLocation("gameTexture");
@@ -65,6 +68,10 @@ void MainView::setUniforms()
     GLuint minHT = _shader.uniformLocation("minH");
     GLuint maxHT = _shader.uniformLocation("maxH");
 
+    GLuint maxW = _shader.uniformLocation("maxW");
+    GLuint minW = _shader.uniformLocation("minW");
+    GLuint maxS = _shader.uniformLocation("maxS");
+    GLuint minS = _shader.uniformLocation("minS");
 
     GLuint heightT[nSmoothing];
     for(int i=0; i<nSmoothing; ++i) {
@@ -95,7 +102,15 @@ void MainView::setUniforms()
     _shader.setUniformValue(minHT,_minH);
     _shader.setUniformValue(maxHT,_maxH);
 
+    // setting 
+    _shader.setUniformValue(maxW, _maxW);
+    _shader.setUniformValue(minW, _minW);
+    _shader.setUniformValue(maxS, _maxS);
+    _shader.setUniformValue(minS, _minS);
+
     checkGLError("setUniforms");
+
+    //_shader.setUniformValue(<nome field>)
 }
 
 void MainView::initializeGL() {
@@ -753,4 +768,12 @@ void MainView::loadState()
 
     file.close();
 
+}
+
+void MainView::rangeChanged(const float minWater, const float maxWater, const float minSediment, const float maxSediment)
+{
+    _minW = minWater;
+    _maxW = maxWater;
+    _minS = minSediment;
+    _maxS = maxSediment;
 }

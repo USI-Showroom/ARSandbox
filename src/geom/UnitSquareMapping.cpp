@@ -4,11 +4,12 @@
 #include <iostream>
 
 UnitSquareMapping::UnitSquareMapping()
-	: _data(512 * 424)
-{ }
+	: _data(512 * 424), _initialized(false)
+{
+}
 
 UnitSquareMapping::UnitSquareMapping(const Point2d &txt0, const Point2d &txt1, const Point2d &txt2, const Point2d &txt3)
-	: _data(512 * 424)
+	: _data(512 * 424), _initialized(false)
 {
     _p0=Point2d(txt0.x()*512,(txt0.y())*424);
     _p1=Point2d(txt1.x()*512,(txt1.y())*424);

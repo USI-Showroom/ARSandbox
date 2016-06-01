@@ -24,13 +24,16 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nDrops=720;
+static const int simulationSize = 120;
 
 GameManager::GameManager()
-: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32)
+: _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
+  _simulation(new Simulation(simulationSize, simulationSize, _mapping)),
+  _grid(new Grid(simulationSize, &_mapping))
 {
     _playing=false;
     _image.fill(QColor(0,0,0,0));
+    _simulation->setGrid(_grid);
 }
 
 GameManager::~GameManager()
@@ -38,8 +41,8 @@ GameManager::~GameManager()
     if(_gameTimer)
         _gameTimer->stop();
 
-    for(size_t i=0;i<_drops.size();++i)
-        delete _drops[i];
+    delete _simulation;
+    delete _grid;
 }
 
 void GameManager::updateTexture()
@@ -68,33 +71,22 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH,
 
 	if (_playing)
     {
-        _drops.resize(nDrops);
-		for (int i = 0; i < nDrops; ++i)
-        {
-#ifdef DEBUG
-            std::cout << "(" << i << ") new drop" << std::endl;
-#endif
-			_drops[i] = new Drop(0.4, 0.7);
-        }
-
         _gameTimer->start(100);
 	}
     else
     {
-        for(size_t i=0;i<_drops.size();++i)
-        {
-            delete _drops[i];
-        }
-        
-        _drops.clear();
         _gameTimer->stop();
-        //_image.fill(QColor(0, 0, 0, 0));
-        //updateTexture();   
+        _image.fill(QColor(0, 0, 0, 0));
     }
 }
 
 void GameManager::keyPress(const int key)
-{ }
+{
+    switch(key) {
+        case Qt::Key_R: _simulation->toggleRain(); std::cout << "here" << std::endl;
+        default: return;
+    }
+}
 
 void GameManager::mousePress(const int x, const int y,  const int w, const int h)
 {
@@ -108,15 +100,16 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     std::cout << "mouse press: " << normalisedX << " " << normalisedY << std::endl;
 #endif
 
-    for(size_t i = 0; i <_drops.size(); ++i)
-    {
-        Drop& theDrop = *_drops[i];
-        theDrop.setPosition(normalisedX + RADIUS * cos(i), normalisedY + RADIUS * sin(i));
+    // convert to grid cell
+    int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
+
+    double amount = 0.15;
+    _simulation->addWaterSource( gridIndex, amount );
+
 #ifdef DEBUG
-        std::cout << "new drop position: " << theDrop.position() << std::endl;
+    std::cout << "Computed grid index: " << gridIndex << std::endl;
+    std::cout << " Water amount " << amount << " added at cell " << gridIndex << std::endl;
 #endif
-        theDrop.setAlive();
-    }
 }
 
 void GameManager::mouseMove(const int x, const int y,  const int w, const int h)
@@ -134,39 +127,16 @@ void GameManager::initialize()
 }
 
 void GameManager::updateGame()
-{	
+{
+    _image.fill(QColor(0, 0, 0, 0));
+
     QPainter painter;
     painter.begin(&_image);
 
-    for(size_t i = 0; i <_drops.size(); ++i)
-    {
-        Drop& d = *_drops[i];
-
-        if(d.alive())
-        {
-            d.update(_mapping);
-            
-            Point2d p=_mapping.fromParameterization(d.position());
-            p.y() = imgHeight - p.y();
-
-            if (p.y() == imgHeight)
-                --p.y();
-            assert(p.y() >= 0);
-            assert(p.y() < imgHeight);
-
-            p*=scaling;
-
-            painter.setRenderHint(QPainter::Antialiasing, true);
-            
-            QPen pen(Qt::blue, 2);
-            painter.setPen(pen);
-            
-            QBrush brush(Qt::blue);
-            painter.setBrush(brush);
-
-            painter.drawEllipse(QPointF(p.x(), p.y()), 5, 5);
-        }
-    }
+    _simulation->update(1000.0/(60));
+    emit rangeChanged((float)_simulation->_minW, (float)_simulation->_maxW,
+                      (float)_simulation->_minS, (float)_simulation->_maxS);
+    _simulation->draw(painter);
 
     painter.end();
     updateTexture();
