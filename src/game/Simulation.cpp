@@ -385,7 +385,7 @@ void Simulation::updateWaterSurface( double dt ) {
         // simulate evaporation
         d2 *= ( 1 - Ke * dt );
 
-        _water[y * _width + x] = d2;
+        _water[y * _width + x] = std::max(0.0,d2);
 
         ++idx;
     }
@@ -482,13 +482,16 @@ void Simulation::updateWaterSurface( double dt ) {
         std::cout << "\nActive cells list size: " << active_cells.size();
     }
 
-    if (active_cells.size() > 0) {
-        std::cout << "\nPrinting active cells WATER heights:" << std::endl;
-        for (auto it = active_cells.begin(); it != active_cells.end(); ++it) {
-            std::cout << *it <<", "<< _water.at(*it) << ", ";
-        }
-        std::cout << "\n";
+
+    std::cout << "\nPrinting active cells WATER heights:" << std::endl;
+    for (auto it = active_cells.begin(); it != active_cells.end(); ++it) {
+        std::cout << *it <<", "<< _water.at(*it) << ", ";
     }
+    std::cout << "\n";    
+
+    //if (_min)
+    std::cout << "minW, maxW: " << _minW << ", "<< _maxW << std::endl;
+    std::cout << "minS, maxS: " << _minS << ", "<< _maxS << std::endl;
 }
 
 std::vector<int> Simulation::getNeighbors(const int index) {
@@ -546,9 +549,6 @@ void Simulation::addWaterSource( const int cellIndex, const double amount ) {
         active_cells.insert(neighbors.at(i));        
         _water[neighbors.at(i)] = amount;
     }
-#ifdef DEBUG
-    std::cout << "\n";
-#endif
 
 #ifdef DEBUG
     std::cout << "\nadded water at cell " << cellIndex << " and his neighbors ";

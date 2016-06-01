@@ -118,7 +118,7 @@ void main()
 #ifndef NO_KINECT
     heightV=1-heightV;
 #endif
-    vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
+    
 
     // red channel holds sediment amount
     // TODO: rescale back
@@ -133,6 +133,8 @@ void main()
     vec4 level3Txt = texture2D(level3, txt);
     vec4 level4Txt = texture2D(level4, txt);
 
+    vec4 waterColor = level0Txt;
+
     vec4 bgCol=
     weight(heightV,0)*level0Txt+
     weight(heightV,1)*level1Txt+
@@ -141,7 +143,7 @@ void main()
     weight(heightV,4)*level4Txt;
 
     // TODO: rescale back
-    float waterHeight = gameTxt.b * (maxW - minW) + minW;
+    float waterHeight = (gameTxt.b * (maxW - minW) + minW)*1000.0;
     waterHeight = min(waterHeight, 1.0);
     waterHeight = max(waterHeight, 0.0);
     
