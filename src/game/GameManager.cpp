@@ -103,7 +103,7 @@ void GameManager::mousePress(const int x, const int y,  const int w, const int h
     // convert to grid cell
     int gridIndex = _grid->getCellIndex(normalisedX, normalisedY);
 
-    double amount = 2.00;
+    double amount = 0.2;
     _simulation->addWaterSource( gridIndex, amount );
 
 #ifdef DEBUG
