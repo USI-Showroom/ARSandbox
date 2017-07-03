@@ -21,11 +21,13 @@ You need:
 
 ## User Manual ##
 
+Remember to turn off stereo mode from the projector's menu
+
 ### Common keys ###
 * ESC         exit
 * P           save mesh/point cloud
 * F5          toggle set-up mode
-* -           turn off visualisation and show only sand
+* -<minus>    turn off visualisation and show only sand
 
   
 ### In set-up mode ###
