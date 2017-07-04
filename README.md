@@ -54,3 +54,10 @@ Remember to turn off stereo mode from the projector's menu
 
 * U/J         increase/decrease the minimum height
 * I/K         increase/decrease the maximum height
+
+# Setup @ USI #
+
+Better to turn on the computer without the kinect plugged, and plug it on the back bottom ports.
+ 
+In case of warning message for the kinect (device not recognised) unplug the kinect, restart the machine, wait that is all loaded (slow) and plug the kinect on one of the bottom usb 3 ports (blue).
+Repeat if necessary, until convergence
