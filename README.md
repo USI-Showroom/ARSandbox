@@ -57,7 +57,7 @@ Remember to turn off stereo mode from the projector's menu
 
 # Setup @ USI #
 
-When mounting the projector, plug the cables first then pass them on the hole on the top. Carefull with the dvi, it goes on the mono port.
+When mounting the projector, plug the cables first then pass them on the hole on the top. Careful with the dvi, it goes on the mono port.
 
 Better to turn on the computer without the kinect plugged, and plug it on the back bottom ports.
  
