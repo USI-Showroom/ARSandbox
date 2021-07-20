@@ -1,39 +1,80 @@
-# README #
-
-## What is this repository for? ##
-
+## What is this repository for?
 Virtual 3D sandbox project
 
-## How do I get set up? ##
 
+## How do I get set up?
 You need:
 
-* Cmake
+* C++ compiler
+* cmake
+* Qt5
+* OpenCV
+* Kinect v2 SDK
 
-* Qt5, for Mac/Unix use a package manager (eg., macports, yum, apt-get, etc...), for Windows download Qt5.5 from http://www.qt.io/download/ and install in C:\
-
-* On Window, you need the kinect v2 sdk https://www.microsoft.com/en-us/download/details.aspx?id=44561
-
-* Modify src/resource/shaders/HeightMap.frag by commenting/uncommenting the first two lines if you have the kinect and you machine supports new shaders
-
-* On windows the kinect is enable by default, if you don't have one, define the macro NO_KINECT
+Notes:
+* You can modify `src/resource/shaders/HeightMap.frag` by commenting/uncommenting the first two lines if you have the Kinect and your machine supports new shaders
+* On windows the Kinect is enabled by default; if you don't have one, define the macro `NO_KINECT`
 
 
-## User Manual ##
+### Linux
+* `sudo apt install cmake`
+* `sudo apt install qt5-default`
+* Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/)
 
-Remember to turn off stereo mode from the projector's menu
+### Mac
+* Install XCode from the Apple Store and 
+* Install [homebrew](https://brew.sh/)
+* Install dependencies with homebrew: `brew install cmake qt opencv`
+* Add Qt to PATH: `echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bashrc` or `echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc` depending on your shell
+ 
+### Windows
+* Install Visual Studio (the community version is free) to obtain the C++ compiler. Select "Desktop development"
+* Download and install cmake from its [official website](https://cmake.org/download/)
+* Download Qt5 from the [official website](https://www.qt.io/download/). Choose the Open Source version, install it in `C:\`
+* Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/) and extract in `C:\`
+* Download and install the [Kinect 2.0 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
+* Set the enviromement variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019_64`)
+* Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019_64\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
 
-### Common keys ###
+
+## Compiling
+Use cmake to generate a makefile (on Linux and Mac), or a Visual Studio project (on Windows).
+
+### Linux/Mac
+* `mkdir bin`
+* `cd bin`
+* `cmake ..`
+* `make`
+* `./ARSandBox`
+
+### Windows
+* Open the cmake GUI
+* Under "Where is the source code", select the root folder of the project
+* Under "Where to build the binaries" select the bin folder in the root directory
+* Click "Configure" and choose your version of Visual Studio
+* Click "Generate" until there are no more red lines to generate the Visual Studio Solution
+* Click "Open Project" to open it
+* In Visual Studio, choose "Release" instead of "Debug"
+* Under "Build" choose "Build solution"
+* Run `bin\Release\ARSandBox.exe`
+
+Note: if it complains about missing DLLs, check that you added the correct folders to PATH
+or copy them over from the Qt folder
+
+
+## Run @ USI
+See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/docs/ARSandBox_manual_ITA.pdf)
+
+
+## Common keys
 * ESC         exit
 * P           save mesh/point cloud
 * F5          toggle set-up mode
-* -<minus>    turn off visualisation and show only sand
+* -<minus>    turn off visualization and show only sand
 
   
-### In set-up mode ###
-
+### In set-up mode
 * Shift       slower movement
-
 
 * F1          terrain 1
 * F2          terrain 2
@@ -43,23 +84,12 @@ Remember to turn off stereo mode from the projector's menu
 * 5           scale
 * 6           move
 
-* W/A/S/D        move the current selection in the 4 directions
+* W/A/S/D     move the current selection in the 4 directions
 
 * Space       toggle Kinect calibration/projector calibration
-
-
 
 * 9           save current calibration to disk
 * 0           load calibration from disk
 
 * U/J         increase/decrease the minimum height
 * I/K         increase/decrease the maximum height
-
-# Setup @ USI #
-
-When mounting the projector, plug the cables first then pass them on the hole on the top. Careful with the dvi, it goes on the mono port.
-
-Better to turn on the computer without the kinect plugged, and plug it on the back bottom ports.
- 
-In case of warning message for the kinect (device not recognised) unplug the kinect, restart the machine, wait that is all loaded (slow) and plug the kinect on one of the bottom usb 3 ports (blue).
-Repeat if necessary, until convergence
