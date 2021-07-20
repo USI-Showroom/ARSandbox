@@ -33,7 +33,7 @@ Notes:
 * Download Qt5 from the [official website](https://www.qt.io/download/). Choose the Open Source version, install it in `C:\`
 * Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/) and extract in `C:\`
 * Download and install the [Kinect 2.0 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
-* Set the enviromement variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019_64`)
+* Set the environment variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019_64`)
 * Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019_64\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
 
 
@@ -55,7 +55,7 @@ Use cmake to generate a makefile (on Linux and Mac), or a Visual Studio project 
 * Click "Generate" until there are no more red lines to generate the Visual Studio Solution
 * Click "Open Project" to open it
 * In Visual Studio, choose "Release" instead of "Debug"
-* Under "Build" choose "Build solution"
+* Under "Build" choose "Build Solution"
 * Run `bin\Release\ARSandBox.exe`
 
 Note: if it complains about missing DLLs, check that you added the correct folders to PATH

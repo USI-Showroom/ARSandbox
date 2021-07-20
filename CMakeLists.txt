@@ -4,7 +4,7 @@ project(ARSandBox)
 
 
 IF(WIN32)
-	SET(CMAKE_PREFIX_PATH "C:\\Qt\\5.5\\msvc2013")
+	SET(CMAKE_PREFIX_PATH "ENV{QT_PATH}")
 ENDIF()
 
 
