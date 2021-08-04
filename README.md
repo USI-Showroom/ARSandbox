@@ -22,7 +22,7 @@ Notes:
 * Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/)
 
 ### Mac
-* Install XCode from the Apple Store and 
+* Install XCode from the Apple Store
 * Install [homebrew](https://brew.sh/)
 * Install dependencies with homebrew: `brew install cmake qt opencv`
 * Add Qt to PATH: `echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bashrc` or `echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc` depending on your shell
@@ -58,8 +58,8 @@ Use cmake to generate a makefile (on Linux and Mac), or a Visual Studio project 
 * Under "Build" choose "Build Solution"
 * Run `bin\Release\ARSandBox.exe`
 
-Note: if it complains about missing DLLs, check that you added the correct folders to PATH
-or copy them over from the Qt folder
+Note: if you get errors about certain DLLs, delete those in the `bin\Release` folder and
+run `windeployqt ARSandBox.exe` in there
 
 
 ## Run @ USI
@@ -84,7 +84,7 @@ See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/d
 * 5           scale
 * 6           move
 
-* W/A/S/D     move the current selection in the 4 directions
+* W/A/S/D     move the current selection in the four directions
 
 * Space       toggle Kinect calibration/projector calibration
 

@@ -1,0 +1,100 @@
+\documentclass[12pt]{article}
+\usepackage[margin=2cm]{geometry} 
+\usepackage{titling}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage[italian]{babel}
+\usepackage{subcaption}
+
+\setlength\parindent{0pt}
+\setlength{\parskip}{1em}
+\setlength{\droptitle}{-2cm}
+
+\title{Istruzioni d'uso AR Sandbox (ad uso interno)}
+\author{Università della Svizzera italiana}
+\date{Versione \today}
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+
+\section{Installazione}\label{installation}	
+
+	\subsection{Componenti}
+	
+		\begin{itemize}
+			\item PC
+			\item Cavo DVI lungo e 2x cavo alimentazione
+			\item Proiettore
+			\item Kinect v2
+			\item Materiale di montaggio Kinect e proiettore
+			\item (opzionale) Altoparlanti
+		\end{itemize}
+		
+		
+	\subsection{Montaggio}
+	
+		\begin{enumerate}
+			\item Collegare l'alimentazione e il cavo DVI al proiettore (entrata MONO 2D)
+			\item Montare il proiettore sull'apposito supporto e far passare i cavi
+			nell'apertura
+			\item Montare il Kinect sul supporto dedicato e far passare il cavo nell'apertura
+			\item Collegare l'alimentazione e il cavo DVI al PC, ed eventualmente gli altoparlanti
+			\item Collegare l'alimentazione del Kinect e il cavo USB (blu) ad una porta USB 3.0 (blu) del PC
+		\end{enumerate}
+		
+		
+	\subsection{Avvio}
+
+		Accendere il proiettore, dopodiché avviare il PC e cliccare sul collegamento
+		\texttt{ARSandBox} sul Desktop. Controllare che il proiettore \textbf{non} sia in modalità 3D
+		(menu $\rightarrow$ stereo $\rightarrow$ stereo mode).
+		
+		
+\newpage
+\section{Utilizzo}
+
+	\subsection{Tasti utili}
+	
+	\begin{tabular}{l l}
+		ESC & exit\\
+		P & save mesh/point cloud\\
+		F5 & toggle set-up mode\\
+		- & turn off visualization and show only sand\\
+	\end{tabular}
+
+	In modalità set-up
+
+	\begin{tabular}{l l}
+		Shift & slower movement\\
+
+		F1 & terrain 1\\
+		F2 & terrain 2\\
+		F3 & terrain 3\\
+
+		1/2/3/4 & select corners\\
+		5 & scale\\
+		6 & move\\
+
+		W/A/S/D & move the current selection in the four directions\\
+
+		Space & toggle Kinect calibration/projector calibration\\
+
+		9 & save current calibration to disk\\
+		0 & load calibration from disk\\
+
+		U/J & increase/decrease the minimum height\\
+		I/K & increase/decrease the maximum height\\
+	\end{tabular}
+		
+		
+\section{Codice sorgente}
+
+	Il codice sorgente dell'applicazione, assieme alle istruzioni per compilarla, si trova alla pagina \url{https://github.com/USI-Showroom/ARSandbox}.
+		
+	
+\end{document}
