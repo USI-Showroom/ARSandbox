@@ -70,26 +70,26 @@ See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/d
 `ESC`:         exit\
 `P`:           save mesh/point cloud\
 `F5`:          toggle set-up mode\
-`-`:           turn off visualization and show only sand\
+`-`:           turn off visualization and show only sand
 
   
 ### In set-up mode
-`Shift`:       slower movement\
+`Shift`:       slower movement
 
 `F1`:          terrain 1\
 `F2`:          terrain 2\
-`F3`:          terrain 3\
+`F3`:          terrain 3
 
 `1/2/3/4`:     select corners\
 `5`:           scale\
-`6`:           move\
+`6`:           move
 
-`W/A/S/D`:     move the current selection in the four directions\
+`W/A/S/D`:     move the current selection in the four directions
 
-`Space`:       toggle Kinect calibration/projector calibration\
+`Space`:       toggle Kinect calibration/projector calibration
 
 `9`:           save current calibration to disk\
-`0`:           load calibration from disk\
+`0`:           load calibration from disk
 
 `U/J`:         increase/decrease the minimum height\
 `I/K`:         increase/decrease the maximum height
