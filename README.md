@@ -33,8 +33,8 @@ Notes:
 * Download Qt5 from the [official website](https://www.qt.io/download/). Choose the Open Source version, install it in `C:\`
 * Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/) and extract in `C:\`
 * Download and install the [Kinect 2.0 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
-* Set the environment variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019_64`)
-* Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019_64\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
+* Set the environment variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019`)
+* Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
 
 
 ## Compiling
@@ -63,33 +63,33 @@ run `windeployqt ARSandBox.exe` in there
 
 
 ## Run @ USI
-See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/docs/ARSandBox_manual_ITA.pdf)
+See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/docs/ARSandBox_Manual_ITA.pdf)
 
 
 ## Common keys
-* ESC         exit
-* P           save mesh/point cloud
-* F5          toggle set-up mode
-* -<minus>    turn off visualization and show only sand
+`ESC`:         exit\
+`P`:           save mesh/point cloud\
+`F5`:          toggle set-up mode\
+`-`:           turn off visualization and show only sand\
 
   
 ### In set-up mode
-* Shift       slower movement
+`Shift`:       slower movement\
 
-* F1          terrain 1
-* F2          terrain 2
-* F3          terrain 3
+`F1`:          terrain 1\
+`F2`:          terrain 2\
+`F3`:          terrain 3\
 
-* 1/2/3/4     select corners
-* 5           scale
-* 6           move
+`1/2/3/4`:     select corners\
+`5`:           scale\
+`6`:           move\
 
-* W/A/S/D     move the current selection in the four directions
+`W/A/S/D`:     move the current selection in the four directions\
 
-* Space       toggle Kinect calibration/projector calibration
+`Space`:       toggle Kinect calibration/projector calibration\
 
-* 9           save current calibration to disk
-* 0           load calibration from disk
+`9`:           save current calibration to disk\
+`0`:           load calibration from disk\
 
-* U/J         increase/decrease the minimum height
-* I/K         increase/decrease the maximum height
+`U/J`:         increase/decrease the minimum height\
+`I/K`:         increase/decrease the maximum height
