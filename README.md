@@ -33,8 +33,8 @@ Notes:
 * Download Qt5 from the [official website](https://www.qt.io/download/). Choose the Open Source version, install it in `C:\`
 * Download OpenCV from their [Sourceforge page](https://sourceforge.net/projects/opencvlibrary/) and extract in `C:\`
 * Download and install the [Kinect 2.0 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
-* Set the environment variable `QT_PATH` to the installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019`)
-* Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
+* Set the environment variable `Qt5_DIR` to the x64 installation of Qt (e.g. `C:\Qt\5.15.0\msvc2019_64`)
+* Add the Qt and OpenCV bin folders (e.g. `C:\Qt\5.15.0\msvc2019_64\bin` and `C:\opencv\build\x64\vc15\bin`) to PATH and reboot your machine
 
 
 ## Compiling
@@ -69,11 +69,11 @@ See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/d
 ## Common keys
 `ESC`:         exit\
 `P`:           save mesh/point cloud\
-`F5`:          toggle set-up mode\
+`F5`:          exit setup mode\
 `-`:           turn off visualization and show only sand
 
   
-### In set-up mode
+### In setup mode
 `Shift`:       slower movement
 
 `F1`:          terrain 1\
