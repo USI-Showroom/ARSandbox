@@ -44,7 +44,7 @@
 			nell'apertura
 			\item Montare il Kinect sul supporto dedicato e far passare il cavo nell'apertura
 			\item Collegare l'alimentazione e il cavo DVI al PC, ed eventualmente gli altoparlanti
-			\item Collegare l'alimentazione del Kinect e il cavo USB (blu) ad una porta USB 3.0 (blu) del PC
+			\item Collegare il Kinect al suo adattatore e quest'ultimo all'alimentazione e ad una porta USB 3.0 (blu) del PC
 		\end{enumerate}
 
 		\begin{figure}[H]
@@ -62,12 +62,21 @@
 		
 	\subsection{Avvio}
 
-		Accendere il proiettore, dopodiché avviare il PC e cliccare sul collegamento
-		\texttt{ARSandBox} sul Desktop. Controllare che il proiettore \textbf{non} sia in modalità 3D
-		(menu $\rightarrow$ stereo $\rightarrow$ stereo mode).\\
+		Accendere il proiettore, dopodiché avviare il PC e attendere l'avvio automatico del software.
+		Per avviare il software manualmente è possibile cliccare sul collegamento
+		\texttt{ARSandBox} sul Desktop.\\
 
-		Se l'immagine dovesse essere calibrata correttamente (con spazio è possibile vedere 
-		un'anteprima), premere F5 per uscire dalla modalità setup.
+		Una volta aperto il software, premere il tasto 0 per caricare l'ultima configurazione salvata e
+		Spazio per vedere un'anteprima. È possibile regolare l'immagine con i comandi descritti
+		al capitolo \ref{sec:commands}. Per uscire dalla modalità setup, premere F5.\\
+
+		NOTA: il terreno con le mucche (selezionato di default) è molto pesante e può fare crashare l'applicazione.
+		In caso dovesse succedere, in modalità setup è possibile selezionare con F3 un altro terreno simile
+		ma più leggero.
+		
+		In caso l'immagine sia di cattiva qualità, controllare
+		che il proiettore \textbf{non} sia in modalità 3D (menu $\rightarrow$ stereo $\rightarrow$ stereo mode).\\
+
 
 	\subsection{Spegnimento}
 		
@@ -77,8 +86,13 @@
 		
 		
 \section{Utilizzo}
+		
+	Il programma riconosce dinamicamente, grazie al sensore Kinect, i cambiamenti di altezza della sabbia
+	e adatta automaticamente l'immagine proiettata. Gli animali (mucche o pesci, a dipendenza del terreno
+	selezionato) camminano unicamente sulle superfici dov'è possibile, anch'essi adattandosi all'ambiente
+	che li circonda.
 
-	\subsection{Tasti utili}
+	\subsection{Tasti utili}\label{sec:commands}
 	
 	\begin{tabular}{l l}
 		ESC & esci\\
@@ -92,9 +106,9 @@
 	\begin{tabular}{l l}
 		Shift & movimento più lento\\
 
-		F1 & terreno 1\\
-		F2 & terreno 2\\
-		F3 & terreno 3\\
+		F1 & terreno 1 (montagne con mucche)\\
+		F2 & terreno 2 (lava)\\
+		F3 & terreno 3 (pianure con pesci)\\
 
 		1/2/3/4 & seleziona angoli\\
 		5 & ridimensiona terreno\\
@@ -102,7 +116,7 @@
 
 		W/A/S/D & sposta il terreno nella direzione corrispondente\\
 
-		Space & entra in modalità calibrazione Kinect/proiettore\\
+		Space & entra in modalità anteprima\\
 
 		9 & salva calibrazione su disco\\
 		0 & carica calibrazione dal disco\\
@@ -112,7 +126,7 @@
 	\end{tabular}
 		
 		
-\section{Codice sorgente}
+\section{Codice sorgente}\label{sec:code}
 
 	Il codice sorgente dell'applicazione, assieme alle istruzioni per compilarla, si trova alla pagina \url{https://github.com/USI-Showroom/ARSandbox}.
 		
