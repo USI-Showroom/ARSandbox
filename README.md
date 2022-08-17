@@ -1,5 +1,9 @@
 # Virtual 3D sandbox project
 
+## Before starting
+
+**NEVER** connect the PC to the internet due to conflict between Windows update and Kinect operation!!
+
 ## How do I get set up?
 
 You need:
