@@ -22,7 +22,7 @@ static const int scaling=3;
 static const int scaling=7;
 #endif
 
-static int nAnimals=50;
+static int nAnimals=40;
 
 GameManager::GameManager()
 : _image(imgWidth*scaling, imgHeight*scaling, QImage::Format_ARGB32),
@@ -85,10 +85,10 @@ void GameManager::toggleSetupMode(const bool isSetup, const int minH, const int 
 			_textureImgWidth = 3;
 
 			for (int i = 0; i < nAnimals; ++i)
-				_animals[i] = new Animal(0.4, 0.7, true);
+				_animals[i] = new Animal(0.4, 0.7, false);
 
 #ifndef NO_KINECT
-			_sound.play();
+			//_sound.play();
 #endif
 			break;
 		}
