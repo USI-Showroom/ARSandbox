@@ -71,7 +71,7 @@ run `windeployqt ARSandBox.exe` in there
 
 ## Run @ USI
 
-See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/docs/ARSandBox_Manual_ITA.pdf)
+See [these instructions](https://github.com/USI-Showroom/ARSandBox/blob/master/docs/ARSandBox_Manual_ENG.pdf)
 
 ## Common keys
 
